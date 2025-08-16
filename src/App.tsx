@@ -1,18 +1,17 @@
-import './App.css'
-import { useTranslation } from 'react-i18next';
+import { Outlet } from 'react-router';
+import { Layout } from 'antd';
+import Header from './components/layout/Header';
+import BreacdCrumb from './components/common/BreacdCrumb';
 
 function App() {
-  const { t, i18n } = useTranslation();
-
   return (
-    <>
-      <h1>{t("HELLO")}</h1>
-      <div className="card">
-        <button onClick={() => i18n.changeLanguage(i18n.language === "tr" ? "en" : "tr")}>
-          Dili değiştir ({i18n.language})
-        </button>
-      </div>
-    </>
+    <Layout>
+     <Header />
+      <Layout.Content>
+        <BreacdCrumb />
+        <Outlet />
+      </Layout.Content>
+    </Layout>
   )
 }
 
