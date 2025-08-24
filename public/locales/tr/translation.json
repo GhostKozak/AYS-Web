@@ -1,3 +1,68 @@
 {
-  "HELLO": "Merhaba Dünya"
+  "HELLO": "Merhaba Dünya",
+  "Breadcrumbs" : {
+    "DASHBOARD": "Gösterge Paneli",
+    "LOGIN": "Giriş Yap",
+    "COMPANIES": "Şirketler",
+    "DRIVERS": "Sürücüler",
+    "VEHICLES": "Araçlar",
+    "TRIPS": "Yolculuklar"
+  },
+  "Companies": {
+    "COMPANY_NAME": "Şirket Adı",
+    "CREATED_AT": "Oluşturulma Tarihi",
+    "UPDATED_AT": "Güncellenme Tarihi",
+    "STATUS": "Durum",
+    "ACTIONS": "İşlem",
+    "EDIT": "Düzenle",
+    "DELETE": "Sil",
+    "ACTIVE": "Aktif",
+    "PASSIVE": "Pasif"
+  },
+  "Drivers": {
+    "FULL_NAME": "Ad Soyad",
+    "PHONE_NUMBER": "Telefon Numarası",
+    "COMPANY_NAME": "Şirket Adı",
+    "CREATED_AT": "Oluşturulma Tarihi",
+    "UPDATED_AT": "Güncellenme Tarihi",
+    "STATUS": "Durum",
+    "ACTIONS": "İşlem",
+    "EDIT": "Düzenle",
+    "DELETE": "Sil",
+    "ACTIVE": "Aktif",
+    "PASSIVE": "Pasif"
+  },
+  "Vehicles": {
+    "LICENSE_PLATE": "Plaka",
+    "VEHICLE_TYPE": "Araç Tipi",
+    "CREATED_AT": "Oluşturulma Tarihi",
+    "UPDATED_AT": "Güncellenme Tarihi",
+    "STATUS": "Durum",
+    "ACTIONS": "İşlem",
+    "EDIT": "Düzenle",
+    "DELETE": "Sil",
+    "ACTIVE": "Aktif",
+    "PASSIVE": "Pasif"
+  },
+  "Trips": {
+    "ARRIVAL_TIME": "Varış Zamanı",
+    "FULL_NAME": "Ad Soyad",
+    "PHONE_NUMBER": "Telefon Numarası",
+    "COMPANY_NAME": "Şirket Adı",
+    "LICENSE_PLATE": "Plaka",
+    "UNLOAD_STATUS": "Boşaltma Durumu",
+    "TRIP_CANCELED": "Sefer İptali",
+    "CREATED_AT": "Oluşturulma Tarihi",
+    "UPDATED_AT": "Güncellenme Tarihi",
+    "STATUS": "Durum",
+    "ACTIONS": "İşlem",
+    "CANCEL": "İptal",
+    "EDIT": "Düzenle",
+    "DELETE": "Sil",
+    "ACTIVE": "Aktif",
+    "PASSIVE": "Pasif"
+  },
+  "Table": {
+    "NO_DATA": "Veri yok"
+  }
 }

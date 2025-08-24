@@ -1,3 +1,68 @@
 {
-  "HELLO": "HELLO WORLD"
+  "HELLO": "HELLO WORLD",
+  "Breadcrumbs" : {
+    "DASHBOARD": "Dashboard",
+    "LOGIN": "Login",
+    "COMPANIES": "Companies",
+    "DRIVERS": "Drivers",
+    "VEHICLES": "Vehicles",
+    "TRIPS": "Trips"
+  },
+  "Companies": {
+    "COMPANY_NAME": "Company Name",
+    "CREATED_AT": "Created At",
+    "UPDATED_AT": "Updated At",
+    "STATUS": "Status",
+    "ACTIONS": "Action",
+    "EDIT": "Edit",
+    "DELETE": "Delete",
+    "ACTIVE": "Active",
+    "PASSIVE": "Passive"
+  },
+  "Drivers": {
+    "FULL_NAME": "Full Name",
+    "PHONE_NUMBER": "Phone Number",
+    "COMPANY_NAME": "Company Name",
+    "CREATED_AT": "Created At",
+    "UPDATED_AT": "Updated At",
+    "STATUS": "Status",
+    "ACTIONS": "Action",
+    "EDIT": "Edit",
+    "DELETE": "Delete",
+    "ACTIVE": "Active",
+    "PASSIVE": "Passive"
+  },
+  "Vehicles": {
+    "LICENSE_PLATE": "License Plate",
+    "VEHICLE_TYPE": "Vehicle Type",
+    "CREATED_AT": "Created At",
+    "UPDATED_AT": "Updated At",
+    "STATUS": "Status",
+    "ACTIONS": "Action",
+    "EDIT": "Edit",
+    "DELETE": "Delete",
+    "ACTIVE": "Active",
+    "PASSIVE": "Passive"
+  },
+  "Trips": {
+    "ARRIVAL_TIME": "Arrival Time",
+    "FULL_NAME": "Full Name",
+    "PHONE_NUMBER": "Phone Number",
+    "COMPANY_NAME": "Company Name",
+    "LICENSE_PLATE": "License Plate",
+    "UNLOAD_STATUS": "Unloading Status",
+    "TRIP_CANCELED": "Trip Canceled",
+    "CREATED_AT": "Created At",
+    "UPDATED_AT": "Updated At",
+    "STATUS": "Status",
+    "ACTIONS": "Action",
+    "CANCEL": "Canceled",
+    "EDIT": "Edit",
+    "DELETE": "Delete",
+    "ACTIVE": "Active",
+    "PASSIVE": "Passive"
+  },
+  "Table": {
+    "NO_DATA": "No data"
+  }
 }
