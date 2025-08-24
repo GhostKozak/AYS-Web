@@ -179,7 +179,6 @@ function Trips() {
 
   return (
     <Layout style={{ padding: "0 50px" }}>
-      <div onClick={() => i18n.changeLanguage(i18n.language=="en" ? "tr" : "en")}>change lang</div>
       <Table 
         columns={columns} 
         dataSource={trips} 

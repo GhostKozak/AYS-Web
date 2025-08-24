@@ -1,9 +1,9 @@
-import { Breadcrumb } from 'antd'
+import { Breadcrumb as AntBreadcrumb } from 'antd'
 import { useLocation, Link } from 'react-router'
 import { HomeOutlined } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next';
 
-function BreacdCrumb() {
+function Breadcrumb() {
   
   const location = useLocation()
   
@@ -40,13 +40,13 @@ function BreacdCrumb() {
   ]
 
   return (
-    <Breadcrumb style={{ margin: '16px 0', padding: '0 50px' }}>
+    <AntBreadcrumb style={{ margin: '16px 0', padding: '0 50px' }}>
       {breadcrumbItems.map(item => (
-        <Breadcrumb.Item key={item.key}>
+        <AntBreadcrumb.Item key={item.key}>
           {item.title}
-        </Breadcrumb.Item>
+        </AntBreadcrumb.Item>
       ))}
-    </Breadcrumb>
+    </AntBreadcrumb>
   )
 }
 
@@ -65,4 +65,4 @@ function getSegmentTitle(segment: string): string {
   return titleMap[segment] || segment.charAt(0).toUpperCase() + segment.slice(1)
 }
 
-export default BreacdCrumb
+export default Breadcrumb

@@ -1,14 +1,14 @@
 import { Outlet } from 'react-router';
 import { Layout } from 'antd';
 import Header from './components/layout/Header';
-import BreacdCrumb from './components/common/BreacdCrumb';
+import Breadcrumb from './components/common/Breadcrumb';
 
 function App() {
   return (
     <Layout>
      <Header />
       <Layout.Content>
-        <BreacdCrumb />
+        <Breadcrumb />
         <Outlet />
       </Layout.Content>
     </Layout>
