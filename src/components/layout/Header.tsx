@@ -1,12 +1,14 @@
 import { Flex, Layout, Menu } from 'antd';
 import { Link } from 'react-router';
+import { CONFIG, ROUTES } from '../../constants';
 
 function Header() {
   return (
     <Layout.Header>
       <Flex justify='space-between'>
       <div className="logo">
-        Ulusal Araç Yönetim Sistemi
+      {CONFIG.APP_NAME} {/* Dinamik app name */}
+      {CONFIG.DEBUG && <span style={{ fontSize: '12px', marginLeft: '10px' }}>v{CONFIG.VERSION}</span>}
       </div>
       <Menu
         theme="dark"
@@ -15,23 +17,23 @@ function Header() {
         items={[
           {
             key: 'dashboard',
-            label: <Link to="/dashboard">Dashboard</Link>
+            label: <Link to={ROUTES.DASHBOARD}>Dashboard</Link>
           },
           {
             key: 'companies',
-            label: <Link to="/companies">Şirketler</Link>
+            label: <Link to={ROUTES.COMPANIES}>Şirketler</Link>
           },
           {
             key: 'drivers',
-            label: <Link to="/drivers">Sürücüler</Link>
+            label: <Link to={ROUTES.DRIVERS}>Sürücüler</Link>
           },
           {
             key: 'vehicles',
-            label: <Link to="/vehicles">Araçlar</Link>
+            label: <Link to={ROUTES.VEHICLES}>Araçlar</Link>
           },
           {
             key: 'trips',
-            label: <Link to="/trips">Seferler</Link>
+            label: <Link to={ROUTES.TRIPS}>Seferler</Link>
           }
         ]}
       />

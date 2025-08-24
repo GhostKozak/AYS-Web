@@ -3,6 +3,7 @@ import type { ColumnsType } from 'antd/es/table';
 import { useEffect, useState } from 'react';
 import apiClient from '../../api/apiClient';
 import { useTranslation } from 'react-i18next';
+import { API_ENDPOINTS } from '../../constants';
 
 function Trips() {
   const [trips, setTrips] = useState<TripType[]>([]);
@@ -162,7 +163,7 @@ function Trips() {
   const fetchTrips = async () => {
     try {
       setLoading(true);
-      const response = await apiClient.get('/trips');
+      const response = await apiClient.get(API_ENDPOINTS.TRIPS);
       setTrips(response.data.data);
       console.table(response.data.data)
     } catch (error) {

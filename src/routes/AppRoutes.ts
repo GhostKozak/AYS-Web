@@ -6,6 +6,7 @@ import Companies from '../pages/companies/Companies';
 import Drivers from '../pages/drivers/Drivers';
 import Vehicles from '../pages/vehicles/Vehicles';
 import Trips from '../pages/trips/Trips';
+import { ROUTES } from '../constants';
 
 function AppRoutes() {
   return createBrowserRouter([
@@ -18,27 +19,27 @@ function AppRoutes() {
           Component: DashboardPage,
         },
         {
-          path: "dashboard",
+          path: ROUTES.DASHBOARD,
           Component: DashboardPage,
         },
         {
-          path: "login",
+          path: ROUTES.LOGIN,
           Component: LoginPage,
         },
         {
-          path: "companies",
+          path: ROUTES.COMPANIES,
           Component: Companies
         },
         {
-          path: "drivers",
+          path: ROUTES.DRIVERS,
           Component: Drivers
         },
         {
-          path: "vehicles",
+          path: ROUTES.VEHICLES,
           Component: Vehicles
         },
         {
-          path: "trips",
+          path: ROUTES.TRIPS,
           Component: Trips
         },
       ],

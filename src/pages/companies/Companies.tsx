@@ -3,12 +3,13 @@ import type { ColumnsType } from 'antd/es/table';
 import { useEffect, useState } from 'react';
 import apiClient from '../../api/apiClient';
 import { useTranslation } from 'react-i18next';
+import { API_ENDPOINTS } from '../../constants';
 
 
 function Companies() {
   const [companies, setCompanies] = useState<CompanyType[]>([]);
   const [loading, setLoading] = useState(false);
-  const {t,i18n} = useTranslation();
+  const {t} = useTranslation();
 
   interface CompanyType {
     _id: string;
@@ -78,7 +79,7 @@ function Companies() {
   const fetchCompanies = async () => {
     try {
       setLoading(true);
-      const response = await apiClient.get('/companies');
+      const response = await apiClient.get(API_ENDPOINTS.COMPANIES);
       setCompanies(response.data.data);
     } catch (error) {
       console.error('Şirketler yüklenirken hata oluştu:', error);

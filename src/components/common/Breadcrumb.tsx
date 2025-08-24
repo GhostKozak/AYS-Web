@@ -2,6 +2,7 @@ import { Breadcrumb as AntBreadcrumb } from 'antd'
 import { useLocation, Link } from 'react-router'
 import { HomeOutlined } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next';
+import { ROUTES } from '../../constants';
 
 function Breadcrumb() {
   
@@ -54,12 +55,12 @@ function getSegmentTitle(segment: string): string {
   const { t } = useTranslation();
 
   const titleMap: Record<string, string> = {
-    'dashboard': t("Breadcrumbs.DASHBOARD"),
-    'login': t("Breadcrumbs.LOGIN"),
-    'companies': t("Breadcrumbs.COMPANIES"),
-    'drivers': t("Breadcrumbs.DRIVERS"),
-    'vehicles': t("Breadcrumbs.VEHICLES"),
-    'trips': t("Breadcrumbs.TRIPS"),
+    [ROUTES.DASHBOARD.split('/')[1]]: t("Breadcrumbs.DASHBOARD"),
+    [ROUTES.LOGIN.split('/')[1]]: t("Breadcrumbs.LOGIN"),
+    [ROUTES.COMPANIES.split('/')[1]]: t("Breadcrumbs.COMPANIES"),
+    [ROUTES.DRIVERS.split('/')[1]]: t("Breadcrumbs.DRIVERS"),
+    [ROUTES.VEHICLES.split('/')[1]]: t("Breadcrumbs.VEHICLES"),
+    [ROUTES.TRIPS.split('/')[1]]: t("Breadcrumbs.TRIPS"),
   }
   
   return titleMap[segment] || segment.charAt(0).toUpperCase() + segment.slice(1)

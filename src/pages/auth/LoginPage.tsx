@@ -2,17 +2,18 @@ import { Form, Input, Button, Card, message } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router';
 import apiClient from '../../api/apiClient';
+import { API_ENDPOINTS, ROUTES, STORAGE_KEYS } from '../../constants';
 
 function LoginPage() {
   const navigate = useNavigate();
 
   const onFinish = async (values: any) => {
     try {
-      const response = await apiClient.post('/auth/login', values);
-      localStorage.setItem('access_token', response.data.access_token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
+      const response = await apiClient.post(API_ENDPOINTS.AUTH.LOGIN, values);
+      localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, response.data.access_token);
+      localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(response.data.user));
       message.success('Giriş başarılı!');
-      navigate('/companies');
+      navigate(ROUTES.DASHBOARD);
     } catch (error) {
       message.error('E-posta veya şifre hatalı!');
     }

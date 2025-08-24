@@ -3,6 +3,7 @@ import type { ColumnsType } from 'antd/es/table';
 import { useEffect, useState } from 'react';
 import apiClient from '../../api/apiClient';
 import { useTranslation } from 'react-i18next';
+import { API_ENDPOINTS } from '../../constants';
 
 function Drivers() {
   const [drivers, setDrivers] = useState<DriverType[]>([]);
@@ -120,7 +121,7 @@ function Drivers() {
   const fetchDrivers = async () => {
     try {
       setLoading(true);
-      const response = await apiClient.get('/drivers');
+      const response = await apiClient.get(API_ENDPOINTS.DRIVERS);
       setDrivers(response.data.data);
     } catch (error) {
       console.error('Sürücüler yüklenirken hata oluştu:', error);

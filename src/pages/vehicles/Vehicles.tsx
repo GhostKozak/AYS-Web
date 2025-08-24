@@ -3,6 +3,7 @@ import type { ColumnsType } from 'antd/es/table';
 import { useEffect, useState } from 'react';
 import apiClient from '../../api/apiClient';
 import { useTranslation } from 'react-i18next';
+import { API_ENDPOINTS } from '../../constants';
 
 function Vehicles() {
   const [vehicles, setVehicles] = useState<VehicleType[]>([]);
@@ -89,7 +90,7 @@ function Vehicles() {
   const fetchVehicles = async () => {
     try {
       setLoading(true);
-      const response = await apiClient.get('/vehicles');
+      const response = await apiClient.get(API_ENDPOINTS.VEHICLES);
       setVehicles(response.data.data);
     } catch (error) {
       console.error('Araçlar yüklenirken hata oluştu:', error);
