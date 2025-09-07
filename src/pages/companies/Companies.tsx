@@ -1,9 +1,10 @@
-import { Empty, Layout, Space, Table, Tag, message } from 'antd';
+import { Empty, Flex, Layout, Space, Table, Tag, message } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { useEffect, useState } from 'react';
 import apiClient from '../../api/apiClient';
 import { useTranslation } from 'react-i18next';
 import { API_ENDPOINTS } from '../../constants';
+import Search from 'antd/es/input/Search';
 
 
 function Companies() {
@@ -89,12 +90,38 @@ function Companies() {
     }
   };
 
+  const searchCompaniesbyName = async (name: string) => {
+    try {
+      setLoading(true);
+      const response = await apiClient.get(API_ENDPOINTS.COMPANIES_SEARCH, {
+        params: {
+          name: name
+        }
+      });
+      setCompanies(response.data.data);
+    } catch (error) {
+      console.error('Şirketler yüklenirken hata oluştu:', error);
+      message.error('Şirketler yüklenemedi');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchCompanies();
   }, []);
 
   return (
     <Layout style={{ padding: "0 50px" }}>
+      <Flex style={{ marginBottom: "20px" }}>
+        <Search
+          placeholder={t("Companies.SEARCH")}
+          allowClear
+          enterButton={t("Companies.SEARCH")}
+          size="large"
+          onSearch={searchCompaniesbyName}
+        />
+      </Flex>
       <Table 
         columns={columns} 
         dataSource={companies} 

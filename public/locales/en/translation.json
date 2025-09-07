@@ -17,7 +17,8 @@
     "EDIT": "Edit",
     "DELETE": "Delete",
     "ACTIVE": "Active",
-    "PASSIVE": "Passive"
+    "PASSIVE": "Passive",
+    "SEARCH": "Search"
   },
   "Drivers": {
     "FULL_NAME": "Full Name",

@@ -17,7 +17,8 @@
     "EDIT": "Düzenle",
     "DELETE": "Sil",
     "ACTIVE": "Aktif",
-    "PASSIVE": "Pasif"
+    "PASSIVE": "Pasif",
+    "SEARCH": "Ara"
   },
   "Drivers": {
     "FULL_NAME": "Ad Soyad",

@@ -6,7 +6,7 @@ function Header() {
   return (
     <Layout.Header>
       <Flex justify='space-between'>
-      <div className="logo">
+      <div className="logo" style={{ color: 'white' }}>
       {CONFIG.APP_NAME} {/* Dinamik app name */}
       {CONFIG.DEBUG && <span style={{ fontSize: '12px', marginLeft: '10px' }}>v{CONFIG.VERSION}</span>}
       </div>

@@ -6,6 +6,7 @@ export const API_ENDPOINTS = {
     REFRESH: '/auth/refresh'
   },
   COMPANIES: '/companies',
+  COMPANIES_SEARCH: '/companies/search',
   DRIVERS: '/drivers',
   VEHICLES: '/vehicles',
   TRIPS: '/trips'
