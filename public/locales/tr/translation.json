@@ -6,7 +6,8 @@
     "COMPANIES": "Şirketler",
     "DRIVERS": "Sürücüler",
     "VEHICLES": "Araçlar",
-    "TRIPS": "Yolculuklar"
+    "TRIPS": "Yolculuklar",
+    "FAQ": "SSS"
   },
   "Companies": {
     "COMPANY_NAME": "Şirket Adı",
@@ -65,5 +66,8 @@
   },
   "Table": {
     "NO_DATA": "Veri yok"
+  },
+  "Other": {
+    "FAQ": "Sıkça Sorulan Sorular"
   }
 }

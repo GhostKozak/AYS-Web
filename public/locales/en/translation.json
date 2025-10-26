@@ -6,7 +6,8 @@
     "COMPANIES": "Companies",
     "DRIVERS": "Drivers",
     "VEHICLES": "Vehicles",
-    "TRIPS": "Trips"
+    "TRIPS": "Trips",
+    "FAQ": "FAQ" 
   },
   "Companies": {
     "COMPANY_NAME": "Company Name",
@@ -65,5 +66,8 @@
   },
   "Table": {
     "NO_DATA": "No data"
+  },
+  "Others": {
+    "FAQ": "Frequently Asked Questions"
   }
 }

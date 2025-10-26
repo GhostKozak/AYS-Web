@@ -2,8 +2,11 @@ import { createRoot } from "react-dom/client";
 import { RouterProvider } from "react-router";
 import AppRoutes from "./routes/AppRoutes";
 import "./i18n";
-import "./base.css";
+import "./styles/base.css";
+import { CustomThemeProvider } from "./utils/ThemeContext";
 
 createRoot(document.getElementById("root")!).render(
-  <RouterProvider router={AppRoutes()} />
+  <CustomThemeProvider>
+    <RouterProvider router={AppRoutes()} />
+  </CustomThemeProvider>
 );

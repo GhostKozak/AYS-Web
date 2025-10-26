@@ -19,7 +19,8 @@ export const ROUTES = {
   COMPANIES: '/companies',
   DRIVERS: '/drivers',
   VEHICLES: '/vehicles',
-  TRIPS: '/trips'
+  TRIPS: '/trips',
+  FAQ: '/sss'
 } as const;
 
 // HTTP Status Codes

@@ -59,6 +59,7 @@ function getSegmentTitle(segment: string): string {
     [ROUTES.DRIVERS.split("/")[1]]: t("Breadcrumbs.DRIVERS"),
     [ROUTES.VEHICLES.split("/")[1]]: t("Breadcrumbs.VEHICLES"),
     [ROUTES.TRIPS.split("/")[1]]: t("Breadcrumbs.TRIPS"),
+    [ROUTES.FAQ.split("/")[1]]: t("Breadcrumbs.FAQ"),
   };
 
   return (

@@ -7,6 +7,7 @@ import Drivers from '../pages/drivers/Drivers';
 import Vehicles from '../pages/vehicles/Vehicles';
 import Trips from '../pages/trips/Trips';
 import { ROUTES } from '../constants';
+import FAQ from '../pages/FAQ';
 
 function AppRoutes() {
   return createBrowserRouter([
@@ -42,6 +43,10 @@ function AppRoutes() {
           path: ROUTES.TRIPS,
           Component: Trips
         },
+        {
+          path: ROUTES.FAQ,
+          Component: FAQ
+        }
       ],
     },
   ]);
