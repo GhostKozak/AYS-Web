@@ -23,10 +23,11 @@ function Companies() {
   const [companies, setCompanies] = useState<CompanyType[]>([]);
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModal2Open, setIsModal2Open] = useState(false);
   const { t } = useTranslation();
   const [form] = Form.useForm();
-
   const [open, setOpen] = useState(false);
+  const [selectedRecord, setSelectedRecord] = useState<CompanyType>();
 
   const confirm = (id: string) => {
     setOpen(false);
@@ -95,7 +96,13 @@ function Companies() {
       key: "action",
       render: (_, record) => (
         <Space size="middle">
-          <a>{t("Companies.EDIT")}</a>
+          <Button
+            onClick={() => showModal2(record)}
+            color="yellow"
+            variant="outlined"
+          >
+            {t("Companies.EDIT")}
+          </Button>
           <Popconfirm
             title="Silme işlemi"
             description={`${record.name} firmasını silmek istediğinize emin misiniz?`}
@@ -104,7 +111,9 @@ function Companies() {
             okText="Onayla"
             cancelText="İptal"
           >
-            <Button danger>{t("Companies.DELETE")}</Button>
+            <Button danger type="link" variant="text">
+              {t("Companies.DELETE")}
+            </Button>
           </Popconfirm>
         </Space>
       ),
@@ -160,8 +169,18 @@ function Companies() {
     setIsModalOpen(true);
   };
 
+  const showModal2 = (record: CompanyType) => {
+    setIsModal2Open(true);
+    setSelectedRecord(record);
+    form.setFieldsValue({
+      name: record.name,
+    });
+  };
+
   const handleCancel = () => {
     setIsModalOpen(false);
+    setIsModal2Open(false);
+    setSelectedRecord(undefined);
   };
 
   const addNewCompanySubmitHandler = async (values: { name: string }) => {
@@ -173,6 +192,22 @@ function Companies() {
       fetchCompanies();
       message.success("Firma başarıyla eklendi.");
       setIsModalOpen(false);
+      form.resetFields();
+    } catch (error) {}
+  };
+
+  const editCompanySubmitHandler = async (values: { name: string }) => {
+    try {
+      const response = await apiClient.patch(
+        API_ENDPOINTS.COMPANIES + "/" + selectedRecord?._id,
+        {
+          name: values.name,
+        }
+      );
+      console.log(response);
+      fetchCompanies();
+      message.success("Firma başarıyla eklendi.");
+      setIsModal2Open(false);
       form.resetFields();
     } catch (error) {}
   };
@@ -240,6 +275,39 @@ function Companies() {
           <Form.Item label={null} wrapperCol={{ offset: 8, span: 16 }}>
             <Button type="primary" htmlType="submit">
               Ekle
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
+      <Modal
+        title="Firma Düzenleme Formu"
+        closable={{ "aria-label": "Custom Close Button" }}
+        open={isModal2Open}
+        onCancel={handleCancel}
+        footer={null}
+      >
+        <Form
+          name="edit"
+          form={form}
+          labelCol={{ span: 8 }}
+          wrapperCol={{ span: 16 }}
+          style={{ maxWidth: 600, paddingBlock: 32 }}
+          initialValues={{ remember: true }}
+          onFinish={editCompanySubmitHandler}
+          onFinishFailed={() => console.log("form calismadi")}
+          autoComplete="off"
+        >
+          <Form.Item
+            label="Firma Ismi"
+            name="name"
+            rules={[{ required: true, message: "Please input company name!" }]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item label={null} wrapperCol={{ offset: 8, span: 16 }}>
+            <Button type="primary" htmlType="submit">
+              Değişiklikleri Kaydet
             </Button>
           </Form.Item>
         </Form>
