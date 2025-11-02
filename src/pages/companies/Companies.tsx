@@ -11,13 +11,15 @@ import {
   Table,
   Tag,
   message,
+  notification,
 } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import apiClient from "../../api/apiClient";
 import { useTranslation } from "react-i18next";
 import { API_ENDPOINTS } from "../../constants";
 import Search from "antd/es/input/Search";
+import { CloseCircleOutlined } from "@ant-design/icons";
 
 function Companies() {
   const [companies, setCompanies] = useState<CompanyType[]>([]);
@@ -28,6 +30,22 @@ function Companies() {
   const [form] = Form.useForm();
   const [open, setOpen] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState<CompanyType>();
+  const [api, contextHolder] = notification.useNotification();
+
+  const openNotification = (
+    message?: string,
+    description?: string,
+    icon?: ReactNode
+  ) => {
+    api.open({
+      message: message,
+      description: description,
+      duration: 10,
+      showProgress: true,
+      pauseOnHover: true,
+      icon: icon,
+    });
+  };
 
   const confirm = (id: string) => {
     setOpen(false);
@@ -193,7 +211,14 @@ function Companies() {
       message.success("Firma başarıyla eklendi.");
       setIsModalOpen(false);
       form.resetFields();
-    } catch (error) {}
+    } catch (error) {
+      const message = (error as any).response.data.message.toString();
+      openNotification(
+        "Hata",
+        message,
+        <CloseCircleOutlined style={{ color: "#a61d24" }} />
+      );
+    }
   };
 
   const editCompanySubmitHandler = async (values: { name: string }) => {
@@ -209,11 +234,19 @@ function Companies() {
       message.success("Firma başarıyla eklendi.");
       setIsModal2Open(false);
       form.resetFields();
-    } catch (error) {}
+    } catch (error) {
+      const message = (error as any).response.data.message.toString();
+      openNotification(
+        "Hata",
+        message,
+        <CloseCircleOutlined style={{ color: "#a61d24" }} />
+      );
+    }
   };
 
   return (
     <Layout style={{ padding: "0 50px" }}>
+      {contextHolder}
       <Flex style={{ marginBottom: "20px" }} gap={25}>
         <Search
           placeholder={t("Companies.SEARCH")}
