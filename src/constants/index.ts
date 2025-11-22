@@ -8,6 +8,7 @@ export const API_ENDPOINTS = {
   COMPANIES: '/companies',
   COMPANIES_SEARCH: '/companies/search',
   DRIVERS: '/drivers',
+  DRIVERS_SEARCH: '/drivers/search',
   VEHICLES: '/vehicles',
   TRIPS: '/trips'
 } as const;

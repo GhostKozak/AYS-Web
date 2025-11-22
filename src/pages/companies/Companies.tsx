@@ -145,7 +145,7 @@ function Companies() {
       );
       console.log(response);
       fetchCompanies();
-    } catch (error) {}
+    } catch (error) { }
   };
 
   const fetchCompanies = async () => {
