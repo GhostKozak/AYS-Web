@@ -19,11 +19,16 @@ import apiClient from "../../api/apiClient";
 import { useTranslation } from "react-i18next";
 import { API_ENDPOINTS } from "../../constants";
 import Search from "antd/es/input/Search";
-import { CloseCircleOutlined } from "@ant-design/icons";
+import {
+  CloseCircleOutlined,
+  DeleteOutlined,
+  PlusCircleOutlined,
+  PlusOutlined,
+} from "@ant-design/icons";
+import { useQuery } from "@tanstack/react-query";
 
 function Companies() {
-  const [companies, setCompanies] = useState<CompanyType[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [searchText, setSearchText] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModal2Open, setIsModal2Open] = useState(false);
   const { t } = useTranslation();
@@ -31,6 +36,18 @@ function Companies() {
   const [open, setOpen] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState<CompanyType>();
   const [api, contextHolder] = notification.useNotification();
+
+  const {
+    isLoading,
+    error,
+    data: companies,
+    isFetching,
+    refetch,
+  } = useQuery({
+    queryKey: ["companyData"],
+    queryFn: () =>
+      apiClient.get(API_ENDPOINTS.COMPANIES).then((res) => res.data.data),
+  });
 
   const openNotification = (
     message?: string,
@@ -123,11 +140,17 @@ function Companies() {
           </Button>
           <Popconfirm
             title="Silme işlemi"
-            description={`${record.name} firmasını silmek istediğinize emin misiniz?`}
+            description={
+              <span>
+                <strong>{record.name}</strong> firmasını silmek istediğinize
+                emin misiniz?
+              </span>
+            }
             onConfirm={() => confirm(record._id)}
             onCancel={cancel}
             okText="Onayla"
             cancelText="İptal"
+            icon={<DeleteOutlined style={{ color: "red" }} />}
           >
             <Button danger type="link" variant="text">
               {t("Companies.DELETE")}
@@ -144,44 +167,9 @@ function Companies() {
         API_ENDPOINTS.COMPANIES + "/" + id
       );
       console.log(response);
-      fetchCompanies();
-    } catch (error) { }
+      refetch();
+    } catch (error) {}
   };
-
-  const fetchCompanies = async () => {
-    try {
-      setLoading(true);
-      const response = await apiClient.get(API_ENDPOINTS.COMPANIES);
-      setCompanies(response.data.data);
-      console.table(response.data.data);
-    } catch (error) {
-      console.error("Şirketler yüklenirken hata oluştu:", error);
-      message.error("Şirketler yüklenemedi");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const searchCompaniesbyName = async (name: string) => {
-    try {
-      setLoading(true);
-      const response = await apiClient.get(API_ENDPOINTS.COMPANIES_SEARCH, {
-        params: {
-          name: name,
-        },
-      });
-      setCompanies(response.data.data);
-    } catch (error) {
-      console.error("Şirketler yüklenirken hata oluştu:", error);
-      message.error("Şirketler yüklenemedi");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchCompanies();
-  }, []);
 
   const showModal = () => {
     setIsModalOpen(true);
@@ -207,7 +195,7 @@ function Companies() {
         name: values.name,
       });
       console.log(response);
-      fetchCompanies();
+      refetch();
       message.success("Firma başarıyla eklendi.");
       setIsModalOpen(false);
       form.resetFields();
@@ -230,7 +218,7 @@ function Companies() {
         }
       );
       console.log(response);
-      fetchCompanies();
+      refetch();
       message.success("Firma başarıyla eklendi.");
       setIsModal2Open(false);
       form.resetFields();
@@ -244,6 +232,16 @@ function Companies() {
     }
   };
 
+  const handleSearch = (value: string) => {
+    setSearchText(value);
+  };
+
+  const filteredCompanies = companies.filter((company: any) => {
+    if (!searchText) return true;
+
+    return company.name.toLowerCase().includes(searchText.toLowerCase());
+  });
+
   return (
     <Layout style={{ padding: "0 50px" }}>
       {contextHolder}
@@ -253,16 +251,16 @@ function Companies() {
           allowClear
           enterButton={t("Companies.SEARCH")}
           size="large"
-          onSearch={searchCompaniesbyName}
+          onSearch={handleSearch}
         />
         <Button color="cyan" variant="solid" size="large" onClick={showModal}>
-          Firma Ekle
+          <PlusOutlined /> Firma Ekle
         </Button>
       </Flex>
       <Table
         columns={columns}
-        dataSource={companies}
-        loading={loading}
+        dataSource={filteredCompanies}
+        loading={isLoading}
         rowKey="_id"
         locale={{
           emptyText: (
