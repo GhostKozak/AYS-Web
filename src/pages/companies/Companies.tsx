@@ -46,7 +46,7 @@ function Companies() {
   };
 
   const {
-    data: companies,
+    data: companies = [],
     isLoading,
     isError,
   } = useQuery({
@@ -229,7 +229,7 @@ function Companies() {
     setIsModalOpen(true);
   };
 
-  const handleFromSubmit = async (values: { inputName: string }) => {
+  const handleFormSubmit = async (values: { inputName: string }) => {
     if (selectedRecord) {
       await updateCompany(values);
     } else {
@@ -259,6 +259,7 @@ function Companies() {
           }
           size="large"
           onSearch={handleSearch}
+          onChange={(e) => handleSearch(e.target.value)}
         />
         <Button color="cyan" variant="solid" size="large" onClick={handleAdd}>
           <PlusOutlined /> Firma Ekle
@@ -303,7 +304,7 @@ function Companies() {
           labelCol={{ span: 8 }}
           wrapperCol={{ span: 16 }}
           style={{ maxWidth: 600, paddingBlock: 32 }}
-          onFinish={handleFromSubmit}
+          onFinish={handleFormSubmit}
           autoComplete="off"
         >
           <Form.Item
