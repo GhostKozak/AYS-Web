@@ -14,7 +14,7 @@ import {
   notification,
 } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import { useEffect, useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import apiClient from "../../api/apiClient";
 import { useTranslation } from "react-i18next";
 import { API_ENDPOINTS } from "../../constants";
@@ -22,31 +22,37 @@ import Search from "antd/es/input/Search";
 import {
   CloseCircleOutlined,
   DeleteOutlined,
-  PlusCircleOutlined,
   PlusOutlined,
+  SearchOutlined,
 } from "@ant-design/icons";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 function Companies() {
   const [searchText, setSearchText] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isModal2Open, setIsModal2Open] = useState(false);
   const { t } = useTranslation();
   const [form] = Form.useForm();
-  const [open, setOpen] = useState(false);
-  const [selectedRecord, setSelectedRecord] = useState<CompanyType>();
+  const [selectedRecord, setSelectedRecord] = useState<CompanyType | undefined>(
+    undefined
+  );
   const [api, contextHolder] = notification.useNotification();
+  const [messageApi, messageContextHolder] = message.useMessage();
+
+  const queryClient = useQueryClient();
+
+  const fetchCompanies = async () => {
+    const response = await apiClient.get(API_ENDPOINTS.COMPANIES);
+    return response.data.data;
+  };
 
   const {
-    isLoading,
-    error,
     data: companies,
-    isFetching,
-    refetch,
+    isLoading,
+    isError,
   } = useQuery({
-    queryKey: ["companyData"],
-    queryFn: () =>
-      apiClient.get(API_ENDPOINTS.COMPANIES).then((res) => res.data.data),
+    queryKey: ["companies"],
+    queryFn: fetchCompanies,
+    staleTime: 1000 * 60 * 5,
   });
 
   const openNotification = (
@@ -62,17 +68,6 @@ function Companies() {
       pauseOnHover: true,
       icon: icon,
     });
-  };
-
-  const confirm = (id: string) => {
-    setOpen(false);
-    deleteCompany(id);
-    message.success("Next step.");
-  };
-
-  const cancel = () => {
-    setOpen(false);
-    message.error("Click on cancel.");
   };
 
   interface CompanyType {
@@ -132,7 +127,7 @@ function Companies() {
       render: (_, record) => (
         <Space size="middle">
           <Button
-            onClick={() => showModal2(record)}
+            onClick={() => handleEdit(record)}
             color="yellow"
             variant="outlined"
           >
@@ -146,8 +141,7 @@ function Companies() {
                 emin misiniz?
               </span>
             }
-            onConfirm={() => confirm(record._id)}
-            onCancel={cancel}
+            onConfirm={() => deleteCompany(record)}
             okText="Onayla"
             cancelText="İptal"
             icon={<DeleteOutlined style={{ color: "red" }} />}
@@ -161,68 +155,55 @@ function Companies() {
     },
   ];
 
-  const deleteCompany = async (id: string) => {
+  const deleteCompany = async (record: CompanyType) => {
     try {
-      const response = await apiClient.delete(
-        API_ENDPOINTS.COMPANIES + "/" + id
+      await apiClient.delete(API_ENDPOINTS.COMPANIES + "/" + record._id);
+      messageApi.warning(
+        <span>
+          <strong>{record.name}</strong> firması başarıyla silindi.
+        </span>
       );
-      console.log(response);
-      refetch();
+      queryClient.invalidateQueries({ queryKey: ["companies"] });
     } catch (error) {}
   };
 
-  const showModal = () => {
-    setIsModalOpen(true);
-  };
-
-  const showModal2 = (record: CompanyType) => {
-    setIsModal2Open(true);
-    setSelectedRecord(record);
-    form.setFieldsValue({
-      name: record.name,
-    });
-  };
-
-  const handleCancel = () => {
-    setIsModalOpen(false);
-    setIsModal2Open(false);
-    setSelectedRecord(undefined);
-  };
-
-  const addNewCompanySubmitHandler = async (values: { name: string }) => {
+  const createCompany = async (values: { inputName: string }) => {
     try {
-      const response = await apiClient.post(API_ENDPOINTS.COMPANIES, {
-        name: values.name,
+      await apiClient.post(API_ENDPOINTS.COMPANIES, {
+        name: values.inputName,
       });
-      console.log(response);
-      refetch();
-      message.success("Firma başarıyla eklendi.");
-      setIsModalOpen(false);
-      form.resetFields();
-    } catch (error) {
-      const message = (error as any).response.data.message.toString();
-      openNotification(
-        "Hata",
-        message,
-        <CloseCircleOutlined style={{ color: "#a61d24" }} />
+      messageApi.success(
+        <span>
+          <strong>{values.inputName}</strong> firması başarıyla eklendi.
+        </span>
       );
+      queryClient.invalidateQueries({ queryKey: ["companies"] });
+    } catch (error) {
+      // TODO: error handler not working properly. Make better error response or handle
+      // openNotification(
+      //   "Hata",
+      //   (error as any).response.data.message[0].constraints.toString(),
+      //   <CloseCircleOutlined style={{ color: "#a61d24" }} />
+      // );
     }
   };
 
-  const editCompanySubmitHandler = async (values: { name: string }) => {
+  const updateCompany = async (values: { inputName: string }) => {
     try {
-      const response = await apiClient.patch(
+      await apiClient.patch(
         API_ENDPOINTS.COMPANIES + "/" + selectedRecord?._id,
         {
-          name: values.name,
+          name: values.inputName,
         }
       );
-      console.log(response);
-      refetch();
-      message.success("Firma başarıyla eklendi.");
-      setIsModal2Open(false);
-      form.resetFields();
+      messageApi.info(
+        <span>
+          <strong>{values.inputName}</strong> firması başarıyla düzenlendi.
+        </span>
+      );
+      queryClient.invalidateQueries({ queryKey: ["companies"] });
     } catch (error) {
+      // TODO: error handler not working properly. Make better error response or handle
       const message = (error as any).response.data.message.toString();
       openNotification(
         "Hata",
@@ -236,24 +217,50 @@ function Companies() {
     setSearchText(value);
   };
 
-  const filteredCompanies = companies.filter((company: any) => {
+  const handleAdd = () => {
+    setSelectedRecord(undefined);
+    form.resetFields();
+    setIsModalOpen(true);
+  };
+
+  const handleEdit = (record: CompanyType) => {
+    setSelectedRecord(record);
+    form.setFieldsValue({ inputName: record.name });
+    setIsModalOpen(true);
+  };
+
+  const handleFromSubmit = async (values: { inputName: string }) => {
+    if (selectedRecord) {
+      await updateCompany(values);
+    } else {
+      await createCompany(values);
+    }
+    setIsModalOpen(false);
+  };
+
+  const filteredCompanies = companies?.filter((company: any) => {
     if (!searchText) return true;
 
-    return company.name.toLowerCase().includes(searchText.toLowerCase());
+    return company.name.toLowerCase().includes(searchText.toLowerCase()) ?? [];
   });
 
   return (
     <Layout style={{ padding: "0 50px" }}>
       {contextHolder}
+      {messageContextHolder}
       <Flex style={{ marginBottom: "20px" }} gap={25}>
         <Search
           placeholder={t("Companies.SEARCH")}
           allowClear
-          enterButton={t("Companies.SEARCH")}
+          enterButton={
+            <Space size={3}>
+              <SearchOutlined /> {t("Companies.SEARCH")}
+            </Space>
+          }
           size="large"
           onSearch={handleSearch}
         />
-        <Button color="cyan" variant="solid" size="large" onClick={showModal}>
+        <Button color="cyan" variant="solid" size="large" onClick={handleAdd}>
           <PlusOutlined /> Firma Ekle
         </Button>
       </Flex>
@@ -278,26 +285,30 @@ function Companies() {
         }}
       />
       <Modal
-        title="Yeni Firma Ekleme Formu"
+        title={
+          selectedRecord ? "Firma Düzenleme Formu" : "Yeni Firma Ekleme Formu"
+        }
         closable={{ "aria-label": "Custom Close Button" }}
         open={isModalOpen}
-        onCancel={handleCancel}
+        onCancel={() => {
+          setIsModalOpen(false);
+          setSelectedRecord(undefined);
+          form.resetFields();
+        }}
         footer={null}
       >
         <Form
-          name="basic"
+          name="companyForm"
           form={form}
           labelCol={{ span: 8 }}
           wrapperCol={{ span: 16 }}
           style={{ maxWidth: 600, paddingBlock: 32 }}
-          initialValues={{ remember: true }}
-          onFinish={addNewCompanySubmitHandler}
-          onFinishFailed={() => console.log("form calismadi")}
+          onFinish={handleFromSubmit}
           autoComplete="off"
         >
           <Form.Item
             label="Firma Ismi"
-            name="name"
+            name="inputName"
             rules={[{ required: true, message: "Please input company name!" }]}
           >
             <Input />
@@ -305,40 +316,7 @@ function Companies() {
 
           <Form.Item label={null} wrapperCol={{ offset: 8, span: 16 }}>
             <Button type="primary" htmlType="submit">
-              Ekle
-            </Button>
-          </Form.Item>
-        </Form>
-      </Modal>
-      <Modal
-        title="Firma Düzenleme Formu"
-        closable={{ "aria-label": "Custom Close Button" }}
-        open={isModal2Open}
-        onCancel={handleCancel}
-        footer={null}
-      >
-        <Form
-          name="edit"
-          form={form}
-          labelCol={{ span: 8 }}
-          wrapperCol={{ span: 16 }}
-          style={{ maxWidth: 600, paddingBlock: 32 }}
-          initialValues={{ remember: true }}
-          onFinish={editCompanySubmitHandler}
-          onFinishFailed={() => console.log("form calismadi")}
-          autoComplete="off"
-        >
-          <Form.Item
-            label="Firma Ismi"
-            name="name"
-            rules={[{ required: true, message: "Please input company name!" }]}
-          >
-            <Input />
-          </Form.Item>
-
-          <Form.Item label={null} wrapperCol={{ offset: 8, span: 16 }}>
-            <Button type="primary" htmlType="submit">
-              Değişiklikleri Kaydet
+              {selectedRecord ? "Değişiklikleri Kaydet" : "Ekle"}
             </Button>
           </Form.Item>
         </Form>
