@@ -15,24 +15,52 @@ import {
   notification,
 } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import { useEffect, useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import apiClient from "../../api/apiClient";
 import { useTranslation } from "react-i18next";
 import { API_ENDPOINTS } from "../../constants";
 import Search from "antd/es/input/Search";
-import { CloseCircleOutlined } from "@ant-design/icons";
+import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 function Drivers() {
-  const [drivers, setDrivers] = useState<DriverType[]>([]);
-  const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isModal2Open, setIsModal2Open] = useState(false);
   const { t } = useTranslation();
   const [form] = Form.useForm();
-  const [open, setOpen] = useState(false);
-  const [selectedRecord, setSelectedRecord] = useState<DriverType>();
+  const [selectedRecord, setSelectedRecord] = useState<DriverType | undefined>(
+    undefined
+  );
   const [api, contextHolder] = notification.useNotification();
-  const [companies, setCompanies] = useState<CompanyType[]>([]);
+  const [messageApi, messageContextHolder] = message.useMessage();
+  const [searchText, setSearchText] = useState("");
+
+  const queryClient = useQueryClient();
+
+  const fetchDrivers = async () => {
+    const response = await apiClient.get(API_ENDPOINTS.DRIVERS);
+    return response.data.data;
+  };
+
+  const fetchCompanies = async () => {
+    const response = await apiClient.get(API_ENDPOINTS.COMPANIES);
+    return response.data.data;
+  };
+
+  const {
+    data: drivers = [],
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["drivers"],
+    queryFn: fetchDrivers,
+    staleTime: 1000 * 60 * 5,
+  });
+
+  const { data: companies = [], isLoading: isCompanyLoading } = useQuery({
+    queryKey: ["companies"],
+    queryFn: fetchCompanies,
+    staleTime: 1000 * 60 * 5,
+  });
 
   const openNotification = (
     message?: string,
@@ -155,7 +183,7 @@ function Drivers() {
       render: (_, record) => (
         <Space size="middle">
           <Button
-            onClick={() => showModal2(record)}
+            onClick={() => handleEdit(record)}
             color="yellow"
             variant="outlined"
           >
@@ -169,10 +197,10 @@ function Drivers() {
                 istediğinize emin misiniz?
               </span>
             }
-            onConfirm={() => confirm(record._id)}
-            onCancel={cancel}
+            onConfirm={() => deleteDriver(record)}
             okText="Onayla"
             cancelText="İptal"
+            icon={<DeleteOutlined style={{ color: "red" }} />}
           >
             <Button danger type="link" variant="text">
               {t("Companies.DELETE")}
@@ -183,170 +211,124 @@ function Drivers() {
     },
   ];
 
-  const confirm = (id: string) => {
-    setOpen(false);
-    deleteDriver(id);
-    message.success("Next step.");
+  const handleSearch = (value: string) => {
+    setSearchText(value);
   };
 
-  const cancel = () => {
-    setOpen(false);
-    message.error("Click on cancel.");
-  };
-
-  const showModal = () => {
+  const handleAdd = () => {
+    setSelectedRecord(undefined);
+    form.resetFields();
     setIsModalOpen(true);
   };
 
-  const showModal2 = (record: DriverType) => {
-    setIsModal2Open(true);
+  const handleEdit = (record: DriverType) => {
     setSelectedRecord(record);
     form.setFieldsValue({
-      name: record.full_name,
-      phone: record.phone_number,
-      company: record.company._id,
+      inputName: record.full_name,
+      inputPhone: record.phone_number,
+      inputCompany: record.company?._id,
     });
+    setIsModalOpen(true);
   };
 
-  const handleCancel = () => {
-    setIsModalOpen(false);
-    setIsModal2Open(false);
-    setSelectedRecord(undefined);
-    form.resetFields();
-  };
-
-  const fetchDrivers = async () => {
+  const createDriver = async (values: {
+    inputName: string;
+    inputPhone: string;
+    inputCompany: string;
+  }) => {
     try {
-      setLoading(true);
-      const response = await apiClient.get(API_ENDPOINTS.DRIVERS);
-      setDrivers(response.data.data);
-      console.table(response.data.data);
-    } catch (error) {
-      console.error("Sürücüler yüklenirken hata oluştu:", error);
-      message.error("Sürücüler yüklenemedi");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const searchDriverbyNameOrPhone = async (query: string) => {
-    try {
-      setLoading(true);
-      const response = await apiClient.get(API_ENDPOINTS.DRIVERS_SEARCH, {
-        params: {
-          query: query,
-        },
+      await apiClient.post(API_ENDPOINTS.DRIVERS, {
+        full_name: values.inputName,
+        phone_number: values.inputPhone,
+        company: values.inputCompany,
       });
-      setDrivers(response.data.data);
-    } catch (error) {
-      console.error("Sürücüler yüklenirken hata oluştu:", error);
-      message.error("Sürücüler yüklenemedi");
-    } finally {
-      setLoading(false);
-    }
+      messageApi.success(
+        <span>
+          <strong>{values.inputName}</strong> sürücüsü başarıyla eklendi.
+        </span>
+      );
+      queryClient.invalidateQueries({ queryKey: ["drivers"] });
+    } catch (error) {}
   };
 
-  const deleteDriver = async (id: string) => {
+  const updateDriver = async (values: {
+    inputName: string;
+    inputPhone: string;
+    inputCompany: string;
+  }) => {
     try {
-      const response = await apiClient.delete(API_ENDPOINTS.DRIVERS + "/" + id);
-      console.log(response);
-      message.success("Sürücü başarıyla silindi.");
-      fetchDrivers();
+      await apiClient.patch(API_ENDPOINTS.DRIVERS + "/" + selectedRecord?._id, {
+        full_name: values.inputName,
+        phone_number: values.inputPhone,
+        company: values.inputCompany,
+      });
+      messageApi.success(
+        <span>
+          <strong>{values.inputName}</strong> sürücüsü başarıyla düzenlendi.
+        </span>
+      );
+      queryClient.invalidateQueries({ queryKey: ["drivers"] });
+    } catch (error) {}
+  };
+
+  const deleteDriver = async (record: DriverType) => {
+    try {
+      await apiClient.delete(API_ENDPOINTS.DRIVERS + "/" + record._id);
+      messageApi.warning(
+        <span>
+          <strong>{record.full_name}</strong> sürücüsü başarıyla silindi.
+        </span>
+      );
+      queryClient.invalidateQueries({ queryKey: ["drivers"] });
     } catch (error) {
       console.error("Sürücü silinirken hata oluştu:", error);
       message.error("Sürücü silinemedi.");
     }
   };
 
-  const addNewDriverSubmitHandler = async (values: {
-    name: string;
-    phone: string;
-    company: string;
+  const handleFormSubmit = async (values: {
+    inputName: string;
+    inputPhone: string;
+    inputCompany: string;
   }) => {
-    try {
-      const response = await apiClient.post(API_ENDPOINTS.DRIVERS, {
-        full_name: values.name,
-        phone_number: values.phone,
-        company: values.company,
-      });
-      console.log(response);
-      fetchDrivers();
-      message.success("Sürücü başarıyla eklendi.");
-      setIsModalOpen(false);
-      form.resetFields();
-    } catch (error) {
-      const message = (error as any).response.data.message.toString();
-      openNotification(
-        "Hata",
-        message,
-        <CloseCircleOutlined style={{ color: "#a61d24" }} />
-      );
+    if (selectedRecord) {
+      await updateDriver(values);
+    } else {
+      await createDriver(values);
     }
+    setIsModalOpen(false);
   };
 
-  const editDriverSubmitHandler = async (values: {
-    name: string;
-    phone: string;
-    company: string;
-  }) => {
-    try {
-      const response = await apiClient.patch(
-        API_ENDPOINTS.DRIVERS + "/" + selectedRecord?._id,
-        {
-          full_name: values.name,
-          phone_number: values.phone,
-          company: values.company,
-        }
-      );
-      console.log(response);
-      fetchDrivers();
-      message.success("Sürücü başarıyla eklendi.");
-      setIsModal2Open(false);
-      form.resetFields();
-    } catch (error) {
-      const message = (error as any).response.data.message.toString();
-      openNotification(
-        "Hata",
-        message,
-        <CloseCircleOutlined style={{ color: "#a61d24" }} />
-      );
-    }
-  };
+  const filteredDrivers = drivers?.filter((driver: any) => {
+    if (!searchText) return true;
 
-  const fetchCompanies = async () => {
-    try {
-      const response = await apiClient.get(API_ENDPOINTS.COMPANIES);
-      setCompanies(response.data.data);
-    } catch (error) {
-      console.error("Şirketler yüklenirken hata oluştu:", error);
-      message.error("Şirketler yüklenemedi");
-    }
-  };
-
-  useEffect(() => {
-    fetchDrivers();
-    fetchCompanies();
-  }, []);
+    return (
+      driver.full_name.toLowerCase().includes(searchText.toLowerCase()) ?? [],
+      driver.phone_number.includes(searchText) ?? []
+    );
+  });
 
   return (
     <Layout style={{ padding: "0 50px" }}>
       {contextHolder}
+      {messageContextHolder}
       <Flex style={{ marginBottom: "20px" }} gap={25}>
         <Search
           placeholder={t("Companies.SEARCH")}
           allowClear
           enterButton={t("Companies.SEARCH")}
           size="large"
-          onSearch={searchDriverbyNameOrPhone}
+          onSearch={handleSearch}
+          onChange={(e) => handleSearch(e.target.value)}
         />
-        <Button color="cyan" variant="solid" size="large" onClick={showModal}>
-          Sürücü Ekle
+        <Button color="cyan" variant="solid" size="large" onClick={handleAdd}>
+          <PlusOutlined /> Sürücü Ekle
         </Button>
       </Flex>
       <Table
         columns={columns}
-        dataSource={drivers}
-        loading={loading}
+        dataSource={filteredDrivers}
+        loading={isLoading}
         rowKey="_id"
         locale={{
           emptyText: (
@@ -364,26 +346,30 @@ function Drivers() {
         }}
       />
       <Modal
-        title="Yeni Sürücü Ekleme Formu"
+        title={
+          selectedRecord ? "Sürücü Düzenleme Formu" : "Yeni Sürücü Ekleme Formu"
+        }
         closable={{ "aria-label": "Custom Close Button" }}
         open={isModalOpen}
-        onCancel={handleCancel}
+        onCancel={() => {
+          setIsModalOpen(false);
+          setSelectedRecord(undefined);
+          form.resetFields();
+        }}
         footer={null}
       >
         <Form
-          name="basic"
+          name="driverForm"
           form={form}
           labelCol={{ span: 8 }}
           wrapperCol={{ span: 16 }}
           style={{ maxWidth: 600, paddingBlock: 32 }}
-          initialValues={{ remember: true }}
-          onFinish={addNewDriverSubmitHandler}
-          onFinishFailed={() => console.log("form calismadi")}
+          onFinish={handleFormSubmit}
           autoComplete="off"
         >
           <Form.Item
             label="Firma"
-            name="company"
+            name="inputCompany"
             rules={[{ required: true, message: "Lütfen bir firma seçin!" }]}
           >
             <Select
@@ -391,7 +377,7 @@ function Drivers() {
               showSearch
               optionFilterProp="children"
             >
-              {companies.map((company) => (
+              {companies.map((company: CompanyType) => (
                 <Select.Option key={company._id} value={company._id}>
                   {company.name}
                 </Select.Option>
@@ -401,7 +387,7 @@ function Drivers() {
 
           <Form.Item
             label="Sürücü İsmi"
-            name="name"
+            name="inputName"
             rules={[{ required: true, message: "Please input driver name!" }]}
           >
             <Input />
@@ -409,7 +395,7 @@ function Drivers() {
 
           <Form.Item
             label="Telefon"
-            name="phone"
+            name="inputPhone"
             rules={[
               { required: true, message: "Please input driver phone number!" },
             ]}
@@ -419,68 +405,7 @@ function Drivers() {
 
           <Form.Item label={null} wrapperCol={{ offset: 8, span: 16 }}>
             <Button type="primary" htmlType="submit">
-              Ekle
-            </Button>
-          </Form.Item>
-        </Form>
-      </Modal>
-      <Modal
-        title="Sürücü Düzenleme Formu"
-        closable={{ "aria-label": "Custom Close Button" }}
-        open={isModal2Open}
-        onCancel={handleCancel}
-        footer={null}
-      >
-        <Form
-          name="edit"
-          form={form}
-          labelCol={{ span: 8 }}
-          wrapperCol={{ span: 16 }}
-          style={{ maxWidth: 600, paddingBlock: 32 }}
-          initialValues={{ remember: true }}
-          onFinish={editDriverSubmitHandler}
-          onFinishFailed={() => console.log("form calismadi")}
-          autoComplete="off"
-        >
-          <Form.Item
-            label="Firma"
-            name="company"
-            rules={[{ required: true, message: "Lütfen bir firma seçin!" }]}
-          >
-            <Select
-              placeholder="Firma Seçin"
-              showSearch
-              optionFilterProp="children"
-            >
-              {companies.map((company) => (
-                <Select.Option key={company._id} value={company._id}>
-                  {company.name}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
-
-          <Form.Item
-            label="Sürücü İsmi"
-            name="name"
-            rules={[{ required: true, message: "Please input driver name!" }]}
-          >
-            <Input />
-          </Form.Item>
-
-          <Form.Item
-            label="Telefon"
-            name="phone"
-            rules={[
-              { required: true, message: "Please input driver phone number!" },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-
-          <Form.Item label={null} wrapperCol={{ offset: 8, span: 16 }}>
-            <Button type="primary" htmlType="submit">
-              Değişiklikleri Kaydet
+              {selectedRecord ? "Değişiklikleri Kaydet" : "Ekle"}
             </Button>
           </Form.Item>
         </Form>
