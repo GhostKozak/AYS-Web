@@ -22,8 +22,9 @@ import {
 } from "@ant-design/icons";
 
 import { useCompanies } from "../../hooks/useCompanies";
-import { type CompanyType } from "../../types";
 import CompanyModal from "./components/CompanyModal";
+import type { ColumnsType } from "antd/es/table";
+import type { CompanyType } from "../../types";
 
 function Companies() {
   const { t } = useTranslation();
@@ -103,7 +104,7 @@ function Companies() {
     return company.name.toLowerCase().includes(searchText.toLowerCase());
   });
 
-  const columns = [
+  const columns: ColumnsType<CompanyType> = [
     {
       title: t("Companies.COMPANY_NAME"),
       dataIndex: "name",

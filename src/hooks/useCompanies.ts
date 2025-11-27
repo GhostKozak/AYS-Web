@@ -5,14 +5,12 @@ import { type CompanyType } from "../types";
 export const useCompanies = () => {
   const queryClient = useQueryClient();
 
-  // GET (Okuma)
   const { data: companies = [], isLoading, isError } = useQuery<CompanyType[]>({
     queryKey: ["companies"],
     queryFn: companyApi.getAll,
     staleTime: 1000 * 60 * 5, // 5 dakika
   });
 
-  // CREATE (Ekleme)
   const createMutation = useMutation({
     mutationFn: companyApi.create,
     onSuccess: () => {
@@ -20,7 +18,6 @@ export const useCompanies = () => {
     },
   });
 
-  // UPDATE (Güncelleme)
   const updateMutation = useMutation({
     mutationFn: ({ id, name }: { id: string; name: string }) => companyApi.update(id, name),
     onSuccess: () => {
@@ -28,7 +25,6 @@ export const useCompanies = () => {
     },
   });
 
-  // DELETE (Silme)
   const deleteMutation = useMutation({
     mutationFn: companyApi.delete,
     onSuccess: () => {
