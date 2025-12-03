@@ -27,6 +27,12 @@ export const formatPhoneNumber = (phone_number: string): string => {
   return phone_number;
 };
 
+export const formatLicencePlate = (plate: string): string => {
+  return plate
+    .replace(/([A-Z]+)(\d+)/g, "$1 $2")
+    .replace(/(\d+)([A-Z]+)/g, "$1 $2");
+};
+
 export const checkTokenValidity = (navigate: NavigateFunction) => {
   const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
 

@@ -1,132 +1,241 @@
-import { Empty, Layout, Space, Table, Tag, message } from 'antd';
-import type { ColumnsType } from 'antd/es/table';
-import { useEffect, useState } from 'react';
-import apiClient from '../../api/apiClient';
-import { useTranslation } from 'react-i18next';
-import { API_ENDPOINTS } from '../../constants';
+import {
+  Button,
+  Empty,
+  Flex,
+  Layout,
+  Popconfirm,
+  Space,
+  Table,
+  Tag,
+  message,
+  notification,
+} from "antd";
+import type { ColumnsType } from "antd/es/table";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import VehicleModal from "./components/VehicleModal";
+import Search from "antd/es/input/Search";
+import {
+  CloseCircleOutlined,
+  DeleteOutlined,
+  PlusOutlined,
+  SearchOutlined,
+} from "@ant-design/icons";
+import { useVehicles } from "../../hooks/useVehicles";
+import type { VehiclesType, VehicleType } from "../../types";
+import { formatLicencePlate } from "../../utils";
 
 function Vehicles() {
-  const [vehicles, setVehicles] = useState<VehicleType[]>([]);
-  const [loading, setLoading] = useState(false);
-  const {t,i18n} = useTranslation();
+  const { t } = useTranslation();
+  const [messageApi, messageContextHolder] = message.useMessage();
+  const [notificationApi, notificationContextHolder] =
+    notification.useNotification();
 
-  interface VehicleType {
-    _id: string;
-    licence_plate: string;
-    vehicle_type: string;
-    deleted: boolean;
-    createdAt: string;
-    updatedAt: string;
-    __v: number;
-  }
-  
-  const formatLicencePlate = (plate: string): string => {
-    // Add space between letters and numbers
-    return plate.replace(/([A-Z]+)(\d+)/g, '$1 $2').replace(/(\d+)([A-Z]+)/g, '$1 $2');
+  const [searchText, setSearchText] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [selectedRecord, setSelectedRecord] = useState<VehicleType | undefined>(
+    undefined
+  );
+
+  const { vehicles, isLoading, createVehicle, updateVehicle, deleteVehicle } =
+    useVehicles();
+
+  const openErrorNotification = (description: string) => {
+    notificationApi.open({
+      message: "İşlem Başarısız",
+      description: description,
+      duration: 4.5,
+      icon: <CloseCircleOutlined style={{ color: "#ff4d4f" }} />,
+    });
   };
-  
+
   const columns: ColumnsType<VehicleType> = [
     {
       title: t("Vehicles.LICENSE_PLATE"),
-      dataIndex: 'licence_plate',
-      key: 'licence_plate',
-      render: (plate: string) => formatLicencePlate(plate),
+      dataIndex: "licence_plate",
+      key: "licence_plate",
+      render: formatLicencePlate,
     },
     {
       title: t("Vehicles.VEHICLE_TYPE"),
-      dataIndex: 'vehicle_type',
-      key: 'vehicle_type'
+      dataIndex: "vehicle_type",
+      key: "vehicle_type",
     },
     {
       title: t("Vehicles.CREATED_AT"),
-      dataIndex: 'createdAt',
-      key: 'createdAt',
-      render: (date: string) => new Date(date).toLocaleString('tr-TR', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit'
-      }),
+      dataIndex: "createdAt",
+      key: "createdAt",
+      render: (date: string) => new Date(date).toLocaleString("tr-TR"),
     },
     {
       title: t("Vehicles.UPDATED_AT"),
-      dataIndex: 'updatedAt',
-      key: 'updatedAt',
-      render: (date: string) => new Date(date).toLocaleString('tr-TR', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit'
-      }),
+      dataIndex: "updatedAt",
+      key: "updatedAt",
+      render: (date: string) => new Date(date).toLocaleString("tr-TR"),
     },
     {
       title: t("Vehicles.STATUS"),
-      key: 'deleted',
-      dataIndex: 'deleted',
-      render: (deleted: boolean) => {
-        const color = deleted ? 'red' : 'green';
-        const text = deleted ? t("Vehicles.PASSIVE") : t("Vehicles.ACTIVE");
-        return (
-          <Tag color={color}>
-            {text}
-          </Tag>
-        );
-      },
+      key: "deleted",
+      dataIndex: "deleted",
+      render: (deleted: boolean) => (
+        <Tag color={deleted ? "red" : "green"}>
+          {deleted ? t("Companies.PASSIVE") : t("Companies.ACTIVE")}
+        </Tag>
+      ),
     },
     {
       title: t("Vehicles.ACTIONS"),
-      key: 'action',
-      render: (_, record) => (
-        <Space size="middle">
-          <a>{t("Vehicles.EDIT")}</a>
-          <a>{t("Vehicles.DELETE")}</a>
+      key: "action",
+      render: (_: any, record: VehicleType) => (
+        <Space>
+          <Button
+            onClick={() => handleEdit(record)}
+            color="yellow"
+            variant="outlined"
+          >
+            {t("Companies.EDIT")}
+          </Button>
+          <Popconfirm
+            title="Silme işlemi"
+            description={
+              <span>
+                <strong>{formatLicencePlate(record.licence_plate)}</strong>{" "}
+                plakalı aracı silmek istediğinize emin misiniz?
+              </span>
+            }
+            okText="Onayla"
+            cancelText="İptal"
+            icon={<DeleteOutlined style={{ color: "red" }} />}
+            onConfirm={() => handleDelete(record)}
+          >
+            <Button danger type="link">
+              {t("Companies.DELETE")}
+            </Button>
+          </Popconfirm>
         </Space>
       ),
     },
   ];
 
-  const fetchVehicles = async () => {
+  const handleDelete = async (record: VehicleType) => {
     try {
-      setLoading(true);
-      const response = await apiClient.get(API_ENDPOINTS.VEHICLES);
-      setVehicles(response.data.data);
+      await deleteVehicle(record._id);
+      messageApi.warning(
+        <span>
+          <strong>{record.licence_plate}</strong> plakalı araç başarıyla
+          silindi.
+        </span>
+      );
     } catch (error) {
-      console.error('Araçlar yüklenirken hata oluştu:', error);
-      message.error('Araçlar yüklenemedi');
-    } finally {
-      setLoading(false);
+      messageApi.error("Silme işlemi başarısız.");
     }
   };
 
-  useEffect(() => {
-    fetchVehicles();
-  }, []);
+  const handleFormSubmit = async (values: {
+    inputLicencePlate: string;
+    inputVehicleType: VehiclesType;
+  }) => {
+    try {
+      if (selectedRecord) {
+        await updateVehicle({
+          id: selectedRecord._id,
+          licence_plate: values.inputLicencePlate,
+          vehicle_type: values.inputVehicleType,
+        });
+        messageApi.info(
+          <span>
+            <strong>{values.inputLicencePlate}</strong> plakalı araç başarıyla
+            düzenlendi.
+          </span>
+        );
+      } else {
+        await createVehicle({
+          licence_plate: values.inputLicencePlate,
+          vehicle_type: values.inputVehicleType,
+        });
+        messageApi.success(
+          <span>
+            <strong>{values.inputLicencePlate}</strong> plakalı araç başarıyla
+            eklendi.
+          </span>
+        );
+      }
+      setIsModalOpen(false);
+    } catch (error: any) {
+      const errorMsg =
+        error.response?.data?.message?.toString() ||
+        "Beklenmedik bir hata oluştu.";
+      openErrorNotification(errorMsg);
+    }
+  };
+
+  const handleAdd = () => {
+    setSelectedRecord(undefined);
+    setIsModalOpen(true);
+  };
+
+  const handleEdit = (record: VehicleType) => {
+    setSelectedRecord(record);
+    setIsModalOpen(true);
+  };
+
+  const filteredVehicles = vehicles.filter((vehicle) => {
+    if (!searchText) return true;
+    return vehicle.licence_plate
+      .toLowerCase()
+      .includes(searchText.toLowerCase());
+  });
 
   return (
     <Layout style={{ padding: "0 50px" }}>
-      <Table 
-        columns={columns} 
-        dataSource={vehicles} 
-        loading={loading}
+      {messageContextHolder}
+      {notificationContextHolder}
+      <Flex style={{ marginBottom: "20px" }} gap={25}>
+        <Search
+          placeholder={t("Companies.SEARCH")}
+          allowClear
+          enterButton={
+            <>
+              <SearchOutlined /> {t("Companies.SEARCH")}
+            </>
+          }
+          size="large"
+          onSearch={setSearchText}
+          onChange={(e) => setSearchText(e.target.value)}
+        />
+        <Button color="cyan" variant="solid" size="large" onClick={handleAdd}>
+          <PlusOutlined /> Araç Ekle
+        </Button>
+      </Flex>
+      <Table
+        columns={columns}
+        dataSource={filteredVehicles}
+        loading={isLoading}
         rowKey="_id"
         locale={{
           emptyText: (
             <Empty
               image={Empty.PRESENTED_IMAGE_SIMPLE}
-              description={ t("Table.NO_DATA") }
+              description={t("Table.NO_DATA")}
             />
-          )
+          ),
         }}
         pagination={{
           showSizeChanger: true,
           showQuickJumper: true,
-          showTotal: (total, range) => `${range[0]}-${range[1]} / ${total} araç`,
+          showTotal: (total, range) =>
+            `${range[0]}-${range[1]} / ${total} araç`,
         }}
       />
+      <VehicleModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onFinish={handleFormSubmit}
+        selectedRecord={selectedRecord}
+      />
     </Layout>
-  )
+  );
 }
 
-export default Vehicles
+export default Vehicles;
