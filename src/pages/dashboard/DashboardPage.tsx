@@ -1,12 +1,17 @@
-import { Card, Row, Col, Statistic } from 'antd';
-import { UserOutlined, CarOutlined, TeamOutlined, AppstoreOutlined } from '@ant-design/icons';
+import { Card, Row, Col, Statistic } from "antd";
+import {
+  UserOutlined,
+  CarOutlined,
+  TeamOutlined,
+  AppstoreOutlined,
+} from "@ant-design/icons";
 
 function DashboardPage() {
   return (
-    <div style={{ padding: '24px' }}>
+    <div style={{ padding: "24px" }}>
       <h1>Dashboard</h1>
-      <Row gutter={16}>
-        <Col span={6}>
+      <Row gutter={[16, 16]}>
+        <Col xs={24} sm={12} md={6}>
           <Card>
             <Statistic
               title="Toplam Şirket"
@@ -15,7 +20,7 @@ function DashboardPage() {
             />
           </Card>
         </Col>
-        <Col span={6}>
+        <Col xs={24} sm={12} md={6}>
           <Card>
             <Statistic
               title="Toplam Sürücü"
@@ -24,7 +29,7 @@ function DashboardPage() {
             />
           </Card>
         </Col>
-        <Col span={6}>
+        <Col xs={24} sm={12} md={6}>
           <Card>
             <Statistic
               title="Toplam Araç"
@@ -33,7 +38,7 @@ function DashboardPage() {
             />
           </Card>
         </Col>
-        <Col span={6}>
+        <Col xs={24} sm={12} md={6}>
           <Card>
             <Statistic
               title="Aktif Sefer"
@@ -44,7 +49,7 @@ function DashboardPage() {
         </Col>
       </Row>
     </div>
-  )
+  );
 }
 
-export default DashboardPage
+export default DashboardPage;
