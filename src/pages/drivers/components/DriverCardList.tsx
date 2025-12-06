@@ -6,21 +6,23 @@ import {
   Button,
   Empty,
   Space,
-  Flex,
   Typography,
+  Flex,
+  Divider,
 } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
-import type { CompanyType } from "../../../types";
+import type { DriverType } from "../../../types";
 import { useTranslation } from "react-i18next";
+import { formatPhoneNumber } from "../../../utils";
 
 type Props = {
-  companies: CompanyType[];
+  companies: DriverType[];
   isLoading: boolean;
-  onEdit: (c: CompanyType) => void;
-  onDelete: (c: CompanyType) => void;
+  onEdit: (c: DriverType) => void;
+  onDelete: (c: DriverType) => void;
 };
 
-export default function CompanyCardList({
+export default function DriverCardList({
   companies,
   isLoading,
   onEdit,
@@ -38,7 +40,7 @@ export default function CompanyCardList({
         <List.Item>
           <Card
             style={{ width: "100%" }}
-            title={item.name}
+            title={item.full_name}
             actions={[
               <Button
                 type="text"
@@ -71,6 +73,15 @@ export default function CompanyCardList({
             }
           >
             <Space direction="vertical" style={{ width: "100%" }}>
+              <Flex justify="space-between">
+                <Text type="secondary">Telefon Numarası:</Text>
+                <Text>{formatPhoneNumber(item.phone_number)}</Text>
+              </Flex>
+              <Flex justify="space-between">
+                <Text type="secondary">Firması:</Text>
+                <Text>{item.company.name}</Text>
+              </Flex>
+              <Divider size="small" />
               <Flex justify="space-between">
                 <Text type="secondary">{t("Companies.CREATED_AT")}:</Text>
                 <Text>
