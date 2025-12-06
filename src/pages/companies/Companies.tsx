@@ -1,30 +1,20 @@
-import {
-  Button,
-  Empty,
-  Flex,
-  Layout,
-  message,
-  notification,
-  Popconfirm,
-  Space,
-  Table,
-  Tag,
-} from "antd";
+import { Button, Flex, Layout, message, notification } from "antd";
 import Search from "antd/es/input/Search";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import {
   CloseCircleOutlined,
-  DeleteOutlined,
   PlusOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
 
 import { useCompanies } from "../../hooks/useCompanies";
 import CompanyModal from "./components/CompanyModal";
-import type { ColumnsType } from "antd/es/table";
+import CompanyTable from "./components/CompanyTable";
 import type { CompanyType } from "../../types";
+import { useIsMobile } from "../../hooks/useIsMobile";
+import CompanyCardList from "./components/CompanyCardList";
 
 function Companies() {
   const { t } = useTranslation();
@@ -40,6 +30,7 @@ function Companies() {
 
   const { companies, isLoading, createCompany, updateCompany, deleteCompany } =
     useCompanies();
+  const isMobile = useIsMobile();
 
   const openErrorNotification = (description: string) => {
     notificationApi.open({
@@ -104,111 +95,44 @@ function Companies() {
     return company.name.toLowerCase().includes(searchText.toLowerCase());
   });
 
-  const columns: ColumnsType<CompanyType> = [
-    {
-      title: t("Companies.COMPANY_NAME"),
-      dataIndex: "name",
-      key: "name",
-    },
-    {
-      title: t("Companies.CREATED_AT"),
-      dataIndex: "createdAt",
-      key: "createdAt",
-      render: (date: string) => new Date(date).toLocaleString("tr-TR"),
-    },
-    {
-      title: t("Companies.UPDATED_AT"),
-      dataIndex: "updatedAt",
-      key: "updatedAt",
-      render: (date: string) => new Date(date).toLocaleString("tr-TR"),
-    },
-    {
-      title: t("Companies.STATUS"),
-      dataIndex: "deleted",
-      key: "deleted",
-      render: (deleted: boolean) => {
-        const color = deleted ? "red" : "green";
-        const text = deleted ? t("Companies.PASSIVE") : t("Companies.ACTIVE");
-        return <Tag color={color}>{text}</Tag>;
-      },
-    },
-    {
-      title: t("Companies.ACTIONS"),
-      key: "action",
-      render: (_: any, record: CompanyType) => (
-        <Space size="middle">
-          <Button
-            onClick={() => handleEdit(record)}
-            color="yellow"
-            variant="outlined"
-          >
-            {t("Companies.EDIT")}
-          </Button>
-          <Popconfirm
-            title="Silme işlemi"
-            description={
-              <span>
-                <strong>{record.name}</strong> firmasını silmek istediğinize
-                emin misiniz?
-              </span>
-            }
-            onConfirm={() => handleDelete(record)}
-            okText="Onayla"
-            cancelText="İptal"
-            icon={<DeleteOutlined style={{ color: "red" }} />}
-          >
-            <Button danger type="link" variant="text">
-              {t("Companies.DELETE")}
-            </Button>
-          </Popconfirm>
-        </Space>
-      ),
-    },
-  ];
-
   return (
-    <Layout style={{ padding: "0 50px" }}>
+    <Layout style={{ padding: isMobile ? "0 16px" : "0 50px" }}>
       {messageContextHolder}
       {notificationContextHolder}
-      <Flex style={{ marginBottom: "20px" }} gap={25}>
+      <Flex gap={isMobile ? 10 : 25} style={{ marginBottom: 20 }}>
         <Search
           placeholder={t("Companies.SEARCH")}
           allowClear
           enterButton={
-            <>
-              <SearchOutlined /> {t("Companies.SEARCH")}
-            </>
+            !isMobile && (
+              <>
+                <SearchOutlined /> {t("Companies.SEARCH")}
+              </>
+            )
           }
           size="large"
           onSearch={setSearchText}
           onChange={(e) => setSearchText(e.target.value)}
         />
         <Button color="cyan" variant="solid" size="large" onClick={handleAdd}>
-          <PlusOutlined /> Firma Ekle
+          <PlusOutlined /> {isMobile ? "Ekle" : "Firma Ekle"}
         </Button>
       </Flex>
-
-      <Table
-        columns={columns}
-        dataSource={filteredCompanies}
-        loading={isLoading}
-        rowKey="_id"
-        locale={{
-          emptyText: (
-            <Empty
-              image={Empty.PRESENTED_IMAGE_SIMPLE}
-              description={t("Table.NO_DATA")}
-            />
-          ),
-        }}
-        pagination={{
-          showSizeChanger: true,
-          showQuickJumper: true,
-          showTotal: (total, range) =>
-            `${range[0]}-${range[1]} / ${total} şirket`,
-        }}
-      />
-
+      {isMobile ? (
+        <CompanyCardList
+          companies={filteredCompanies}
+          isLoading={isLoading}
+          onDelete={handleDelete}
+          onEdit={handleEdit}
+        />
+      ) : (
+        <CompanyTable
+          companies={filteredCompanies}
+          isLoading={isLoading}
+          onDelete={handleDelete}
+          onEdit={handleEdit}
+        />
+      )}
       <CompanyModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

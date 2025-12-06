@@ -133,7 +133,6 @@ function Header() {
           color: "white",
           display: "flex",
           alignItems: "center",
-          fontSize: "18px",
           fontWeight: "bold",
           marginRight: "20px",
         }}

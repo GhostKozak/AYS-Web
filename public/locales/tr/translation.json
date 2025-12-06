@@ -19,7 +19,7 @@
     "DELETE": "Sil",
     "ACTIVE": "Aktif",
     "PASSIVE": "Pasif",
-    "SEARCH": "Ara"
+    "SEARCH": "Şirket Adı ile Ara"
   },
   "Drivers": {
     "FULL_NAME": "Ad Soyad",

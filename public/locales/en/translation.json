@@ -19,7 +19,7 @@
     "DELETE": "Delete",
     "ACTIVE": "Active",
     "PASSIVE": "Passive",
-    "SEARCH": "Search"
+    "SEARCH": "Search with Company Name"
   },
   "Drivers": {
     "FULL_NAME": "Full Name",
