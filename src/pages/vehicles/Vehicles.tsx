@@ -1,29 +1,18 @@
-import {
-  Button,
-  Empty,
-  Flex,
-  Layout,
-  Popconfirm,
-  Space,
-  Table,
-  Tag,
-  message,
-  notification,
-} from "antd";
-import type { ColumnsType } from "antd/es/table";
+import { Button, Flex, Layout, message, notification } from "antd";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import VehicleModal from "./components/VehicleModal";
 import Search from "antd/es/input/Search";
 import {
   CloseCircleOutlined,
-  DeleteOutlined,
   PlusOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
 import { useVehicles } from "../../hooks/useVehicles";
 import type { VehiclesType, VehicleType } from "../../types";
-import { formatLicencePlate } from "../../utils";
+import VehicleTable from "./components/VehicleTable";
+import { useIsMobile } from "../../hooks/useIsMobile";
+import VehicleCardList from "./components/VehicleCardList";
 
 function Vehicles() {
   const { t } = useTranslation();
@@ -40,6 +29,7 @@ function Vehicles() {
 
   const { vehicles, isLoading, createVehicle, updateVehicle, deleteVehicle } =
     useVehicles();
+  const isMobile = useIsMobile();
 
   const openErrorNotification = (description: string) => {
     notificationApi.open({
@@ -49,74 +39,6 @@ function Vehicles() {
       icon: <CloseCircleOutlined style={{ color: "#ff4d4f" }} />,
     });
   };
-
-  const columns: ColumnsType<VehicleType> = [
-    {
-      title: t("Vehicles.LICENSE_PLATE"),
-      dataIndex: "licence_plate",
-      key: "licence_plate",
-      render: formatLicencePlate,
-    },
-    {
-      title: t("Vehicles.VEHICLE_TYPE"),
-      dataIndex: "vehicle_type",
-      key: "vehicle_type",
-    },
-    {
-      title: t("Vehicles.CREATED_AT"),
-      dataIndex: "createdAt",
-      key: "createdAt",
-      render: (date: string) => new Date(date).toLocaleString("tr-TR"),
-    },
-    {
-      title: t("Vehicles.UPDATED_AT"),
-      dataIndex: "updatedAt",
-      key: "updatedAt",
-      render: (date: string) => new Date(date).toLocaleString("tr-TR"),
-    },
-    {
-      title: t("Vehicles.STATUS"),
-      key: "deleted",
-      dataIndex: "deleted",
-      render: (deleted: boolean) => (
-        <Tag color={deleted ? "red" : "green"}>
-          {deleted ? t("Companies.PASSIVE") : t("Companies.ACTIVE")}
-        </Tag>
-      ),
-    },
-    {
-      title: t("Vehicles.ACTIONS"),
-      key: "action",
-      render: (_: any, record: VehicleType) => (
-        <Space>
-          <Button
-            onClick={() => handleEdit(record)}
-            color="yellow"
-            variant="outlined"
-          >
-            {t("Companies.EDIT")}
-          </Button>
-          <Popconfirm
-            title="Silme işlemi"
-            description={
-              <span>
-                <strong>{formatLicencePlate(record.licence_plate)}</strong>{" "}
-                plakalı aracı silmek istediğinize emin misiniz?
-              </span>
-            }
-            okText="Onayla"
-            cancelText="İptal"
-            icon={<DeleteOutlined style={{ color: "red" }} />}
-            onConfirm={() => handleDelete(record)}
-          >
-            <Button danger type="link">
-              {t("Companies.DELETE")}
-            </Button>
-          </Popconfirm>
-        </Space>
-      ),
-    },
-  ];
 
   const handleDelete = async (record: VehicleType) => {
     try {
@@ -188,17 +110,19 @@ function Vehicles() {
   });
 
   return (
-    <Layout style={{ padding: "0 50px" }}>
+    <Layout style={{ padding: isMobile ? "0 16px" : "0 50px" }}>
       {messageContextHolder}
       {notificationContextHolder}
-      <Flex style={{ marginBottom: "20px" }} gap={25}>
+      <Flex gap={isMobile ? 10 : 25} style={{ marginBottom: 20 }}>
         <Search
           placeholder={t("Companies.SEARCH")}
           allowClear
           enterButton={
-            <>
-              <SearchOutlined /> {t("Companies.SEARCH")}
-            </>
+            !isMobile && (
+              <>
+                <SearchOutlined /> {t("Companies.SEARCH")}
+              </>
+            )
           }
           size="large"
           onSearch={setSearchText}
@@ -208,26 +132,22 @@ function Vehicles() {
           <PlusOutlined /> Araç Ekle
         </Button>
       </Flex>
-      <Table
-        columns={columns}
-        dataSource={filteredVehicles}
-        loading={isLoading}
-        rowKey="_id"
-        locale={{
-          emptyText: (
-            <Empty
-              image={Empty.PRESENTED_IMAGE_SIMPLE}
-              description={t("Table.NO_DATA")}
-            />
-          ),
-        }}
-        pagination={{
-          showSizeChanger: true,
-          showQuickJumper: true,
-          showTotal: (total, range) =>
-            `${range[0]}-${range[1]} / ${total} araç`,
-        }}
-      />
+      {isMobile ? (
+        <VehicleCardList
+          vehicles={filteredVehicles}
+          isLoading={isLoading}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+        />
+      ) : (
+        <VehicleTable
+          vehicles={filteredVehicles}
+          isLoading={isLoading}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+        />
+      )}
+
       <VehicleModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
