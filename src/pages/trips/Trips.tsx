@@ -1,210 +1,195 @@
-import { Empty, Layout, Space, Table, Tag, Tooltip, message } from 'antd';
-import type { ColumnsType } from 'antd/es/table';
-import { useEffect, useState } from 'react';
-import apiClient from '../../api/apiClient';
-import { useTranslation } from 'react-i18next';
-import { API_ENDPOINTS } from '../../constants';
+import { Button, Flex, Layout, message, notification } from "antd";
+import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
+
+import {
+  CloseCircleOutlined,
+  PlusOutlined,
+  SearchOutlined,
+} from "@ant-design/icons";
+
+import type { TripType } from "../../types";
+import { useIsMobile } from "../../hooks/useIsMobile";
+import { useTrips } from "../../hooks/useTrips";
+import TripTable from "./components/TripTable";
+import Search from "antd/es/input/Search";
+import TripCardList from "./components/TripCardList";
+import TripModal from "./components/TripModal";
+
+import { useCompanies } from "../../hooks/useCompanies";
+import { useVehicles } from "../../hooks/useVehicles";
+import { useDrivers } from "../../hooks/useDrivers";
 
 function Trips() {
-  const [trips, setTrips] = useState<TripType[]>([]);
-  const [loading, setLoading] = useState(false);
-  const {t,i18n} = useTranslation();
+  const { t } = useTranslation();
+  const [messageApi, messageContextHolder] = message.useMessage();
+  const [notificationApi, notificationContextHolder] =
+    notification.useNotification();
 
-  interface TripType {
-    _id: string;
-    driver: {
-      _id: string;
-      full_name: string;
-      phone_number: string;
-    };
-    company: {
-      _id: string;
-      name: string;
-    };
-    vehicle: {
-      _id: string;
-      licence_plate: string;
-    };
-    departure_time: string;
-    arrival_time: string;
-    unload_status: string;
-    has_gps_tracking: boolean;
-    is_in_temporary_parking_lot: boolean;
-    is_trip_canceled: boolean;
-    notes: string;
-    deleted: boolean;
-    createdAt: string;
-    updatedAt: string;
-    __v: number;
-  }
-  
-  const formatLicencePlate = (plate: string): string => {
-    // Add space between letters and numbers
-    return plate.replace(/([A-Z]+)(\d+)/g, '$1 $2').replace(/(\d+)([A-Z]+)/g, '$1 $2');
+  const [searchText, setSearchText] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedRecord, setSelectedRecord] = useState<TripType | undefined>(
+    undefined
+  );
+
+  const { trips, isLoading, createTrip, updateTrip, deleteTrip } = useTrips();
+  const isMobile = useIsMobile();
+  const { companies } = useCompanies();
+  const { drivers } = useDrivers();
+  const { vehicles } = useVehicles();
+  const queryClient = useQueryClient();
+
+  const openErrorNotification = (description: string) => {
+    notificationApi.open({
+      message: "İşlem Başarısız",
+      description: description,
+      duration: 4.5,
+      icon: <CloseCircleOutlined style={{ color: "#ff4d4f" }} />,
+    });
   };
-  
-  const formatPhoneNumber = (phone_number: string): string => {
-    const cleanNumber = String(phone_number).replace(/\D/g, '');
-  
-    if (cleanNumber.length === 11 && cleanNumber.startsWith('0')) {
-      const [, countryCode, ...rest] = cleanNumber.split('');
-      const areaCode = rest.slice(0, 3).join('');
-      const prefix = rest.slice(3, 6).join('');
-      const suffix = rest.slice(6, 8).join('');
-      const lastTwo = rest.slice(8, 10).join('');
-      
-      return `${countryCode}${areaCode} ${prefix} ${suffix} ${lastTwo}`;
-    }
-  
-    if (cleanNumber.length === 10) {
-      const [, ...rest] = `0${cleanNumber}`.split('');
-      const areaCode = rest.slice(0, 3).join('');
-      const prefix = rest.slice(3, 6).join('');
-      const suffix = rest.slice(6, 8).join('');
-      const lastTwo = rest.slice(8, 10).join('');
-  
-      return `0${areaCode} ${prefix} ${suffix} ${lastTwo}`;
-    }
-    
-    return phone_number;
-  }
-  
-  const columns: ColumnsType<TripType> = [
-    {
-      title: t("Trips.ARRIVAL_TIME"),
-      dataIndex: 'arrival_time',
-      key: 'arrival_time',
-      render: (date: string) => new Date(date).toLocaleString('tr-TR', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit'
-      }),
-    },
-    {
-      title: t("Trips.FULL_NAME"),
-      dataIndex: 'driver',
-      key: 'driver',
-      render: (driver: { _id: string; full_name: string }) => driver?.full_name || 'Sürücü bulunamadı',
-    },
-    {
-      title: t("Trips.PHONE_NUMBER"),
-      dataIndex: 'driver',
-      key: 'driver',
-      render: (driver: { _id: string; phone_number: string }) => formatPhoneNumber(driver?.phone_number) || 'Sürücü bulunamadı',
-    },
-    {
-      title: t("Trips.COMPANY_NAME"),
-      dataIndex: 'company',
-      key: 'company',
-      render: (company: { _id: string; name: string }) => company?.name || 'Şirket bulunamadı',
-    },
-    {
-      title: t("Trips.LICENSE_PLATE"),
-      dataIndex: 'vehicle',
-      key: 'vehicle',
-      render: (vehicle: { _id: string; licence_plate: string }) => formatLicencePlate(vehicle?.licence_plate) || 'Şirket bulunamadı',
-    },
-    {
-      title: t("Trips.UNLOAD_STATUS"),
-      dataIndex: 'unload_status',
-      key: 'unload_status',
-    },
-    {
-      title: 'ATS',
-      dataIndex: 'has_gps_tracking',
-      key: 'has_gps_tracking',
-      render: (has_gps_tracking: boolean) => {
-        const color = has_gps_tracking ? 'green' : 'red';
-        const text = has_gps_tracking ? 'Var' : 'Yok';
-        return (
-          <Tag color={color}>
-            {text}
-          </Tag>
-        );
-      },
-    },
-    {
-      title: (
-        <Tooltip title="Koridor Kesik">
-          <span>KK</span>
-        </Tooltip>
-      ),
-      dataIndex: 'is_in_temporary_parking_lot',
-      key: 'is_in_temporary_parking_lot',
-      render: (is_in_temporary_parking_lot: boolean) => {
-        const color = is_in_temporary_parking_lot ? 'green' : '';
-        const text = is_in_temporary_parking_lot ? 'Kesik' : '';
-        return (
-          <Tag color={color}>
-            {text}
-          </Tag>
-        );
-      },
-    },
-    {
-      title: t("Trips.TRIP_CANCELED"),
-      dataIndex: 'is_trip_canceled',
-      key: 'is_trip_canceled',
-      render: (is_trip_canceled: boolean) => {
-        const color = is_trip_canceled ? 'red' : '';
-        const text = is_trip_canceled ? t("Trips.CANCEL") : '';
-        return (
-          <Tag color={color}>
-            {text}
-          </Tag>
-        );
-      },
-    },
-    Table.EXPAND_COLUMN,
-  ];
 
-  const fetchTrips = async () => {
+  const handleDelete = async (record: TripType) => {
     try {
-      setLoading(true);
-      const response = await apiClient.get(API_ENDPOINTS.TRIPS);
-      setTrips(response.data.data);
-      console.table(response.data.data)
+      await deleteTrip(record._id);
+      messageApi.warning(<span>Sefer firması başarıyla silindi.</span>);
     } catch (error) {
-      console.error('Sefer yüklenirken hata oluştu:', error);
-      message.error('Sefer yüklenemedi');
-    } finally {
-      setLoading(false);
+      messageApi.error("Silme işlemi başarısız.");
     }
   };
 
-  useEffect(() => {
-    fetchTrips();
-  }, []);
+  const handleSearch = (value: string) => {
+    setSearchText(value);
+  };
+
+  const handleAdd = () => {
+    setSelectedRecord(undefined);
+    setIsModalOpen(true);
+  };
+
+  const handleEdit = (record: TripType) => {
+    setSelectedRecord(record);
+    setIsModalOpen(true);
+  };
+
+  const handleFormSubmit = async (values: {
+    inputName: string;
+    inputPhone: string;
+    inputCompany: string;
+    inputVehicle: string;
+    inputDriver?: string;
+    departure_time?: string;
+    arrival_time?: string;
+    unload_status?: string;
+    has_gps_tracking?: boolean;
+    is_in_temporary_parking_lot?: boolean;
+    is_trip_canceled?: boolean;
+    notes?: string;
+  }) => {
+    try {
+      const payload = {
+        driver_full_name: values.inputName,
+        driver_phone_number: values.inputPhone,
+        company_name: values.inputCompany,
+        licence_plate: values.inputVehicle,
+      };
+
+      if (selectedRecord) {
+        await updateTrip({ id: selectedRecord._id, ...payload });
+        messageApi.info(
+          <span>
+            <strong>{values.inputName}</strong> güncellendi.
+          </span>
+        );
+      } else {
+        await createTrip(payload);
+        messageApi.success(
+          <span>
+            <strong>{values.inputName}</strong> eklendi.
+          </span>
+        );
+      }
+      setIsModalOpen(false);
+    } catch (error: any) {
+      const errorMsg =
+        error.response?.data?.message?.toString() ||
+        "Beklenmedik bir hata oluştu.";
+      openErrorNotification(errorMsg);
+    }
+  };
+
+  const filteredTrips = trips.filter((trip) => {
+    if (!searchText) return true;
+
+    return (
+      trip.company.name.toLowerCase().includes(searchText.toLowerCase()) ||
+      trip.driver.full_name.toLowerCase().includes(searchText.toLowerCase()) ||
+      trip.driver.phone_number.includes(searchText) ||
+      trip.vehicle.licence_plate
+        .toLowerCase()
+        .includes(searchText.toLowerCase())
+    );
+  });
 
   return (
     <Layout style={{ padding: "0 50px" }}>
-      <Table 
-        columns={columns} 
-        dataSource={trips} 
-        loading={loading}
-        rowKey="_id"
-        locale={{
-          emptyText: (
-            <Empty
-              image={Empty.PRESENTED_IMAGE_SIMPLE}
-              description={ t("Table.NO_DATA") }
-            />
-          )
+      {messageContextHolder}
+      {notificationContextHolder}
+      <Flex gap={isMobile ? 10 : 25} style={{ marginBottom: 20 }}>
+        <Search
+          placeholder={t("Companies.SEARCH")}
+          allowClear
+          enterButton={
+            !isMobile && (
+              <>
+                <SearchOutlined /> {t("Companies.SEARCH")}
+              </>
+            )
+          }
+          size="large"
+          onSearch={handleSearch}
+          onChange={(e) => handleSearch(e.target.value)}
+        />
+        <Button color="cyan" variant="solid" size="large" onClick={handleAdd}>
+          <PlusOutlined /> {isMobile ? "Ekle" : "Sefer Ekle"}
+        </Button>
+      </Flex>
+      {isMobile ? (
+        <TripCardList
+          trips={filteredTrips}
+          isLoading={isLoading}
+          onDelete={handleDelete}
+          onEdit={handleEdit}
+        />
+      ) : (
+        <TripTable
+          trips={filteredTrips as unknown as TripType[]}
+          isLoading={isLoading}
+          onDelete={handleDelete}
+          onEdit={handleEdit}
+        />
+      )}
+      <TripModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onFinish={handleFormSubmit}
+        onCreated={() => {
+          // ensure lists refresh immediately after modal-created items
+          try {
+            queryClient.invalidateQueries({ queryKey: ["companies"] });
+            queryClient.invalidateQueries({ queryKey: ["drivers"] });
+            queryClient.invalidateQueries({ queryKey: ["vehicles"] });
+          } catch (e) {
+            /* ignore */
+          }
         }}
-        pagination={{
-          showSizeChanger: true,
-          showQuickJumper: true,
-          showTotal: (total, range) => `${range[0]}-${range[1]} / ${total} sefer`,
-        }}
-        expandable={{
-          expandedRowRender: (record) => <p style={{ margin: 0 }}>{record.notes}</p>,
-          rowExpandable: (record) => !!record.notes && record.notes !== '',
-        }}
+        selectedRecord={selectedRecord}
+        companies={companies}
+        vehicles={vehicles}
+        drivers={drivers}
       />
     </Layout>
-  )
+  );
 }
 
-export default Trips
+export default Trips;
