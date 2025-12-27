@@ -64,7 +64,7 @@ function Companies() {
           </span>
         );
       } else {
-        await createCompany(values.inputName);
+        await createCompany({ name: values.inputName });
         messageApi.success(
           <span>
             <strong>{values.inputName}</strong> firması başarıyla eklendi.

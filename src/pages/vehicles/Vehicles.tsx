@@ -9,7 +9,7 @@ import {
   SearchOutlined,
 } from "@ant-design/icons";
 import { useVehicles } from "../../hooks/useVehicles";
-import type { VehiclesType, VehicleType } from "../../types";
+import type { VehicleType, VehicleTypeEnum } from "../../types";
 import VehicleTable from "./components/VehicleTable";
 import { useIsMobile } from "../../hooks/useIsMobile";
 import VehicleCardList from "./components/VehicleCardList";
@@ -56,7 +56,7 @@ function Vehicles() {
 
   const handleFormSubmit = async (values: {
     inputLicencePlate: string;
-    inputVehicleType: VehiclesType;
+    inputVehicleType: VehicleTypeEnum;
   }) => {
     try {
       if (selectedRecord) {

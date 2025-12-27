@@ -4,7 +4,7 @@ import {
   VehicleLabels,
   VehicleValues,
   type VehicleType,
-  type VehiclesType,
+  type VehicleTypeEnum,
 } from "../../../types";
 
 interface VehicleModalProps {
@@ -12,7 +12,7 @@ interface VehicleModalProps {
   onClose: () => void;
   onFinish: (values: {
     inputLicencePlate: string;
-    inputVehicleType: VehiclesType;
+    inputVehicleType: VehicleTypeEnum;
   }) => void;
 
   selectedRecord?: VehicleType;
@@ -33,15 +33,12 @@ const VehicleModal = ({
     value: value,
   }));
 
-  interface MyFormValues {
-    vehicle: VehicleType; // Type güvenliği devam ediyor
-  }
-
   useEffect(() => {
     if (isOpen) {
       if (selectedRecord) {
         form.setFieldsValue({
-          inputLicensePlate: selectedRecord.licence_plate,
+          inputLicencePlate: selectedRecord.licence_plate,
+          inputVehicleType: selectedRecord.vehicle_type,
         });
       } else {
         form.resetFields();
@@ -68,7 +65,7 @@ const VehicleModal = ({
       >
         <Form.Item
           label="Araç Plakası"
-          name="inputLicensePlate"
+          name="inputLicencePlate"
           rules={[
             { required: true, message: "Lütfen araç plakasını giriniz!" },
           ]}
