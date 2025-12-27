@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { companyApi } from "../api/companyApi";
-import { type CompanyType } from "../types";
+import { type CompanyType, type CreateCompanyPayload } from "../types";
 
 export const useCompanies = () => {
   const queryClient = useQueryClient();
@@ -12,14 +12,14 @@ export const useCompanies = () => {
   });
 
   const createMutation = useMutation({
-    mutationFn: companyApi.create,
+    mutationFn: (data: CreateCompanyPayload) => companyApi.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["companies"] });
     },
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, name }: { id: string; name: string }) => companyApi.update(id, name),
+    mutationFn: ({ id, ...data }: { id: string } & Partial<CreateCompanyPayload>) => companyApi.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["companies"] });
     },

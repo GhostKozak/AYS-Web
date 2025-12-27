@@ -1,6 +1,6 @@
 import apiClient from "./apiClient";
 import { API_ENDPOINTS } from "../constants";
-import type { VehiclesType } from "../types";
+import type { CreateVehiclePayload } from "../types";
 
 export const vehicleApi = {
   getAll: async () => {
@@ -8,12 +8,12 @@ export const vehicleApi = {
     return response.data.data;
   },
 
-  create: async (payload: { licence_plate: string; vehicle_type: VehiclesType }) => {
+  create: async (payload: CreateVehiclePayload) => {
     const response = await apiClient.post(API_ENDPOINTS.VEHICLES, payload);
     return response.data;
   },
 
-  update: async (id: string, payload: { licence_plate: string; vehicle_type: VehiclesType }) => {
+  update: async (id: string, payload: Partial<CreateVehiclePayload>) => {
     const response = await apiClient.patch(`${API_ENDPOINTS.VEHICLES}/${id}`, payload);
     return response.data;
   },

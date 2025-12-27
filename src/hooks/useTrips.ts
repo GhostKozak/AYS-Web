@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { tripApi } from "../api/tripApi";
-import { type TripType } from "../types";
+import { type CreateTripPayload, type TripType } from "../types";
 
 export const useTrips = () => {
   const queryClient = useQueryClient();
@@ -12,14 +12,15 @@ export const useTrips = () => {
   });
 
   const createMutation = useMutation({
-    mutationFn: tripApi.create,
+    mutationFn: (data: CreateTripPayload) => tripApi.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["trips"] });
     },
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, ...data }: { id: string } & Record<string, any>) => tripApi.update(id, data),
+    mutationFn: ({ id, ...data }: { id: string } & Partial<CreateTripPayload>) => 
+      tripApi.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["trips"] });
     },

@@ -88,10 +88,19 @@ function Trips() {
   }) => {
     try {
       const payload = {
+        driver: values.inputDriver, // Backend ID bekliyorsa
+        company: values.inputCompany, // Backend ID bekliyorsa
+        vehicle: values.inputVehicle, // Backend ID bekliyorsa
         driver_full_name: values.inputName,
         driver_phone_number: values.inputPhone,
-        company_name: values.inputCompany,
-        licence_plate: values.inputVehicle,
+        // Eksik alanlar eklendi:
+        departure_time: values.departure_time,
+        arrival_time: values.arrival_time,
+        unload_status: values.unload_status,
+        has_gps_tracking: values.has_gps_tracking,
+        is_in_temporary_parking_lot: values.is_in_temporary_parking_lot,
+        is_trip_canceled: values.is_trip_canceled,
+        notes: values.notes,
       };
 
       if (selectedRecord) {
@@ -122,11 +131,13 @@ function Trips() {
     if (!searchText) return true;
 
     return (
-      trip.company.name.toLowerCase().includes(searchText.toLowerCase()) ||
-      trip.driver.full_name.toLowerCase().includes(searchText.toLowerCase()) ||
-      trip.driver.phone_number.includes(searchText) ||
-      trip.vehicle.licence_plate
-        .toLowerCase()
+      trip.company?.name?.toLowerCase().includes(searchText.toLowerCase()) ||
+      trip.driver?.full_name
+        ?.toLowerCase()
+        .includes(searchText.toLowerCase()) ||
+      trip.driver?.phone_number?.includes(searchText) ||
+      trip.vehicle?.licence_plate
+        ?.toLowerCase()
         .includes(searchText.toLowerCase())
     );
   });

@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { vehicleApi } from "../api/vehicleApi";
-import { type VehiclesType, type VehicleType } from "../types";
+import { type CreateVehiclePayload, type VehicleType } from "../types";
 
 export const useVehicles = () => {
   const queryClient = useQueryClient();
@@ -12,14 +12,14 @@ export const useVehicles = () => {
   });
 
   const createMutation = useMutation({
-    mutationFn: vehicleApi.create,
+    mutationFn: (data: CreateVehiclePayload) => vehicleApi.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["vehicles"] });
     },
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, ...data }: { id: string; licence_plate: string; vehicle_type: VehiclesType;}) => vehicleApi.update(id, data),
+    mutationFn: ({ id, ...data }: { id: string } & Partial<CreateVehiclePayload>) => vehicleApi.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["vehicles"] });
     },

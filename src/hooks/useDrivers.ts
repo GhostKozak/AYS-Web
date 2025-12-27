@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { driverApi } from "../api/driverApi";
-import { type DriverType } from "../types";
+import { type CreateDriverPayload, type DriverType } from "../types";
 
 export const useDrivers = () => {
   const queryClient = useQueryClient();
@@ -12,15 +12,14 @@ export const useDrivers = () => {
   });
 
   const createMutation = useMutation({
-    mutationFn: driverApi.create,
+    mutationFn: (data: CreateDriverPayload) => driverApi.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["drivers"] });
     },
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, ...data }: { id: string; full_name: string; phone_number: string; company: string }) => 
-      driverApi.update(id, data),
+    mutationFn: ({ id, ...data }: { id: string } & Partial<CreateDriverPayload>) => driverApi.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["drivers"] });
     },

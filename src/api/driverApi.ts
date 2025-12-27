@@ -1,5 +1,6 @@
 import apiClient from "./apiClient";
 import { API_ENDPOINTS } from "../constants";
+import type { CreateDriverPayload } from "../types";
 
 export const driverApi = {
   getAll: async () => {
@@ -7,12 +8,12 @@ export const driverApi = {
     return response.data.data;
   },
 
-  create: async (payload: { full_name: string; phone_number: string; company: string }) => {
+  create: async (payload: CreateDriverPayload) => {
     const response = await apiClient.post(API_ENDPOINTS.DRIVERS, payload);
     return response.data;
   },
 
-  update: async (id: string, payload: { full_name: string; phone_number: string; company: string }) => {
+  update: async (id: string, payload: Partial<CreateDriverPayload>) => {
     const response = await apiClient.patch(`${API_ENDPOINTS.DRIVERS}/${id}`, payload);
     return response.data;
   },
