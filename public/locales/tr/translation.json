@@ -41,7 +41,8 @@
     "ERROR": "Hata",
     "SUCCESS": "Başarılı",
     "SEARCH": "Ara",
-    "APP_SUBTITLE": "Araç Yönetim Sistemi"
+    "APP_SUBTITLE": "Araç Yönetim Sistemi",
+    "BACK_HOME": "Ana Sayfaya Dön"
   },
 
   "Table": {
@@ -55,7 +56,9 @@
   "Errors": {
     "OPERATION_FAILED": "İşlem Başarısız",
     "UNEXPECTED_ERROR": "Beklenmedik bir hata oluştu.",
-    "DELETE_FAILED": "Silme işlemi başarısız."
+    "DELETE_FAILED": "Silme işlemi başarısız.",
+    "PAGE_NOT_FOUND": "Üzgünüz, aradığınız sayfa mevcut değil.",
+    "GENERAL_ERROR": "Bir hata oluştu."
   },
 
   "Validation": {

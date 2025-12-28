@@ -41,7 +41,8 @@
     "ERROR": "Error",
     "SUCCESS": "Success",
     "SEARCH": "Search",
-    "APP_SUBTITLE": "Vehicle Management System"
+    "APP_SUBTITLE": "Vehicle Management System",
+    "BACK_HOME": "Back to Home"
   },
 
   "Table": {
@@ -55,7 +56,9 @@
   "Errors": {
     "OPERATION_FAILED": "Operation Failed",
     "UNEXPECTED_ERROR": "An unexpected error occurred.",
-    "DELETE_FAILED": "Deletion failed."
+    "DELETE_FAILED": "Deletion failed.",
+    "PAGE_NOT_FOUND": "Sorry, the page you are looking for does not exist.",
+    "GENERAL_ERROR": "An error occurred."
   },
 
   "Validation": {

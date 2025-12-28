@@ -4,6 +4,7 @@ import Header from "./components/layout/Header";
 import Breadcrumb from "./components/common/Breadcrumb";
 import { useEffect } from "react";
 import { checkTokenValidity } from "./utils";
+import AxiosInterceptor from "./api/AxiosInterceptor";
 
 function App() {
   const navigate = useNavigate();
@@ -14,6 +15,7 @@ function App() {
 
   return (
     <Layout>
+      <AxiosInterceptor />
       <Header />
       <Layout.Content>
         <Breadcrumb />

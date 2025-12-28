@@ -1,13 +1,9 @@
-import { Button, Flex, Layout, message, notification } from "antd";
+import { App, Button, Flex, Layout } from "antd";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 
-import {
-  CloseCircleOutlined,
-  PlusOutlined,
-  SearchOutlined,
-} from "@ant-design/icons";
+import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
 
 import type { TripType } from "../../types";
 import { useIsMobile } from "../../hooks/useIsMobile";
@@ -23,9 +19,7 @@ import { useDrivers } from "../../hooks/useDrivers";
 
 function Trips() {
   const { t } = useTranslation();
-  const [messageApi, messageContextHolder] = message.useMessage();
-  const [notificationApi, notificationContextHolder] =
-    notification.useNotification();
+  const { message, notification, modal } = App.useApp();
 
   const [searchText, setSearchText] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -40,21 +34,14 @@ function Trips() {
   const { vehicles } = useVehicles();
   const queryClient = useQueryClient();
 
-  const openErrorNotification = (description: string) => {
-    notificationApi.open({
-      message: t("Errors.OPERATION_FAILED"),
-      description: description,
-      duration: 4.5,
-      icon: <CloseCircleOutlined style={{ color: "#ff4d4f" }} />,
-    });
-  };
-
   const handleDelete = async (record: TripType) => {
     try {
       await deleteTrip(record._id);
-      messageApi.success(<span>{t("Trips.DELETE_SUCCESS")}</span>);
+      notification.success({
+        message: <span>{t("Trips.DELETE_SUCCESS")}</span>,
+      });
     } catch (error) {
-      messageApi.error(t("Errors.DELETE_FAILED"));
+      notification.error({ message: t("Errors.DELETE_FAILED") });
     }
   };
 
@@ -104,17 +91,23 @@ function Trips() {
 
       if (selectedRecord) {
         await updateTrip({ id: selectedRecord._id, ...payload });
-        messageApi.info(<span>{t("Trips.UPDATE_SUCCESS")}</span>);
+        notification.info({
+          message: <span>{t("Trips.UPDATE_SUCCESS")}</span>,
+        });
       } else {
         await createTrip(payload);
-        messageApi.success(<span>{t("Trips.CREATE_SUCCESS")}</span>);
+        notification.success({
+          message: <span>{t("Trips.CREATE_SUCCESS")}</span>,
+        });
       }
       setIsModalOpen(false);
     } catch (error: any) {
-      const errorMsg =
-        error.response?.data?.message?.toString() ||
-        t("Errors.UNEXPECTED_ERROR");
-      openErrorNotification(errorMsg);
+      if (error.response?.status === 400) {
+        notification.error({
+          message:
+            error.response?.data?.message || t("Errors.OPERATION_FAILED"),
+        });
+      }
     }
   };
 
@@ -135,8 +128,6 @@ function Trips() {
 
   return (
     <Layout style={{ padding: "0 50px" }}>
-      {messageContextHolder}
-      {notificationContextHolder}
       <Flex gap={isMobile ? 10 : 25} style={{ marginBottom: 20 }}>
         <Search
           placeholder={t("Trips.SEARCH")}

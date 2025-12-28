@@ -1,13 +1,9 @@
-import { Button, Flex, Layout, message, notification } from "antd";
+import { App, Button, Flex, Layout } from "antd";
 import Search from "antd/es/input/Search";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import {
-  CloseCircleOutlined,
-  PlusOutlined,
-  SearchOutlined,
-} from "@ant-design/icons";
+import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
 
 import { useCompanies } from "../../hooks/useCompanies";
 import CompanyModal from "./components/CompanyModal";
@@ -18,9 +14,7 @@ import CompanyCardList from "./components/CompanyCardList";
 
 function Companies() {
   const { t } = useTranslation();
-  const [messageApi, messageContextHolder] = message.useMessage();
-  const [notificationApi, notificationContextHolder] =
-    notification.useNotification();
+  const { message, notification, modal } = App.useApp();
 
   const [searchText, setSearchText] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -32,23 +26,14 @@ function Companies() {
     useCompanies();
   const isMobile = useIsMobile();
 
-  const openErrorNotification = (description: string) => {
-    notificationApi.open({
-      message: t("Errors.OPERATION_FAILED"),
-      description: description,
-      duration: 4.5,
-      icon: <CloseCircleOutlined style={{ color: "#ff4d4f" }} />,
-    });
-  };
-
   const handleDelete = async (record: CompanyType) => {
     try {
       await deleteCompany(record._id);
-      messageApi.success(
-        <span>{t("Companies.DELETE_SUCCESS", { name: record.name })}</span>
-      );
+      notification.success({
+        message: t("Companies.DELETE_SUCCESS", { name: record.name }),
+      });
     } catch (error) {
-      messageApi.error(t("Errors.DELETE_FAILED"));
+      notification.error({ message: t("Errors.DELETE_FAILED") });
     }
   };
 
@@ -56,25 +41,31 @@ function Companies() {
     try {
       if (selectedRecord) {
         await updateCompany({ id: selectedRecord._id, name: values.inputName });
-        messageApi.info(
-          <span>
-            {t("Companies.UPDATE_SUCCESS", { name: values.inputName })}
-          </span>
-        );
+        notification.info({
+          message: (
+            <span>
+              {t("Companies.UPDATE_SUCCESS", { name: selectedRecord.name })}
+            </span>
+          ),
+        });
       } else {
         await createCompany({ name: values.inputName });
-        messageApi.success(
-          <span>
-            {t("Companies.CREATE_SUCCESS", { name: values.inputName })}
-          </span>
-        );
+        notification.success({
+          message: (
+            <span>
+              {t("Companies.CREATE_SUCCESS", { name: values.inputName })}
+            </span>
+          ),
+        });
       }
       setIsModalOpen(false);
     } catch (error: any) {
-      const errorMsg =
-        error.response?.data?.message?.toString() ||
-        t("Errors.UNEXPECTED_ERROR");
-      openErrorNotification(errorMsg);
+      if (error.response?.status === 400) {
+        notification.error({
+          message:
+            error.response?.data?.message || t("Errors.OPERATION_FAILED"),
+        });
+      }
     }
   };
 
@@ -95,8 +86,6 @@ function Companies() {
 
   return (
     <Layout style={{ padding: isMobile ? "0 16px" : "0 50px" }}>
-      {messageContextHolder}
-      {notificationContextHolder}
       <Flex gap={isMobile ? 10 : 25} style={{ marginBottom: 20 }}>
         <Search
           placeholder={t("Companies.SEARCH")}

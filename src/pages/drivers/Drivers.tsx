@@ -1,33 +1,13 @@
-import {
-  Button,
-  Empty,
-  Flex,
-  Layout,
-  message,
-  notification,
-  Popconfirm,
-  Space,
-  Table,
-  Tag,
-} from "antd";
+import { App, Button, Flex, Layout } from "antd";
 import Search from "antd/es/input/Search";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import {
-  PlusOutlined,
-  SearchOutlined,
-  DeleteOutlined,
-  CloseCircleOutlined,
-} from "@ant-design/icons";
+import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
 
-import { useCompanies } from "../../hooks/useCompanies"; // Şirketleri buradan çekiyoruz
+import { useCompanies } from "../../hooks/useCompanies";
 import { useDrivers } from "../../hooks/useDrivers";
 import DriverModal from "./components/DriverModal";
-
-import { formatPhoneNumber } from "../../utils";
-
-import type { ColumnsType } from "antd/es/table";
 import type { DriverType } from "../../types";
 import DriverTable from "./components/DriverTable";
 import { useIsMobile } from "../../hooks/useIsMobile";
@@ -35,9 +15,7 @@ import DriverCardList from "./components/DriverCardList";
 
 function Drivers() {
   const { t } = useTranslation();
-  const [messageApi, messageContextHolder] = message.useMessage();
-  const [notificationApi, notificationContextHolder] =
-    notification.useNotification();
+  const { message, notification, modal } = App.useApp();
 
   const [searchText, setSearchText] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -50,23 +28,16 @@ function Drivers() {
   const { companies } = useCompanies();
   const isMobile = useIsMobile();
 
-  const openErrorNotification = (description: string) => {
-    notificationApi.open({
-      message: t("Errors.OPERATION_FAILED"),
-      description: description,
-      duration: 4.5,
-      icon: <CloseCircleOutlined style={{ color: "#ff4d4f" }} />,
-    });
-  };
-
   const handleDelete = async (record: DriverType) => {
     try {
       await deleteDriver(record._id);
-      messageApi.success(
-        <span>{t("Drivers.DELETE_SUCCESS", { name: record.full_name })}</span>
-      );
+      notification.success({
+        message: (
+          <span>{t("Drivers.DELETE_SUCCESS", { name: record.full_name })}</span>
+        ),
+      });
     } catch (error) {
-      messageApi.error(t("Errors.DELETE_FAILED"));
+      notification.error({ message: t("Errors.DELETE_FAILED") });
     }
   };
 
@@ -98,21 +69,31 @@ function Drivers() {
 
       if (selectedRecord) {
         await updateDriver({ id: selectedRecord._id, ...payload });
-        messageApi.info(
-          <span>{t("Drivers.UPDATE_SUCCESS", { name: values.inputName })}</span>
-        );
+        notification.info({
+          message: (
+            <span>
+              {t("Drivers.UPDATE_SUCCESS", { name: values.inputName })}
+            </span>
+          ),
+        });
       } else {
         await createDriver(payload);
-        messageApi.success(
-          <span>{t("Drivers.CREATE_SUCCESS", { name: values.inputName })}</span>
-        );
+        notification.success({
+          message: (
+            <span>
+              {t("Drivers.CREATE_SUCCESS", { name: values.inputName })}
+            </span>
+          ),
+        });
       }
       setIsModalOpen(false);
     } catch (error: any) {
-      const errorMsg =
-        error.response?.data?.message?.toString() ||
-        t("Errors.UNEXPECTED_ERROR");
-      openErrorNotification(errorMsg);
+      if (error.response?.status === 400) {
+        notification.error({
+          message:
+            error.response?.data?.message || t("Errors.OPERATION_FAILED"),
+        });
+      }
     }
   };
 
@@ -126,8 +107,6 @@ function Drivers() {
 
   return (
     <Layout style={{ padding: isMobile ? "0 16px" : "0 50px" }}>
-      {messageContextHolder}
-      {notificationContextHolder}
       <Flex gap={isMobile ? 10 : 25} style={{ marginBottom: 20 }}>
         <Search
           placeholder={t("Drivers.SEARCH")}
