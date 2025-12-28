@@ -164,7 +164,7 @@ function Header() {
           marginRight: "20px",
         }}
       >
-        {CONFIG.APP_NAME + " " + t("Common.APP_SUBTITLE")}
+        {CONFIG.APP.NAME + " " + t("Common.APP_SUBTITLE")}
         {CONFIG.DEBUG && (
           <span
             style={{
@@ -174,7 +174,7 @@ function Header() {
               fontWeight: "normal",
             }}
           >
-            v{CONFIG.VERSION}
+            v{CONFIG.APP.VERSION}
           </span>
         )}
       </div>

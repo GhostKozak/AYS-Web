@@ -74,7 +74,15 @@ export const isRoute = (value: string): value is Route => {
 // Environment-based constants
 export const CONFIG = {
   API_BASE_URL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000',
-  APP_NAME: 'Ulusal',
-  VERSION: '1.0.0',
+  APP: {
+    NAME: 'Ulusal',
+    TITLE: 'Ulusal | Lojistik ve Filo Yönetim Sistemi',
+    DESCRIPTION: 'Şirket, sürücü, araç ve sefer süreçlerini uçtan uca yöneten kapsamlı lojistik takip platformu.',
+    KEYWORDS: 'lojistik, filo yönetimi, araç takip, sürücü yönetimi, sefer planlama, taşıma yönetimi',
+    AUTHOR: 'Ulusal Yazılım Ekibi',
+    VERSION: '1.1.0',
+    LOGO: '/logo.png',
+    FAVICON: '/favicon.ico'
+  },
   DEBUG: import.meta.env.DEV
 } as const;
