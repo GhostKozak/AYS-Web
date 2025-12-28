@@ -117,6 +117,8 @@ export default function TripTable({
     {
       title: t("Drivers.ACTIONS"),
       key: "action",
+      fixed: "right",
+      width: 200,
       render: (_: any, record: TripType) => (
         <Space>
           <Button
@@ -150,6 +152,7 @@ export default function TripTable({
       dataSource={trips}
       loading={isLoading}
       rowKey="_id"
+      scroll={{ x: 1500 }}
       locale={{
         emptyText: (
           <Empty

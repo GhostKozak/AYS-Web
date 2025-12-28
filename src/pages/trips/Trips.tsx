@@ -34,7 +34,7 @@ function Trips() {
   );
 
   const { trips, isLoading, createTrip, updateTrip, deleteTrip } = useTrips();
-  const isMobile = useIsMobile();
+  const isMobile = useIsMobile(1024);
   const { companies } = useCompanies();
   const { drivers } = useDrivers();
   const { vehicles } = useVehicles();
