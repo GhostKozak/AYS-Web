@@ -23,14 +23,14 @@ import {
   UserOutlined,
 } from "@ant-design/icons";
 import type { MenuProps } from "antd";
-import { useTheme } from "../../utils/ThemeContext";
+import { useAppConfig } from "../../utils/AppConfigProvider";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useIsMobile } from "../../hooks/useIsMobile";
 
 function Header() {
   const { t, i18n } = useTranslation();
-  const { themeMode, toggleTheme } = useTheme();
+  const { themeMode, toggleTheme } = useAppConfig();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [form] = Form.useForm();

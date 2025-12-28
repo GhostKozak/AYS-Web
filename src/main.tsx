@@ -3,7 +3,7 @@ import { RouterProvider } from "react-router";
 import AppRoutes from "./routes/AppRoutes";
 import "./i18n";
 import "./styles/base.css";
-import { CustomThemeProvider } from "./utils/ThemeContext";
+import { AppConfigProvider } from "./utils/AppConfigProvider";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { App as AntdApp } from "antd";
@@ -11,7 +11,7 @@ import { App as AntdApp } from "antd";
 const queryClient = new QueryClient();
 
 createRoot(document.getElementById("root")!).render(
-  <CustomThemeProvider>
+  <AppConfigProvider>
     <AntdApp>
       <QueryClientProvider client={queryClient}>
         <RouterProvider router={AppRoutes()} />
@@ -21,7 +21,7 @@ createRoot(document.getElementById("root")!).render(
         />
       </QueryClientProvider>
     </AntdApp>
-  </CustomThemeProvider>
+  </AppConfigProvider>
 );
 
 //* for the React Query Devtools extension.

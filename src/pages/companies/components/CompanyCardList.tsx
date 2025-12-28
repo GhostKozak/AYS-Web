@@ -60,8 +60,6 @@ export default function CompanyCardList({
                   </span>
                 }
                 onConfirm={() => onDelete(item)}
-                okText={t("Common.YES")}
-                cancelText={t("Common.NO")}
                 icon={<DeleteOutlined style={{ color: "red" }} />}
               >
                 <Button

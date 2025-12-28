@@ -19,19 +19,36 @@ export default function CompaniesTable({
 }: Props) {
   const { t } = useTranslation();
 
+  const nameFilters = companies
+    .map((c) => c.name)
+    .filter((value, index, self) => self.indexOf(value) === index) // Benzersizleri al
+    .map((name) => ({ text: name, value: name })); // AntD formatına çevir
+
   const columns: ColumnsType<CompanyType> = [
-    { title: t("Companies.COMPANY_NAME"), dataIndex: "name", key: "name" },
+    {
+      title: t("Companies.COMPANY_NAME"),
+      dataIndex: "name",
+      key: "name",
+      filters: nameFilters,
+      onFilter: (value, record) => record.name === value,
+      filterSearch: true,
+    },
     {
       title: t("Table.CREATED_AT"),
       dataIndex: "createdAt",
       key: "createdAt",
       render: (d: string) => new Date(d).toLocaleString("tr-TR"),
+      sorter: (a, b) =>
+        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
     },
     {
       title: t("Table.UPDATED_AT"),
       dataIndex: "updatedAt",
       key: "updatedAt",
       render: (d: string) => new Date(d).toLocaleString("tr-TR"),
+      sorter: (a, b) =>
+        new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime(),
+      responsive: ["lg"],
     },
     {
       title: t("Table.STATUS"),
@@ -42,6 +59,11 @@ export default function CompaniesTable({
           {deleted ? t("Common.PASSIVE") : t("Common.ACTIVE")}
         </Tag>
       ),
+      filters: [
+        { text: t("Common.ACTIVE"), value: false },
+        { text: t("Common.PASSIVE"), value: true },
+      ],
+      onFilter: (value, record) => record.deleted === value,
     },
     {
       title: t("Table.ACTIONS"),
@@ -67,8 +89,6 @@ export default function CompaniesTable({
               </span>
             }
             onConfirm={() => onDelete(record)}
-            okText={t("Common.CONFIRM")}
-            cancelText={t("Common.CANCEL")}
             icon={<DeleteOutlined style={{ color: "red" }} />}
           >
             <Button danger type="text">
@@ -86,14 +106,6 @@ export default function CompaniesTable({
       dataSource={companies}
       loading={isLoading}
       rowKey="_id"
-      locale={{
-        emptyText: (
-          <Empty
-            image={Empty.PRESENTED_IMAGE_SIMPLE}
-            description={t("Table.NO_DATA")}
-          />
-        ),
-      }}
       pagination={{
         showSizeChanger: true,
         showQuickJumper: true,

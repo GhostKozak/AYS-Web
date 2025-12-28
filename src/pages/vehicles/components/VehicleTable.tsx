@@ -77,8 +77,6 @@ export default function VehicleTable({
                 />
               </span>
             }
-            okText={t("Common.CONFIRM")}
-            cancelText={t("Common.CANCEL")}
             icon={<DeleteOutlined style={{ color: "red" }} />}
             onConfirm={() => onDelete(record)}
           >
@@ -97,14 +95,6 @@ export default function VehicleTable({
       dataSource={vehicles}
       loading={isLoading}
       rowKey="_id"
-      locale={{
-        emptyText: (
-          <Empty
-            image={Empty.PRESENTED_IMAGE_SIMPLE}
-            description={t("Table.NO_DATA")}
-          />
-        ),
-      }}
       pagination={{
         showSizeChanger: true,
         showQuickJumper: true,

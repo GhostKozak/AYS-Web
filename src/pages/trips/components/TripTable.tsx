@@ -137,8 +137,6 @@ export default function TripTable({
                 />
               </span>
             }
-            okText={t("Common.CONFIRM")}
-            cancelText={t("Common.CANCEL")}
             icon={<DeleteOutlined style={{ color: "red" }} />}
             onConfirm={() => onDelete(record)}
           >
@@ -159,14 +157,6 @@ export default function TripTable({
       loading={isLoading}
       rowKey="_id"
       scroll={{ x: 1500 }}
-      locale={{
-        emptyText: (
-          <Empty
-            image={Empty.PRESENTED_IMAGE_SIMPLE}
-            description={t("Table.NO_DATA")}
-          />
-        ),
-      }}
       pagination={{
         showSizeChanger: true,
         showQuickJumper: true,
