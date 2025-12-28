@@ -57,7 +57,7 @@ export default function TripTable({
     {
       title: t("Trips.PHONE_NUMBER"),
       dataIndex: "driver",
-      key: "driver",
+      key: "driver_phone",
       render: (driver: { _id: string; phone_number: string }) =>
         formatPhoneNumber(driver?.phone_number) || "Sürücü bulunamadı",
     },

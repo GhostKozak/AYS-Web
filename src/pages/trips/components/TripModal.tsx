@@ -56,10 +56,12 @@ const TripModal = ({
   const { createCompany } = useCompanies();
   const { createDriver } = useDrivers();
   const { createVehicle } = useVehicles();
+  const [isExistingDriver, setIsExistingDriver] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
       if (selectedRecord) {
+        setIsExistingDriver(true);
         const toInputDate = (iso?: string) => {
           if (!iso) return undefined;
           const d = new Date(iso);
@@ -87,9 +89,27 @@ const TripModal = ({
         });
       } else {
         form.resetFields();
+        setIsExistingDriver(false);
       }
     }
   }, [isOpen, selectedRecord, form]);
+
+  const handleDriverChange = (value: string) => {
+    const driverExists = drivers.some((d) => d._id === value);
+    setIsExistingDriver(driverExists);
+
+    if (driverExists) {
+      const selectedDriver = drivers.find((d) => d._id === value);
+      // Seçili sürücünün bilgilerini gizli veya salt okunur alanlara set edebiliriz
+      form.setFieldsValue({
+        inputName: selectedDriver?.full_name,
+        inputPhone: selectedDriver?.phone_number,
+      });
+    } else {
+      // Yeni sürücü yazılıyorsa alanları temizle ki kullanıcı girsin
+      form.setFieldsValue({ inputName: value, inputPhone: "" });
+    }
+  };
 
   const extractId = (res: any) => {
     return (
@@ -107,7 +127,7 @@ const TripModal = ({
         (c) => c._id === values.inputCompany
       );
       if (!companyExists && values.inputCompany) {
-        const res = await createCompany(values.inputCompany as any);
+        const res = await createCompany({ name: values.inputCompany } as any);
         const newId = extractId(res);
         if (newId) finalValues.inputCompany = newId;
       }
@@ -125,16 +145,15 @@ const TripModal = ({
       }
 
       // Driver
-      const driverExists = drivers.some((d) => d._id === values.inputDriver);
-      if (!driverExists && values.inputDriver) {
+      if (!isExistingDriver) {
+        // Yeni sürücü oluştur
         const payload = {
-          full_name: values.inputDriver,
-          phone_number: values.inputPhone || "",
-          company: finalValues.inputCompany || "",
+          full_name: values.inputName,
+          phone_number: values.inputPhone,
+          company: finalValues.inputCompany,
         };
         const res = await createDriver(payload as any);
-        const newId = extractId(res);
-        if (newId) finalValues.inputDriver = newId;
+        finalValues.inputDriver = extractId(res);
       }
 
       // Update form to reflect newly-created ids so UI shows selected values
@@ -162,6 +181,8 @@ const TripModal = ({
       } catch (e) {
         /* ignore */
       }
+    } catch (error) {
+      console.error("Sefer kaydedilirken hata oluştu:", error);
     } finally {
       setSubmitting(false);
     }
@@ -254,6 +275,7 @@ const TripModal = ({
             filterOption={false}
             onSearch={(val) => setDriverSearch(val)}
             notFoundContent={null}
+            onChange={handleDriverChange}
           >
             {drivers.map((driver) => (
               <Select.Option key={driver._id} value={driver._id}>
@@ -272,23 +294,26 @@ const TripModal = ({
           </Select>
         </Form.Item>
 
-        <Form.Item
-          label="Sürücü İsmi"
-          name="inputName"
-          rules={[{ required: true, message: "Lütfen sürücü ismini giriniz!" }]}
-        >
-          <Input />
-        </Form.Item>
+        {/* Sürücü mevcut değilse (Yeni ekleniyorsa) bu alanları göster */}
+        {!isExistingDriver && (
+          <>
+            <Form.Item
+              label="Yeni Sürücü İsmi"
+              name="inputName"
+              rules={[{ required: true, message: "İsim zorunludur!" }]}
+            >
+              <Input placeholder="Sürücü tam adı" />
+            </Form.Item>
 
-        <Form.Item
-          label="Telefon"
-          name="inputPhone"
-          rules={[
-            { required: true, message: "Lütfen telefon numarasını giriniz!" },
-          ]}
-        >
-          <Input />
-        </Form.Item>
+            <Form.Item
+              label="Yeni Sürücü Telefonu"
+              name="inputPhone"
+              rules={[{ required: true, message: "Telefon zorunludur!" }]}
+            >
+              <Input placeholder="05XX XXX XX XX" />
+            </Form.Item>
+          </>
+        )}
 
         <Form.Item label="Kalkış Tarihi" name="departure_time">
           <Input type="datetime-local" />
