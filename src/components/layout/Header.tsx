@@ -24,8 +24,9 @@ import {
 } from "@ant-design/icons";
 import type { MenuProps } from "antd";
 import { useTheme } from "../../utils/ThemeContext";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useIsMobile } from "../../hooks/useIsMobile";
 
 function Header() {
   const { t, i18n } = useTranslation();
@@ -38,15 +39,7 @@ function Header() {
 
   const { useToken } = theme;
   const { token } = useToken();
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
-
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  const isMobile = useIsMobile();
 
   // Sayfa değişince mobil menüyü kapat
   useEffect(() => {
@@ -73,82 +66,92 @@ function Header() {
     i18n.changeLanguage(newLang);
   };
 
-  const menuItems: MenuProps["items"] = [
-    {
-      key: "dashboard",
-      label: <Link to={ROUTES.DASHBOARD}>{t("Breadcrumbs.DASHBOARD")}</Link>,
-    },
-    {
-      key: "companies",
-      label: <Link to={ROUTES.COMPANIES}>{t("Breadcrumbs.COMPANIES")}</Link>,
-    },
-    {
-      key: "drivers",
-      label: <Link to={ROUTES.DRIVERS}>{t("Breadcrumbs.DRIVERS")}</Link>,
-    },
-    {
-      key: "vehicles",
-      label: <Link to={ROUTES.VEHICLES}>{t("Breadcrumbs.VEHICLES")}</Link>,
-    },
-    {
-      key: "trips",
-      label: <Link to={ROUTES.TRIPS}>{t("Breadcrumbs.TRIPS")}</Link>,
-    },
-  ];
+  const menuItems: MenuProps["items"] = useMemo(
+    () => [
+      {
+        key: "dashboard",
+        label: <Link to={ROUTES.DASHBOARD}>{t("Breadcrumbs.DASHBOARD")}</Link>,
+      },
+      {
+        key: "companies",
+        label: <Link to={ROUTES.COMPANIES}>{t("Breadcrumbs.COMPANIES")}</Link>,
+      },
+      {
+        key: "drivers",
+        label: <Link to={ROUTES.DRIVERS}>{t("Breadcrumbs.DRIVERS")}</Link>,
+      },
+      {
+        key: "vehicles",
+        label: <Link to={ROUTES.VEHICLES}>{t("Breadcrumbs.VEHICLES")}</Link>,
+      },
+      {
+        key: "trips",
+        label: <Link to={ROUTES.TRIPS}>{t("Breadcrumbs.TRIPS")}</Link>,
+      },
+    ],
+    [t]
+  );
 
-  const userMenuItems: MenuProps["items"] = [
-    {
-      key: "0",
-      disabled: true,
-      label: (
-        <Flex justify="space-between" align="center">
-          <Space style={{ marginRight: 20 }}>
-            {userObject?.firstName + " " + userObject?.lastName}
-          </Space>
-          <Tag>{userObject?.email}</Tag>
-        </Flex>
-      ),
-    },
-    { type: "divider" },
-    {
-      key: "1",
-      label: <Link to={ROUTES.DASHBOARD}>{t("Header.ACCOUNT_SETTINGS")}</Link>,
-    },
-    { key: "2", label: t("Header.SUBSCRIPTION") },
-    { key: "3", label: <a onClick={showModal}>{t("Header.SEND_FEEDBACK")}</a> },
-    {
-      key: "4",
-      label: (
-        <a onClick={toggleTheme}>
-          {themeMode === "dark" ? (
-            <>
-              <SunOutlined /> {t("Header.LIGHT_MODE")}
-            </>
-          ) : (
-            <>
-              <MoonOutlined /> {t("Header.DARK_MODE")}
-            </>
-          )}
-        </a>
-      ),
-    },
-    { key: "6", label: <Link to={ROUTES.FAQ}>{t("Breadcrumbs.FAQ")}</Link> },
-    { type: "divider" },
-    {
-      key: "7",
-      label: (
-        <span onClick={handleLogout} style={{ color: "red" }}>
-          {t("Header.LOGOUT")}
-        </span>
-      ),
-    },
-  ];
+  const userMenuItems: MenuProps["items"] = useMemo(
+    () => [
+      {
+        key: "0",
+        disabled: true,
+        label: (
+          <Flex justify="space-between" align="center">
+            <Space style={{ marginRight: 20 }}>
+              {userObject?.firstName + " " + userObject?.lastName}
+            </Space>
+            <Tag>{userObject?.email}</Tag>
+          </Flex>
+        ),
+      },
+      { type: "divider" },
+      {
+        key: "1",
+        label: (
+          <Link to={ROUTES.DASHBOARD}>{t("Header.ACCOUNT_SETTINGS")}</Link>
+        ),
+      },
+      { key: "2", label: t("Header.SUBSCRIPTION") },
+      {
+        key: "3",
+        label: <a onClick={showModal}>{t("Header.SEND_FEEDBACK")}</a>,
+      },
+      {
+        key: "4",
+        label: (
+          <a onClick={toggleTheme}>
+            {themeMode === "dark" ? (
+              <>
+                <SunOutlined /> {t("Header.LIGHT_MODE")}
+              </>
+            ) : (
+              <>
+                <MoonOutlined /> {t("Header.DARK_MODE")}
+              </>
+            )}
+          </a>
+        ),
+      },
+      { key: "6", label: <Link to={ROUTES.FAQ}>{t("Breadcrumbs.FAQ")}</Link> },
+      { type: "divider" },
+      {
+        key: "7",
+        label: (
+          <span onClick={handleLogout} style={{ color: "red" }}>
+            {t("Header.LOGOUT")}
+          </span>
+        ),
+      },
+    ],
+    [t]
+  );
 
   return (
     <Layout.Header
       style={{
         padding: "0 24px",
-        background: "#001529",
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
@@ -190,6 +193,7 @@ function Header() {
             minWidth: 0,
             borderBottom: "none",
             justifyContent: "center",
+            background: "transparent",
           }}
         />
       )}
