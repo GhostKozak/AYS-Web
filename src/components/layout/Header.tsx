@@ -25,8 +25,10 @@ import {
 import type { MenuProps } from "antd";
 import { useTheme } from "../../utils/ThemeContext";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 function Header() {
+  const { t, i18n } = useTranslation();
   const { themeMode, toggleTheme } = useTheme();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -57,6 +59,7 @@ function Header() {
   const userString = localStorage.getItem(STORAGE_KEYS.USER);
   const userObject = userString ? JSON.parse(userString) : null;
   const isLoggedIn = !!userObject;
+  const currentLang = localStorage.getItem(STORAGE_KEYS.LANGUAGE) || "tr";
 
   const handleLogout = () => {
     localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
@@ -64,12 +67,33 @@ function Header() {
     navigate(ROUTES.LOGIN);
   };
 
+  const toggleLang = () => {
+    const newLang = currentLang === "tr" ? "en" : "tr";
+    localStorage.setItem(STORAGE_KEYS.LANGUAGE, newLang);
+    i18n.changeLanguage(newLang);
+  };
+
   const menuItems: MenuProps["items"] = [
-    { key: "dashboard", label: <Link to={ROUTES.DASHBOARD}>Dashboard</Link> },
-    { key: "companies", label: <Link to={ROUTES.COMPANIES}>Şirketler</Link> },
-    { key: "drivers", label: <Link to={ROUTES.DRIVERS}>Sürücüler</Link> },
-    { key: "vehicles", label: <Link to={ROUTES.VEHICLES}>Araçlar</Link> },
-    { key: "trips", label: <Link to={ROUTES.TRIPS}>Seferler</Link> },
+    {
+      key: "dashboard",
+      label: <Link to={ROUTES.DASHBOARD}>{t("Breadcrumbs.DASHBOARD")}</Link>,
+    },
+    {
+      key: "companies",
+      label: <Link to={ROUTES.COMPANIES}>{t("Breadcrumbs.COMPANIES")}</Link>,
+    },
+    {
+      key: "drivers",
+      label: <Link to={ROUTES.DRIVERS}>{t("Breadcrumbs.DRIVERS")}</Link>,
+    },
+    {
+      key: "vehicles",
+      label: <Link to={ROUTES.VEHICLES}>{t("Breadcrumbs.VEHICLES")}</Link>,
+    },
+    {
+      key: "trips",
+      label: <Link to={ROUTES.TRIPS}>{t("Breadcrumbs.TRIPS")}</Link>,
+    },
   ];
 
   const userMenuItems: MenuProps["items"] = [
@@ -86,32 +110,35 @@ function Header() {
       ),
     },
     { type: "divider" },
-    { key: "1", label: <Link to={ROUTES.DASHBOARD}>Hesap Ayarları</Link> },
-    { key: "2", label: "Abonelik Bilgileri" },
-    { key: "3", label: <a onClick={showModal}>Geri Bildirim Gönder</a> },
+    {
+      key: "1",
+      label: <Link to={ROUTES.DASHBOARD}>{t("Header.ACCOUNT_SETTINGS")}</Link>,
+    },
+    { key: "2", label: t("Header.SUBSCRIPTION") },
+    { key: "3", label: <a onClick={showModal}>{t("Header.SEND_FEEDBACK")}</a> },
     {
       key: "4",
       label: (
         <a onClick={toggleTheme}>
           {themeMode === "dark" ? (
             <>
-              <SunOutlined /> Light Mode
+              <SunOutlined /> {t("Header.LIGHT_MODE")}
             </>
           ) : (
             <>
-              <MoonOutlined /> Dark Mode
+              <MoonOutlined /> {t("Header.DARK_MODE")}
             </>
           )}
         </a>
       ),
     },
-    { key: "6", label: <Link to={ROUTES.FAQ}>SSS</Link> },
+    { key: "6", label: <Link to={ROUTES.FAQ}>{t("Breadcrumbs.FAQ")}</Link> },
     { type: "divider" },
     {
       key: "7",
       label: (
         <span onClick={handleLogout} style={{ color: "red" }}>
-          Çıkış Yap
+          {t("Header.LOGOUT")}
         </span>
       ),
     },
@@ -137,7 +164,7 @@ function Header() {
           marginRight: "20px",
         }}
       >
-        {CONFIG.APP_NAME}
+        {CONFIG.APP_NAME + " " + t("Common.APP_SUBTITLE")}
         {CONFIG.DEBUG && (
           <span
             style={{
@@ -168,7 +195,15 @@ function Header() {
       )}
 
       {!isMobile ? (
-        <div style={{ display: "flex", alignItems: "center" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+          <Button
+            ghost
+            size="small"
+            onClick={toggleLang}
+            style={{ borderColor: "rgba(255,255,255,0.3)", color: "white" }}
+          >
+            {currentLang.toUpperCase()}
+          </Button>
           {isLoggedIn ? (
             <Dropdown
               menu={{ items: userMenuItems }}
@@ -202,21 +237,31 @@ function Header() {
           ) : (
             <Link to={ROUTES.LOGIN}>
               <Button type="primary" icon={<LoginOutlined />}>
-                Giriş Yap
+                {t("Header.LOGIN")}
               </Button>
             </Link>
           )}
         </div>
       ) : (
-        <Button
-          type="text"
-          icon={<MenuOutlined style={{ color: "white", fontSize: "20px" }} />}
-          onClick={() => setIsMobileMenuOpen(true)}
-        />
+        <Space>
+          <Button
+            type="text"
+            size="small"
+            onClick={toggleLang}
+            style={{ color: "white", fontWeight: "bold" }}
+          >
+            {currentLang.toUpperCase()}
+          </Button>
+          <Button
+            type="text"
+            icon={<MenuOutlined style={{ color: "white", fontSize: "20px" }} />}
+            onClick={() => setIsMobileMenuOpen(true)}
+          />
+        </Space>
       )}
 
       <Drawer
-        title="Menü"
+        title={t("Header.MENU")}
         placement="right"
         onClose={() => setIsMobileMenuOpen(false)}
         open={isMobileMenuOpen}
@@ -272,7 +317,7 @@ function Header() {
             <div style={{ padding: "20px" }}>
               <Link to={ROUTES.LOGIN}>
                 <Button type="primary" block icon={<LoginOutlined />}>
-                  Giriş Yap
+                  {t("Header.LOGIN")}
                 </Button>
               </Link>
             </div>
@@ -281,7 +326,7 @@ function Header() {
       </Drawer>
 
       <Modal
-        title="Geri Bildirim"
+        title={t("Header.FEEDBACK_TITLE")}
         open={isModalOpen}
         onOk={() => {
           form
@@ -293,23 +338,35 @@ function Header() {
             .catch(() => {});
         }}
         onCancel={handleCancel}
+        okText={t("Common.SEND")}
+        cancelText={t("Common.CANCEL")}
       >
-        <p>Görüşleriniz bizim için değerli.</p>
+        <p>{t("Header.FEEDBACK_DESC")}</p>
         <Form form={form} layout="vertical" name="feedback_form">
-          <Form.Item name="name" label="Ad Soyad" rules={[{ required: true }]}>
+          <Form.Item
+            name="name"
+            label={t("Header.FULL_NAME")}
+            rules={[{ required: true, message: t("Validation.REQUIRED") }]}
+          >
             <Input />
           </Form.Item>
           <Form.Item
             name="email"
-            label="Email"
-            rules={[{ required: true, type: "email" }]}
+            label={t("Header.EMAIL")}
+            rules={[
+              {
+                required: true,
+                type: "email",
+                message: t("Validation.REQUIRED"),
+              },
+            ]}
           >
             <Input />
           </Form.Item>
           <Form.Item
             name="message"
-            label="Mesajınız"
-            rules={[{ required: true }]}
+            label={t("Header.MESSAGE")}
+            rules={[{ required: true, message: t("Validation.REQUIRED") }]}
           >
             <Input.TextArea rows={4} />
           </Form.Item>

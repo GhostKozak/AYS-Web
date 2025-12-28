@@ -1,6 +1,7 @@
 import { Modal, Form, Input, Button } from "antd";
 import { useEffect } from "react";
 import { type CompanyType } from "../../../types";
+import { useTranslation } from "react-i18next";
 
 interface CompanyModalProps {
   isOpen: boolean;
@@ -18,6 +19,7 @@ const CompanyModal = ({
   isLoading,
 }: CompanyModalProps) => {
   const [form] = Form.useForm();
+  const { t } = useTranslation();
 
   // Modal açıldığında form dolsun veya temizlensin
   useEffect(() => {
@@ -33,7 +35,9 @@ const CompanyModal = ({
   return (
     <Modal
       title={
-        selectedRecord ? "Firma Düzenleme Formu" : "Yeni Firma Ekleme Formu"
+        selectedRecord
+          ? t("Companies.EDIT_FORM_TITLE")
+          : t("Companies.ADD_FORM_TITLE")
       }
       closable={{ "aria-label": "Custom Close Button" }}
       open={isOpen}
@@ -50,16 +54,16 @@ const CompanyModal = ({
         autoComplete="off"
       >
         <Form.Item
-          label="Firma İsmi"
+          label={t("Companies.COMPANY_NAME")}
           name="inputName"
-          rules={[{ required: true, message: "Lütfen firma ismini giriniz!" }]}
+          rules={[{ required: true, message: t("Companies.NAME_REQUIRED") }]}
         >
           <Input />
         </Form.Item>
 
         <Form.Item label={null} wrapperCol={{ offset: 8, span: 16 }}>
           <Button type="primary" htmlType="submit" loading={isLoading}>
-            {selectedRecord ? "Değişiklikleri Kaydet" : "Ekle"}
+            {selectedRecord ? t("Companies.SAVE_CHANGES") : t("Common.ADD")}
           </Button>
         </Form.Item>
       </Form>

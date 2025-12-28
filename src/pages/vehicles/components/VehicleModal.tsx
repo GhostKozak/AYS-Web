@@ -6,6 +6,7 @@ import {
   type VehicleType,
   type VehicleTypeEnum,
 } from "../../../types";
+import { useTranslation } from "react-i18next";
 
 interface VehicleModalProps {
   isOpen: boolean;
@@ -27,6 +28,7 @@ const VehicleModal = ({
   isLoading,
 }: VehicleModalProps) => {
   const [form] = Form.useForm();
+  const { t } = useTranslation();
 
   const vehicleOptions = VehicleValues.map((value) => ({
     label: VehicleLabels[value],
@@ -48,7 +50,11 @@ const VehicleModal = ({
 
   return (
     <Modal
-      title={selectedRecord ? "Araç Düzenleme Formu" : "Yeni Araç Ekleme Formu"}
+      title={
+        selectedRecord
+          ? t("Vehicles.EDIT_FORM_TITLE")
+          : t("Vehicles.ADD_FORM_TITLE")
+      }
       closable={{ "aria-label": "Custom Close Button" }}
       open={isOpen}
       onCancel={onClose}
@@ -64,22 +70,20 @@ const VehicleModal = ({
         autoComplete="off"
       >
         <Form.Item
-          label="Araç Plakası"
+          label={t("Vehicles.LICENSE_PLATE")}
           name="inputLicencePlate"
-          rules={[
-            { required: true, message: "Lütfen araç plakasını giriniz!" },
-          ]}
+          rules={[{ required: true, message: t("Vehicles.PLATE_REQUIRED") }]}
         >
           <Input />
         </Form.Item>
 
         <Form.Item
-          label="Firma"
+          label={t("Vehicles.VEHICLE_TYPE")}
           name="inputVehicleType"
-          rules={[{ required: true, message: "Lütfen bir araç tipi seçin!" }]}
+          rules={[{ required: true, message: t("Vehicles.TYPE_REQUIRED") }]}
         >
           <Select
-            placeholder="Araç Tipi Seçin"
+            placeholder={t("Vehicles.TYPE_REQUIRED")}
             showSearch
             optionFilterProp="children"
             options={vehicleOptions}
@@ -88,7 +92,7 @@ const VehicleModal = ({
 
         <Form.Item label={null} wrapperCol={{ offset: 8, span: 16 }}>
           <Button type="primary" htmlType="submit" loading={isLoading}>
-            {selectedRecord ? "Değişiklikleri Kaydet" : "Ekle"}
+            {selectedRecord ? t("Common.SAVE") : t("Common.ADD")}
           </Button>
         </Form.Item>
       </Form>

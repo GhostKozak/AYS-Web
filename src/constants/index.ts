@@ -74,7 +74,7 @@ export const isRoute = (value: string): value is Route => {
 // Environment-based constants
 export const CONFIG = {
   API_BASE_URL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000',
-  APP_NAME: 'Ulusal Araç Yönetim Sistemi',
+  APP_NAME: 'Ulusal',
   VERSION: '1.0.0',
   DEBUG: import.meta.env.DEV
 } as const;

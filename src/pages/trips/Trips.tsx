@@ -42,7 +42,7 @@ function Trips() {
 
   const openErrorNotification = (description: string) => {
     notificationApi.open({
-      message: "İşlem Başarısız",
+      message: t("Errors.OPERATION_FAILED"),
       description: description,
       duration: 4.5,
       icon: <CloseCircleOutlined style={{ color: "#ff4d4f" }} />,
@@ -52,9 +52,9 @@ function Trips() {
   const handleDelete = async (record: TripType) => {
     try {
       await deleteTrip(record._id);
-      messageApi.warning(<span>Sefer firması başarıyla silindi.</span>);
+      messageApi.success(<span>{t("Trips.DELETE_SUCCESS")}</span>);
     } catch (error) {
-      messageApi.error("Silme işlemi başarısız.");
+      messageApi.error(t("Errors.DELETE_FAILED"));
     }
   };
 
@@ -88,12 +88,11 @@ function Trips() {
   }) => {
     try {
       const payload = {
-        driver: values.inputDriver, // Backend ID bekliyorsa
-        company: values.inputCompany, // Backend ID bekliyorsa
-        vehicle: values.inputVehicle, // Backend ID bekliyorsa
+        driver: values.inputDriver,
+        company: values.inputCompany,
+        vehicle: values.inputVehicle,
         driver_full_name: values.inputName,
         driver_phone_number: values.inputPhone,
-        // Eksik alanlar eklendi:
         departure_time: values.departure_time,
         arrival_time: values.arrival_time,
         unload_status: values.unload_status,
@@ -105,24 +104,16 @@ function Trips() {
 
       if (selectedRecord) {
         await updateTrip({ id: selectedRecord._id, ...payload });
-        messageApi.info(
-          <span>
-            <strong>{values.inputName}</strong> güncellendi.
-          </span>
-        );
+        messageApi.info(<span>{t("Trips.UPDATE_SUCCESS")}</span>);
       } else {
         await createTrip(payload);
-        messageApi.success(
-          <span>
-            <strong>{values.inputName}</strong> eklendi.
-          </span>
-        );
+        messageApi.success(<span>{t("Trips.CREATE_SUCCESS")}</span>);
       }
       setIsModalOpen(false);
     } catch (error: any) {
       const errorMsg =
         error.response?.data?.message?.toString() ||
-        "Beklenmedik bir hata oluştu.";
+        t("Errors.UNEXPECTED_ERROR");
       openErrorNotification(errorMsg);
     }
   };
@@ -148,12 +139,12 @@ function Trips() {
       {notificationContextHolder}
       <Flex gap={isMobile ? 10 : 25} style={{ marginBottom: 20 }}>
         <Search
-          placeholder={t("Companies.SEARCH")}
+          placeholder={t("Trips.SEARCH")}
           allowClear
           enterButton={
             !isMobile && (
               <>
-                <SearchOutlined /> {t("Companies.SEARCH")}
+                <SearchOutlined /> {t("Common.SEARCH")}
               </>
             )
           }
@@ -162,7 +153,7 @@ function Trips() {
           onChange={(e) => handleSearch(e.target.value)}
         />
         <Button color="cyan" variant="solid" size="large" onClick={handleAdd}>
-          <PlusOutlined /> {isMobile ? "Ekle" : "Sefer Ekle"}
+          <PlusOutlined /> {isMobile ? t("Common.ADD") : t("Trips.ADD_BUTTON")}
         </Button>
       </Flex>
       {isMobile ? (

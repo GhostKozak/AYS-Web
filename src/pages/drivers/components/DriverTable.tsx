@@ -2,7 +2,7 @@ import { Table, Empty, Tag, Popconfirm, Button, Space } from "antd";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import type { DriverType } from "../../../types";
-import { useTranslation } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 import { formatPhoneNumber } from "../../../utils";
 
 type Props = {
@@ -35,29 +35,29 @@ export default function DriverTable({
       render: (company: { name: string }) => company?.name || "Şirket Yok",
     },
     {
-      title: t("Companies.CREATED_AT"),
+      title: t("Table.CREATED_AT"),
       dataIndex: "createdAt",
       key: "createdAt",
       render: (date: string) => new Date(date).toLocaleString("tr-TR"),
     },
     {
-      title: t("Companies.UPDATED_AT"),
+      title: t("Table.UPDATED_AT"),
       dataIndex: "updatedAt",
       key: "updatedAt",
       render: (date: string) => new Date(date).toLocaleString("tr-TR"),
     },
     {
-      title: t("Companies.STATUS"),
+      title: t("Table.STATUS"),
       dataIndex: "deleted",
       key: "deleted",
       render: (deleted: boolean) => (
         <Tag color={deleted ? "red" : "green"}>
-          {deleted ? t("Companies.PASSIVE") : t("Companies.ACTIVE")}
+          {deleted ? t("Common.PASSIVE") : t("Common.ACTIVE")}
         </Tag>
       ),
     },
     {
-      title: t("Drivers.ACTIONS"),
+      title: t("Table.ACTIONS"),
       key: "action",
       render: (_: any, record: DriverType) => (
         <Space>
@@ -66,23 +66,26 @@ export default function DriverTable({
             icon={<EditOutlined />}
             onClick={() => onEdit(record)}
           >
-            {t("Companies.EDIT")}
+            {t("Common.EDIT")}
           </Button>
           <Popconfirm
-            title="Silme işlemi"
+            title={t("Drivers.DELETE_CONFIRM_TITLE")}
             description={
               <span>
-                <strong>{record.full_name}</strong> sürücünü silmek istediğinize
-                emin misiniz?
+                <Trans
+                  i18nKey="Drivers.DELETE_CONFIRM_DESC"
+                  values={{ name: record.full_name }}
+                  components={{ bold: <strong /> }}
+                />
               </span>
             }
-            okText="Onayla"
-            cancelText="İptal"
+            okText={t("Common.CONFIRM")}
+            cancelText={t("Common.CANCEL")}
             icon={<DeleteOutlined style={{ color: "red" }} />}
             onConfirm={() => onDelete(record)}
           >
             <Button danger type="text">
-              {t("Companies.DELETE")}
+              {t("Common.DELETE")}
             </Button>
           </Popconfirm>
         </Space>
@@ -96,6 +99,7 @@ export default function DriverTable({
       dataSource={drivers}
       loading={isLoading}
       rowKey="_id"
+      scroll={{ x: 1000 }}
       locale={{
         emptyText: (
           <Empty
@@ -108,7 +112,7 @@ export default function DriverTable({
         showSizeChanger: true,
         showQuickJumper: true,
         showTotal: (total, range) =>
-          `${range[0]}-${range[1]} / ${total} şirket`,
+          `${range[0]}-${range[1]} / ${total} ${t("Drivers.TOTAL")}`,
       }}
     />
   );

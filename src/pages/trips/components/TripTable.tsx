@@ -2,7 +2,7 @@ import { Table, Empty, Tag, Popconfirm, Button, Space, Tooltip } from "antd";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import type { TripType } from "../../../types";
-import { useTranslation } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 import { formatLicencePlate, formatPhoneNumber } from "../../../utils";
 
 type Props = {
@@ -26,40 +26,42 @@ export default function TripTable({
       dataIndex: "arrival_time",
       key: "arrival_time",
       render: (date: string) =>
-        new Date(date).toLocaleString("tr-TR", {
-          year: "numeric",
-          month: "2-digit",
-          day: "2-digit",
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
+        date
+          ? new Date(date).toLocaleString("tr-TR", {
+              year: "numeric",
+              month: "2-digit",
+              day: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit",
+            })
+          : "-",
     },
     {
-      title: t("Trips.ARRIVAL_TIME"),
+      title: t("Trips.DEPARTURE_TIME"),
       dataIndex: "departure_time",
       key: "departure_time",
       render: (date: string) =>
-        new Date(date).toLocaleString("tr-TR", {
-          year: "numeric",
-          month: "2-digit",
-          day: "2-digit",
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
+        date
+          ? new Date(date).toLocaleString("tr-TR", {
+              year: "numeric",
+              month: "2-digit",
+              day: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit",
+            })
+          : "-",
     },
     {
       title: t("Trips.FULL_NAME"),
       dataIndex: "driver",
       key: "driver",
-      render: (driver: { _id: string; full_name: string }) =>
-        driver?.full_name || "Sürücü bulunamadı",
+      render: (driver: any) => driver?.full_name || "-",
     },
     {
       title: t("Trips.PHONE_NUMBER"),
       dataIndex: "driver",
       key: "driver_phone",
-      render: (driver: { _id: string; phone_number: string }) =>
-        formatPhoneNumber(driver?.phone_number) || "Sürücü bulunamadı",
+      render: (driver: any) => formatPhoneNumber(driver?.phone_number) || "-",
     },
     {
       title: t("Trips.COMPANY_NAME"),
@@ -72,8 +74,8 @@ export default function TripTable({
       title: t("Trips.LICENSE_PLATE"),
       dataIndex: "vehicle",
       key: "vehicle",
-      render: (vehicle: { _id: string; licence_plate: string }) =>
-        formatLicencePlate(vehicle?.licence_plate) || "Şirket bulunamadı",
+      render: (vehicle: any) =>
+        formatLicencePlate(vehicle?.licence_plate) || "-",
     },
     {
       title: t("Trips.UNLOAD_STATUS"),
@@ -81,41 +83,34 @@ export default function TripTable({
       key: "unload_status",
     },
     {
-      title: "ATS",
+      title: t("Trips.GPS_TRACKING"),
       dataIndex: "has_gps_tracking",
       key: "has_gps_tracking",
-      render: (has_gps_tracking: boolean) => {
-        const color = has_gps_tracking ? "green" : "red";
-        const text = has_gps_tracking ? "Var" : "Yok";
-        return <Tag color={color}>{text}</Tag>;
-      },
+      render: (val: boolean) => (
+        <Tag color={val ? "green" : "red"}>
+          {val ? t("Common.YES") : t("Common.NO")}
+        </Tag>
+      ),
     },
     {
       title: (
-        <Tooltip title="Koridor Kesik">
+        <Tooltip title={t("Trips.TEMP_PARKING")}>
           <span>KK</span>
         </Tooltip>
       ),
       dataIndex: "is_in_temporary_parking_lot",
       key: "is_in_temporary_parking_lot",
-      render: (is_in_temporary_parking_lot: boolean) => {
-        const color = is_in_temporary_parking_lot ? "green" : "";
-        const text = is_in_temporary_parking_lot ? "Kesik" : "";
-        return <Tag color={color}>{text}</Tag>;
-      },
+      render: (val: boolean) => (val ? <Tag color="green">Kesik</Tag> : null),
     },
     {
       title: t("Trips.TRIP_CANCELED"),
       dataIndex: "is_trip_canceled",
       key: "is_trip_canceled",
-      render: (is_trip_canceled: boolean) => {
-        const color = is_trip_canceled ? "red" : "";
-        const text = is_trip_canceled ? t("Trips.CANCEL") : "";
-        return <Tag color={color}>{text}</Tag>;
-      },
+      render: (val: boolean) =>
+        val ? <Tag color="red">{t("Common.CANCEL")}</Tag> : null,
     },
     {
-      title: t("Drivers.ACTIONS"),
+      title: t("Table.ACTIONS"),
       key: "action",
       fixed: "right",
       width: 200,
@@ -126,18 +121,29 @@ export default function TripTable({
             icon={<EditOutlined />}
             onClick={() => onEdit(record)}
           >
-            {t("Companies.EDIT")}
+            {t("Common.EDIT")}
           </Button>
           <Popconfirm
-            title="Silme işlemi"
-            description="Bu girdiyi silmek istediğinize emin misiniz?"
-            okText="Onayla"
-            cancelText="İptal"
+            title={t("Trips.DELETE_CONFIRM_TITLE")}
+            description={
+              <span>
+                <Trans
+                  i18nKey="Trips.DELETE_CONFIRM_DESC"
+                  values={{
+                    plate:
+                      formatLicencePlate(record.vehicle?.licence_plate) || "",
+                  }}
+                  components={{ bold: <strong /> }}
+                />
+              </span>
+            }
+            okText={t("Common.CONFIRM")}
+            cancelText={t("Common.CANCEL")}
             icon={<DeleteOutlined style={{ color: "red" }} />}
             onConfirm={() => onDelete(record)}
           >
             <Button danger type="text">
-              {t("Companies.DELETE")}
+              {t("Common.DELETE")}
             </Button>
           </Popconfirm>
         </Space>
@@ -164,13 +170,16 @@ export default function TripTable({
       pagination={{
         showSizeChanger: true,
         showQuickJumper: true,
-        showTotal: (total, range) => `${range[0]}-${range[1]} / ${total} sefer`,
+        showTotal: (total, range) =>
+          `${range[0]}-${range[1]} / ${total} ${t("Trips.TOTAL")}`,
       }}
       expandable={{
         expandedRowRender: (record) => (
-          <p style={{ margin: 0 }}>{record.notes}</p>
+          <p style={{ margin: 0 }}>
+            {t("Trips.NOTES")}: {record.notes}
+          </p>
         ),
-        rowExpandable: (record) => !!record.notes && record.notes !== "",
+        rowExpandable: (record) => !!record.notes,
       }}
     />
   );

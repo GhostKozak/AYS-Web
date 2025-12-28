@@ -34,7 +34,7 @@ function Companies() {
 
   const openErrorNotification = (description: string) => {
     notificationApi.open({
-      message: "İşlem Başarısız",
+      message: t("Errors.OPERATION_FAILED"),
       description: description,
       duration: 4.5,
       icon: <CloseCircleOutlined style={{ color: "#ff4d4f" }} />,
@@ -44,13 +44,11 @@ function Companies() {
   const handleDelete = async (record: CompanyType) => {
     try {
       await deleteCompany(record._id);
-      messageApi.warning(
-        <span>
-          <strong>{record.name}</strong> firması başarıyla silindi.
-        </span>
+      messageApi.success(
+        <span>{t("Companies.DELETE_SUCCESS", { name: record.name })}</span>
       );
     } catch (error) {
-      messageApi.error("Silme işlemi başarısız.");
+      messageApi.error(t("Errors.DELETE_FAILED"));
     }
   };
 
@@ -60,14 +58,14 @@ function Companies() {
         await updateCompany({ id: selectedRecord._id, name: values.inputName });
         messageApi.info(
           <span>
-            <strong>{values.inputName}</strong> firması başarıyla düzenlendi.
+            {t("Companies.UPDATE_SUCCESS", { name: values.inputName })}
           </span>
         );
       } else {
         await createCompany({ name: values.inputName });
         messageApi.success(
           <span>
-            <strong>{values.inputName}</strong> firması başarıyla eklendi.
+            {t("Companies.CREATE_SUCCESS", { name: values.inputName })}
           </span>
         );
       }
@@ -75,7 +73,7 @@ function Companies() {
     } catch (error: any) {
       const errorMsg =
         error.response?.data?.message?.toString() ||
-        "Beklenmedik bir hata oluştu.";
+        t("Errors.UNEXPECTED_ERROR");
       openErrorNotification(errorMsg);
     }
   };
@@ -106,7 +104,7 @@ function Companies() {
           enterButton={
             !isMobile && (
               <>
-                <SearchOutlined /> {t("Companies.SEARCH")}
+                <SearchOutlined /> {t("Common.SEARCH")}
               </>
             )
           }
@@ -115,7 +113,8 @@ function Companies() {
           onChange={(e) => setSearchText(e.target.value)}
         />
         <Button color="cyan" variant="solid" size="large" onClick={handleAdd}>
-          <PlusOutlined /> {isMobile ? "Ekle" : "Firma Ekle"}
+          <PlusOutlined />{" "}
+          {isMobile ? t("Common.ADD") : t("Companies.ADD_BUTTON")}
         </Button>
       </Flex>
       {isMobile ? (

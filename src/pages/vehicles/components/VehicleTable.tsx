@@ -2,7 +2,7 @@ import { Table, Empty, Tag, Popconfirm, Button, Space } from "antd";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import type { VehicleType } from "../../../types";
-import { useTranslation } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 import { formatLicencePlate } from "../../../utils";
 
 type Props = {
@@ -33,29 +33,29 @@ export default function VehicleTable({
       key: "vehicle_type",
     },
     {
-      title: t("Vehicles.CREATED_AT"),
+      title: t("Table.CREATED_AT"),
       dataIndex: "createdAt",
       key: "createdAt",
       render: (date: string) => new Date(date).toLocaleString("tr-TR"),
     },
     {
-      title: t("Vehicles.UPDATED_AT"),
+      title: t("Table.UPDATED_AT"),
       dataIndex: "updatedAt",
       key: "updatedAt",
       render: (date: string) => new Date(date).toLocaleString("tr-TR"),
     },
     {
-      title: t("Vehicles.STATUS"),
+      title: t("Table.STATUS"),
       key: "deleted",
       dataIndex: "deleted",
       render: (deleted: boolean) => (
         <Tag color={deleted ? "red" : "green"}>
-          {deleted ? t("Companies.PASSIVE") : t("Companies.ACTIVE")}
+          {deleted ? t("Common.PASSIVE") : t("Common.ACTIVE")}
         </Tag>
       ),
     },
     {
-      title: t("Vehicles.ACTIONS"),
+      title: t("Table.ACTIONS"),
       key: "action",
       render: (_: any, record: VehicleType) => (
         <Space>
@@ -64,23 +64,26 @@ export default function VehicleTable({
             onClick={() => onEdit(record)}
             icon={<EditOutlined />}
           >
-            {t("Companies.EDIT")}
+            {t("Common.EDIT")}
           </Button>
           <Popconfirm
-            title="Silme işlemi"
+            title={t("Vehicles.DELETE_CONFIRM_TITLE")}
             description={
               <span>
-                <strong>{formatLicencePlate(record.licence_plate)}</strong>{" "}
-                plakalı aracı silmek istediğinize emin misiniz?
+                <Trans
+                  i18nKey="Vehicles.DELETE_CONFIRM_DESC"
+                  values={{ plate: formatLicencePlate(record.licence_plate) }}
+                  components={{ bold: <strong /> }}
+                />
               </span>
             }
-            okText="Onayla"
-            cancelText="İptal"
+            okText={t("Common.CONFIRM")}
+            cancelText={t("Common.CANCEL")}
             icon={<DeleteOutlined style={{ color: "red" }} />}
             onConfirm={() => onDelete(record)}
           >
             <Button danger type="text">
-              {t("Companies.DELETE")}
+              {t("Common.DELETE")}
             </Button>
           </Popconfirm>
         </Space>
@@ -105,7 +108,8 @@ export default function VehicleTable({
       pagination={{
         showSizeChanger: true,
         showQuickJumper: true,
-        showTotal: (total, range) => `${range[0]}-${range[1]} / ${total} araç`,
+        showTotal: (total, range) =>
+          `${range[0]}-${range[1]} / ${total} ${t("Vehicles.TOTAL")}`,
       }}
     />
   );

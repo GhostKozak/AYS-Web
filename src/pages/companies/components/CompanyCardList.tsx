@@ -11,7 +11,7 @@ import {
 } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import type { CompanyType } from "../../../types";
-import { useTranslation } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 
 type Props = {
   companies: CompanyType[];
@@ -46,13 +46,23 @@ export default function CompanyCardList({
                 onClick={() => onEdit(item)}
                 key="edit"
               >
-                {t("Companies.EDIT")}
+                {t("Common.EDIT")}
               </Button>,
               <Popconfirm
-                title="Sil?"
+                title={t("Companies.DELETE_CONFIRM_TITLE")}
+                description={
+                  <span>
+                    <Trans
+                      i18nKey="Companies.DELETE_CONFIRM_DESC"
+                      values={{ name: item.name }}
+                      components={{ bold: <strong /> }}
+                    />
+                  </span>
+                }
                 onConfirm={() => onDelete(item)}
-                okText="Evet"
-                cancelText="Hayır"
+                okText={t("Common.YES")}
+                cancelText={t("Common.NO")}
+                icon={<DeleteOutlined style={{ color: "red" }} />}
               >
                 <Button
                   type="text"
@@ -60,25 +70,25 @@ export default function CompanyCardList({
                   icon={<DeleteOutlined />}
                   key="delete"
                 >
-                  {t("Companies.DELETE")}
+                  {t("Common.DELETE")}
                 </Button>
               </Popconfirm>,
             ]}
             extra={
               <Tag color={item.deleted ? "red" : "green"}>
-                {item.deleted ? t("Companies.PASSIVE") : t("Companies.ACTIVE")}
+                {item.deleted ? t("Common.PASSIVE") : t("Common.ACTIVE")}
               </Tag>
             }
           >
             <Space direction="vertical" style={{ width: "100%" }}>
               <Flex justify="space-between">
-                <Text type="secondary">{t("Companies.CREATED_AT")}:</Text>
+                <Text type="secondary">{t("Table.CREATED_AT")}:</Text>
                 <Text>
                   {new Date(item.createdAt).toLocaleDateString("tr-TR")}
                 </Text>
               </Flex>
               <Flex justify="space-between">
-                <Text type="secondary">{t("Companies.UPDATED_AT")}:</Text>
+                <Text type="secondary">{t("Table.UPDATED_AT")}:</Text>
                 <Text>
                   {new Date(item.updatedAt).toLocaleDateString("tr-TR")}
                 </Text>

@@ -52,7 +52,7 @@ function Drivers() {
 
   const openErrorNotification = (description: string) => {
     notificationApi.open({
-      message: "İşlem Başarısız",
+      message: t("Errors.OPERATION_FAILED"),
       description: description,
       duration: 4.5,
       icon: <CloseCircleOutlined style={{ color: "#ff4d4f" }} />,
@@ -62,13 +62,11 @@ function Drivers() {
   const handleDelete = async (record: DriverType) => {
     try {
       await deleteDriver(record._id);
-      messageApi.warning(
-        <span>
-          <strong>{record.full_name}</strong> firması başarıyla silindi.
-        </span>
+      messageApi.success(
+        <span>{t("Drivers.DELETE_SUCCESS", { name: record.full_name })}</span>
       );
     } catch (error) {
-      messageApi.error("Silme işlemi başarısız.");
+      messageApi.error(t("Errors.DELETE_FAILED"));
     }
   };
 
@@ -101,23 +99,19 @@ function Drivers() {
       if (selectedRecord) {
         await updateDriver({ id: selectedRecord._id, ...payload });
         messageApi.info(
-          <span>
-            <strong>{values.inputName}</strong> güncellendi.
-          </span>
+          <span>{t("Drivers.UPDATE_SUCCESS", { name: values.inputName })}</span>
         );
       } else {
         await createDriver(payload);
         messageApi.success(
-          <span>
-            <strong>{values.inputName}</strong> eklendi.
-          </span>
+          <span>{t("Drivers.CREATE_SUCCESS", { name: values.inputName })}</span>
         );
       }
       setIsModalOpen(false);
     } catch (error: any) {
       const errorMsg =
         error.response?.data?.message?.toString() ||
-        "Beklenmedik bir hata oluştu.";
+        t("Errors.UNEXPECTED_ERROR");
       openErrorNotification(errorMsg);
     }
   };
@@ -136,12 +130,12 @@ function Drivers() {
       {notificationContextHolder}
       <Flex gap={isMobile ? 10 : 25} style={{ marginBottom: 20 }}>
         <Search
-          placeholder={t("Companies.SEARCH")}
+          placeholder={t("Drivers.SEARCH")}
           allowClear
           enterButton={
             !isMobile && (
               <>
-                <SearchOutlined /> {t("Companies.SEARCH")}
+                <SearchOutlined /> {t("Common.SEARCH")}
               </>
             )
           }
@@ -150,12 +144,13 @@ function Drivers() {
           onChange={(e) => handleSearch(e.target.value)}
         />
         <Button color="cyan" variant="solid" size="large" onClick={handleAdd}>
-          <PlusOutlined /> {isMobile ? "Ekle" : "Sürücü Ekle"}
+          <PlusOutlined />{" "}
+          {isMobile ? t("Common.ADD") : t("Drivers.ADD_BUTTON")}
         </Button>
       </Flex>
       {isMobile ? (
         <DriverCardList
-          companies={filteredDrivers}
+          drivers={filteredDrivers}
           isLoading={isLoading}
           onDelete={handleDelete}
           onEdit={handleEdit}

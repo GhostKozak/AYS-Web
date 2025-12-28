@@ -1,6 +1,7 @@
 {
   "HELLO": "Merhaba Dünya",
-  "Breadcrumbs" : {
+
+  "Breadcrumbs": {
     "DASHBOARD": "Gösterge Paneli",
     "LOGIN": "Giriş Yap",
     "COMPANIES": "Şirketler",
@@ -9,64 +10,137 @@
     "TRIPS": "Yolculuklar",
     "FAQ": "SSS"
   },
-  "Companies": {
-    "COMPANY_NAME": "Şirket Adı",
-    "CREATED_AT": "Oluşturulma Tarihi",
-    "UPDATED_AT": "Güncellenme Tarihi",
-    "STATUS": "Durum",
-    "ACTIONS": "İşlem",
+
+  "Header": {
+    "ACCOUNT_SETTINGS": "Hesap Ayarları",
+    "SUBSCRIPTION": "Abonelik Bilgileri",
+    "SEND_FEEDBACK": "Geri Bildirim Gönder",
+    "LIGHT_MODE": "Aydınlık Mod",
+    "DARK_MODE": "Karanlık Mod",
+    "LOGOUT": "Çıkış Yap",
+    "LOGIN": "Giriş Yap",
+    "FEEDBACK_TITLE": "Geri Bildirim",
+    "FEEDBACK_DESC": "Görüşleriniz bizim için değerli.",
+    "FULL_NAME": "Ad Soyad",
+    "EMAIL": "E-posta",
+    "MESSAGE": "Mesajınız",
+    "MENU": "Menü"
+  },
+
+  "Common": {
+    "YES": "Evet",
+    "NO": "Hayır",
+    "CONFIRM": "Onayla",
+    "CANCEL": "İptal",
+    "ADD": "Ekle",
+    "SAVE": "Kaydet",
     "EDIT": "Düzenle",
     "DELETE": "Sil",
     "ACTIVE": "Aktif",
     "PASSIVE": "Pasif",
-    "SEARCH": "Şirket Adı ile Ara"
+    "ERROR": "Hata",
+    "SUCCESS": "Başarılı",
+    "SEARCH": "Ara",
+    "APP_SUBTITLE": "Araç Yönetim Sistemi"
   },
+
+  "Table": {
+    "NO_DATA": "Veri yok",
+    "CREATED_AT": "Oluşturulma Tarihi",
+    "UPDATED_AT": "Güncellenme Tarihi",
+    "STATUS": "Durum",
+    "ACTIONS": "İşlem"
+  },
+
+  "Errors": {
+    "OPERATION_FAILED": "İşlem Başarısız",
+    "UNEXPECTED_ERROR": "Beklenmedik bir hata oluştu.",
+    "DELETE_FAILED": "Silme işlemi başarısız."
+  },
+
+  "Validation": {
+    "REQUIRED": "Bu alan zorunludur!"
+  },
+  
+  "Companies": {
+    "COMPANY_NAME": "Şirket Adı",
+    "SEARCH": "Şirket Ara",
+    "ADD_BUTTON": "Firma Ekle",
+    "EDIT_FORM_TITLE": "Firma Düzenleme Formu",
+    "ADD_FORM_TITLE": "Yeni Firma Ekleme Formu",
+    "NAME_REQUIRED": "Lütfen firma ismini giriniz!",
+    "SAVE_CHANGES": "Değişiklikleri Kaydet",
+    "DELETE_CONFIRM_TITLE": "Silme İşlemi",
+    "DELETE_CONFIRM_DESC": "<bold>{{name}}</bold> firmasını silmek istediğinize emin misiniz?",
+    "CREATE_SUCCESS": "{{name}} firması başarıyla eklendi.",
+    "UPDATE_SUCCESS": "{{name}} firması başarıyla düzenlendi.",
+    "DELETE_SUCCESS": "{{name}} firması başarıyla silindi.",
+    "TOTAL": "adet firma"   
+  },
+
   "Drivers": {
     "FULL_NAME": "Ad Soyad",
     "PHONE_NUMBER": "Telefon Numarası",
     "COMPANY_NAME": "Şirket Adı",
-    "CREATED_AT": "Oluşturulma Tarihi",
-    "UPDATED_AT": "Güncellenme Tarihi",
-    "STATUS": "Durum",
-    "ACTIONS": "İşlem",
-    "EDIT": "Düzenle",
-    "DELETE": "Sil",
-    "ACTIVE": "Aktif",
-    "PASSIVE": "Pasif"
+    "SEARCH": "Sürücü Ara",
+    "ADD_BUTTON": "Sürücü Ekle",
+    "EDIT_FORM_TITLE": "Sürücü Düzenleme Formu",
+    "ADD_FORM_TITLE": "Yeni Sürücü Ekleme Formu",
+    "FULL_NAME_REQUIRED": "Lütfen sürücü ismini giriniz!",
+    "PHONE_REQUIRED": "Lütfen telefon numarasını giriniz!",
+    "COMPANY_REQUIRED": "Lütfen bir firma seçin!",
+    "DELETE_CONFIRM_TITLE": "Silme İşlemi",
+    "DELETE_CONFIRM_DESC": "<bold>{{name}}</bold> sürücüsünü silmek istediğinize emin misiniz?",
+    "CREATE_SUCCESS": "{{name}} sürücüsü başarıyla eklendi.",
+    "UPDATE_SUCCESS": "{{name}} sürücüsü başarıyla güncellendi.",
+    "DELETE_SUCCESS": "{{name}} sürücüsü silindi.",
+    "TOTAL": "adet sürücü"
   },
+
   "Vehicles": {
     "LICENSE_PLATE": "Plaka",
     "VEHICLE_TYPE": "Araç Tipi",
-    "CREATED_AT": "Oluşturulma Tarihi",
-    "UPDATED_AT": "Güncellenme Tarihi",
-    "STATUS": "Durum",
-    "ACTIONS": "İşlem",
-    "EDIT": "Düzenle",
-    "DELETE": "Sil",
-    "ACTIVE": "Aktif",
-    "PASSIVE": "Pasif"
+    "SEARCH": "Araç Ara",
+    "ADD_BUTTON": "Araç Ekle",
+    "EDIT_FORM_TITLE": "Araç Düzenleme Formu",
+    "ADD_FORM_TITLE": "Yeni Araç Ekleme Formu",
+    "PLATE_REQUIRED": "Lütfen plaka giriniz!",
+    "TYPE_REQUIRED": "Lütfen araç tipi seçiniz!",
+    "DELETE_CONFIRM_TITLE": "Silme İşlemi",
+    "DELETE_CONFIRM_DESC": "<bold>{{plate}}</bold> plakalı aracı silmek istediğinize emin misiniz?",
+    "CREATE_SUCCESS": "{{plate}} plakalı araç başarıyla eklendi.",
+    "UPDATE_SUCCESS": "{{plate}} plakalı araç başarıyla güncellendi.",
+    "DELETE_SUCCESS": "{{plate}} plakalı araç silindi.",
+    "TOTAL": "adet araç"
   },
+
   "Trips": {
     "ARRIVAL_TIME": "Varış Zamanı",
-    "FULL_NAME": "Ad Soyad",
-    "PHONE_NUMBER": "Telefon Numarası",
+    "DEPARTURE_TIME": "Çıkış Zamanı",
+    "FULL_NAME": "Sürücü Adı",
+    "PHONE_NUMBER": "Sürücü Telefonu",
     "COMPANY_NAME": "Şirket Adı",
     "LICENSE_PLATE": "Plaka",
     "UNLOAD_STATUS": "Boşaltma Durumu",
+    "GPS_TRACKING": "ATS",
+    "TEMP_PARKING": "Koridor Kesik (KK)",
     "TRIP_CANCELED": "Sefer İptali",
-    "CREATED_AT": "Oluşturulma Tarihi",
-    "UPDATED_AT": "Güncellenme Tarihi",
-    "STATUS": "Durum",
-    "ACTIONS": "İşlem",
-    "CANCEL": "İptal",
-    "EDIT": "Düzenle",
-    "DELETE": "Sil",
-    "ACTIVE": "Aktif",
-    "PASSIVE": "Pasif"
+    "NOTES": "Notlar",
+    "SEARCH": "Sefer, Plaka veya Sürücü Ara",
+    "ADD_BUTTON": "Sefer Ekle",
+    "EDIT_FORM_TITLE": "Sefer Düzenleme Formu",
+    "ADD_FORM_TITLE": "Yeni Sefer Ekleme Formu",
+    "DRIVER_REQUIRED": "Lütfen bir sürücü seçin!",
+    "COMPANY_REQUIRED": "Lütfen bir firma seçin!",
+    "VEHICLE_REQUIRED": "Lütfen bir araç seçin!",
+    "DELETE_CONFIRM_TITLE": "Silme İşlemi",
+    "DELETE_CONFIRM_DESC": "<bold>{{plate}}</bold> plakalı araca ait seferi silmek istediğinize emin misiniz?",
+    "CREATE_SUCCESS": "Sefer başarıyla oluşturuldu.",
+    "UPDATE_SUCCESS": "Sefer başarıyla güncellendi.",
+    "DELETE_SUCCESS": "Sefer kaydı silindi.",
+    "TOTAL": "adet sefer"
   },
-  "Table": {
-    "NO_DATA": "Veri yok"
-  },
+  
   "Other": {
     "FAQ": "Sıkça Sorulan Sorular"
   }

@@ -9,13 +9,14 @@ import {
   type TripType,
   type VehicleType,
 } from "../../../types";
+import { useTranslation } from "react-i18next";
 
 interface TripFormValues {
   inputName: string;
   inputPhone: string;
-  inputCompany: string; // company _id
-  inputVehicle: string; // vehicle _id
-  inputDriver: string; // driver _id
+  inputCompany: string;
+  inputVehicle: string;
+  inputDriver: string;
   departure_time?: string;
   arrival_time?: string;
   unload_status?: string;
@@ -57,6 +58,7 @@ const TripModal = ({
   const { createDriver } = useDrivers();
   const { createVehicle } = useVehicles();
   const [isExistingDriver, setIsExistingDriver] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (isOpen) {
@@ -191,11 +193,12 @@ const TripModal = ({
   return (
     <Modal
       title={
-        selectedRecord ? "Sefer Düzenleme Formu" : "Yeni Sefer Ekleme Formu"
+        selectedRecord ? t("Trips.EDIT_FORM_TITLE") : t("Trips.ADD_FORM_TITLE")
       }
       open={isOpen}
       onCancel={onClose}
       footer={null}
+      width={700}
     >
       <Form
         name="tipForm"
@@ -207,12 +210,12 @@ const TripModal = ({
         autoComplete="off"
       >
         <Form.Item
-          label="Firma"
+          label={t("Trips.COMPANY_NAME")}
           name="inputCompany"
-          rules={[{ required: true, message: "Lütfen bir firma seçin!" }]}
+          rules={[{ required: true, message: t("Trips.COMPANY_REQUIRED") }]}
         >
           <Select
-            placeholder="Firma Seçin veya yeni yazın"
+            placeholder={t("Trips.COMPANY_REQUIRED")}
             showSearch
             filterOption={false}
             onSearch={(val) => setCompanySearch(val)}
@@ -236,12 +239,12 @@ const TripModal = ({
         </Form.Item>
 
         <Form.Item
-          label="Araç"
+          label={t("Trips.LICENSE_PLATE")}
           name="inputVehicle"
-          rules={[{ required: true, message: "Lütfen bir araç seçin!" }]}
+          rules={[{ required: true, message: t("Trips.VEHICLE_REQUIRED") }]}
         >
           <Select
-            placeholder="Araç Seçin veya plaka yazın"
+            placeholder={t("Trips.VEHICLE_REQUIRED")}
             showSearch
             filterOption={false}
             onSearch={(val) => setVehicleSearch(val)}
@@ -265,12 +268,12 @@ const TripModal = ({
         </Form.Item>
 
         <Form.Item
-          label="Sürücü"
+          label={t("Trips.FULL_NAME")}
           name="inputDriver"
-          rules={[{ required: true, message: "Lütfen bir sürücü seçin!" }]}
+          rules={[{ required: true, message: t("Trips.DRIVER_REQUIRED") }]}
         >
           <Select
-            placeholder="Sürücü Seçin veya isim yazın"
+            placeholder={t("Trips.DRIVER_REQUIRED")}
             showSearch
             filterOption={false}
             onSearch={(val) => setDriverSearch(val)}
@@ -298,37 +301,37 @@ const TripModal = ({
         {!isExistingDriver && (
           <>
             <Form.Item
-              label="Yeni Sürücü İsmi"
+              label={t("Trips.FULL_NAME")}
               name="inputName"
-              rules={[{ required: true, message: "İsim zorunludur!" }]}
+              rules={[{ required: true, message: t("Trips.DRIVER_REQUIRED") }]}
             >
-              <Input placeholder="Sürücü tam adı" />
+              <Input placeholder={t("Trips.FULL_NAME")} />
             </Form.Item>
 
             <Form.Item
-              label="Yeni Sürücü Telefonu"
+              label={t("Trips.PHONE_NUMBER")}
               name="inputPhone"
-              rules={[{ required: true, message: "Telefon zorunludur!" }]}
+              rules={[{ required: true, message: t("Trips.PHONE_REQUIRED") }]}
             >
               <Input placeholder="05XX XXX XX XX" />
             </Form.Item>
           </>
         )}
 
-        <Form.Item label="Kalkış Tarihi" name="departure_time">
+        <Form.Item label={t("Trips.DEPARTURE_TIME")} name="departure_time">
           <Input type="datetime-local" />
         </Form.Item>
 
-        <Form.Item label="Varış Tarihi" name="arrival_time">
+        <Form.Item label={t("Trips.ARRIVAL_TIME")} name="arrival_time">
           <Input type="datetime-local" />
         </Form.Item>
 
-        <Form.Item label="Boşaltma Durumu" name="unload_status">
+        <Form.Item label={t("Trips.UNLOAD_STATUS")} name="unload_status">
           <Input />
         </Form.Item>
 
         <Form.Item
-          label="GPS Takibi"
+          label={t("Trips.GPS_TRACKING")}
           name="has_gps_tracking"
           valuePropName="checked"
         >
@@ -336,7 +339,7 @@ const TripModal = ({
         </Form.Item>
 
         <Form.Item
-          label="Geçici Park Alanında"
+          label={t("Trips.TEMP_PARKING")}
           name="is_in_temporary_parking_lot"
           valuePropName="checked"
         >
@@ -344,14 +347,14 @@ const TripModal = ({
         </Form.Item>
 
         <Form.Item
-          label="Sefer İptal"
+          label={t("Trips.TRIP_CANCELED")}
           name="is_trip_canceled"
           valuePropName="checked"
         >
           <Switch />
         </Form.Item>
 
-        <Form.Item label="Notlar" name="notes">
+        <Form.Item label={t("Trips.NOTES")} name="notes">
           <Input.TextArea rows={4} />
         </Form.Item>
 
@@ -361,7 +364,7 @@ const TripModal = ({
             htmlType="submit"
             loading={isLoading || submitting}
           >
-            {selectedRecord ? "Değişiklikleri Kaydet" : "Ekle"}
+            {selectedRecord ? t("Common.SAVE") : t("Common.ADD")}
           </Button>
         </Form.Item>
       </Form>

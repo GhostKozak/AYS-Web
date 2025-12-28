@@ -12,18 +12,18 @@ import {
 } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import type { DriverType } from "../../../types";
-import { useTranslation } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 import { formatPhoneNumber } from "../../../utils";
 
 type Props = {
-  companies: DriverType[];
+  drivers: DriverType[];
   isLoading: boolean;
   onEdit: (c: DriverType) => void;
   onDelete: (c: DriverType) => void;
 };
 
 export default function DriverCardList({
-  companies,
+  drivers,
   isLoading,
   onEdit,
   onDelete,
@@ -34,7 +34,7 @@ export default function DriverCardList({
   return (
     <List
       loading={isLoading}
-      dataSource={companies}
+      dataSource={drivers}
       locale={{ emptyText: <Empty description={t("Table.NO_DATA")} /> }}
       renderItem={(item) => (
         <List.Item>
@@ -48,13 +48,23 @@ export default function DriverCardList({
                 onClick={() => onEdit(item)}
                 key="edit"
               >
-                {t("Companies.EDIT")}
+                {t("Common.EDIT")}
               </Button>,
               <Popconfirm
-                title="Sil?"
+                title={t("Drivers.DELETE_CONFIRM_TITLE")}
+                description={
+                  <span>
+                    <Trans
+                      i18nKey="Drivers.DELETE_CONFIRM_DESC"
+                      values={{ name: item.full_name }}
+                      components={{ bold: <strong /> }}
+                    />
+                  </span>
+                }
                 onConfirm={() => onDelete(item)}
-                okText="Evet"
-                cancelText="Hayır"
+                okText={t("Common.YES")}
+                cancelText={t("Common.NO")}
+                icon={<DeleteOutlined style={{ color: "red" }} />}
               >
                 <Button
                   type="text"
@@ -62,23 +72,23 @@ export default function DriverCardList({
                   icon={<DeleteOutlined />}
                   key="delete"
                 >
-                  {t("Companies.DELETE")}
+                  {t("Common.DELETE")}
                 </Button>
               </Popconfirm>,
             ]}
             extra={
               <Tag color={item.deleted ? "red" : "green"}>
-                {item.deleted ? t("Companies.PASSIVE") : t("Companies.ACTIVE")}
+                {item.deleted ? t("Common.PASSIVE") : t("Common.ACTIVE")}
               </Tag>
             }
           >
             <Space direction="vertical" style={{ width: "100%" }}>
               <Flex justify="space-between">
-                <Text type="secondary">Telefon Numarası:</Text>
+                <Text type="secondary">{t("Drivers.PHONE_NUMBER")}:</Text>
                 <Text>{formatPhoneNumber(item.phone_number)}</Text>
               </Flex>
               <Flex justify="space-between">
-                <Text type="secondary">Firması:</Text>
+                <Text type="secondary">{t("Drivers.COMPANY_NAME")}:</Text>
                 <Text>{item.company.name}</Text>
               </Flex>
               <Divider size="small" />

@@ -1,6 +1,7 @@
 import { Modal, Form, Input, Button, Select } from "antd";
 import { useEffect } from "react";
 import { type CompanyType, type DriverType } from "../../../types";
+import { useTranslation } from "react-i18next";
 
 interface DriverFormValues {
   inputName: string;
@@ -26,6 +27,7 @@ const DriverModal = ({
   companies,
 }: DriverModalProps) => {
   const [form] = Form.useForm();
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (isOpen) {
@@ -44,7 +46,9 @@ const DriverModal = ({
   return (
     <Modal
       title={
-        selectedRecord ? "Sürücü Düzenleme Formu" : "Yeni Sürücü Ekleme Formu"
+        selectedRecord
+          ? t("Drivers.EDIT_FORM_TITLE")
+          : t("Drivers.ADD_FORM_TITLE")
       }
       open={isOpen}
       onCancel={onClose}
@@ -60,12 +64,12 @@ const DriverModal = ({
         autoComplete="off"
       >
         <Form.Item
-          label="Firma"
+          label={t("Drivers.COMPANY_NAME")}
           name="inputCompany"
-          rules={[{ required: true, message: "Lütfen bir firma seçin!" }]}
+          rules={[{ required: true, message: t("Drivers.COMPANY_REQUIRED") }]}
         >
           <Select
-            placeholder="Firma Seçin"
+            placeholder={t("Drivers.COMPANY_REQUIRED")}
             showSearch
             optionFilterProp="children"
             filterOption={(input, option) =>
@@ -83,26 +87,24 @@ const DriverModal = ({
         </Form.Item>
 
         <Form.Item
-          label="Sürücü İsmi"
+          label={t("Drivers.FULL_NAME")}
           name="inputName"
-          rules={[{ required: true, message: "Lütfen sürücü ismini giriniz!" }]}
+          rules={[{ required: true, message: t("Drivers.FULL_NAME_REQUIRED") }]}
         >
           <Input />
         </Form.Item>
 
         <Form.Item
-          label="Telefon"
+          label={t("Drivers.PHONE_NUMBER")}
           name="inputPhone"
-          rules={[
-            { required: true, message: "Lütfen telefon numarasını giriniz!" },
-          ]}
+          rules={[{ required: true, message: t("Drivers.PHONE_REQUIRED") }]}
         >
           <Input />
         </Form.Item>
 
         <Form.Item label={null} wrapperCol={{ offset: 8, span: 16 }}>
           <Button type="primary" htmlType="submit" loading={isLoading}>
-            {selectedRecord ? "Değişiklikleri Kaydet" : "Ekle"}
+            {selectedRecord ? t("Common.SAVE") : t("Common.ADD")}
           </Button>
         </Form.Item>
       </Form>

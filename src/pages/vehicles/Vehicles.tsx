@@ -33,7 +33,7 @@ function Vehicles() {
 
   const openErrorNotification = (description: string) => {
     notificationApi.open({
-      message: "İşlem Başarısız",
+      message: t("Errors.OPERATION_FAILED"),
       description: description,
       duration: 4.5,
       icon: <CloseCircleOutlined style={{ color: "#ff4d4f" }} />,
@@ -43,14 +43,13 @@ function Vehicles() {
   const handleDelete = async (record: VehicleType) => {
     try {
       await deleteVehicle(record._id);
-      messageApi.warning(
+      messageApi.success(
         <span>
-          <strong>{record.licence_plate}</strong> plakalı araç başarıyla
-          silindi.
+          {t("Vehicles.DELETE_SUCCESS", { plate: record.licence_plate })}
         </span>
       );
     } catch (error) {
-      messageApi.error("Silme işlemi başarısız.");
+      messageApi.error(t("Errors.DELETE_FAILED"));
     }
   };
 
@@ -67,8 +66,7 @@ function Vehicles() {
         });
         messageApi.info(
           <span>
-            <strong>{values.inputLicencePlate}</strong> plakalı araç başarıyla
-            düzenlendi.
+            {t("Vehicles.UPDATE_SUCCESS", { plate: values.inputLicencePlate })}
           </span>
         );
       } else {
@@ -78,8 +76,7 @@ function Vehicles() {
         });
         messageApi.success(
           <span>
-            <strong>{values.inputLicencePlate}</strong> plakalı araç başarıyla
-            eklendi.
+            {t("Vehicles.CREATE_SUCCESS", { plate: values.inputLicencePlate })}
           </span>
         );
       }
@@ -87,7 +84,7 @@ function Vehicles() {
     } catch (error: any) {
       const errorMsg =
         error.response?.data?.message?.toString() ||
-        "Beklenmedik bir hata oluştu.";
+        t("Errors.UNEXPECTED_ERROR");
       openErrorNotification(errorMsg);
     }
   };
@@ -115,12 +112,12 @@ function Vehicles() {
       {notificationContextHolder}
       <Flex gap={isMobile ? 10 : 25} style={{ marginBottom: 20 }}>
         <Search
-          placeholder={t("Companies.SEARCH")}
+          placeholder={t("Vehicles.SEARCH")}
           allowClear
           enterButton={
             !isMobile && (
               <>
-                <SearchOutlined /> {t("Companies.SEARCH")}
+                <SearchOutlined /> {t("Common.SEARCH")}
               </>
             )
           }
@@ -129,7 +126,8 @@ function Vehicles() {
           onChange={(e) => setSearchText(e.target.value)}
         />
         <Button color="cyan" variant="solid" size="large" onClick={handleAdd}>
-          <PlusOutlined /> Araç Ekle
+          <PlusOutlined />{" "}
+          {isMobile ? t("Common.ADD") : t("Vehicles.ADD_BUTTON")}
         </Button>
       </Flex>
       {isMobile ? (

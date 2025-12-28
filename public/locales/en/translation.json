@@ -1,72 +1,146 @@
 {
   "HELLO": "HELLO WORLD",
-  "Breadcrumbs" : {
+
+  "Breadcrumbs": {
     "DASHBOARD": "Dashboard",
     "LOGIN": "Login",
     "COMPANIES": "Companies",
     "DRIVERS": "Drivers",
     "VEHICLES": "Vehicles",
     "TRIPS": "Trips",
-    "FAQ": "FAQ" 
+    "FAQ": "FAQ"
   },
-  "Companies": {
-    "COMPANY_NAME": "Company Name",
-    "CREATED_AT": "Created At",
-    "UPDATED_AT": "Updated At",
-    "STATUS": "Status",
-    "ACTIONS": "Action",
+
+  "Header": {
+    "ACCOUNT_SETTINGS": "Account Settings",
+    "SUBSCRIPTION": "Subscription Info",
+    "SEND_FEEDBACK": "Send Feedback",
+    "LIGHT_MODE": "Light Mode",
+    "DARK_MODE": "Dark Mode",
+    "LOGOUT": "Logout",
+    "LOGIN": "Login",
+    "FEEDBACK_TITLE": "Feedback",
+    "FEEDBACK_DESC": "Your feedback is valuable to us.",
+    "FULL_NAME": "Full Name",
+    "EMAIL": "Email",
+    "MESSAGE": "Message",
+    "MENU": "Menu"
+  },
+
+  "Common": {
+    "YES": "Yes",
+    "NO": "No",
+    "CONFIRM": "Confirm",
+    "CANCEL": "Cancel",
+    "ADD": "Add",
+    "SAVE": "Save",
     "EDIT": "Edit",
     "DELETE": "Delete",
     "ACTIVE": "Active",
     "PASSIVE": "Passive",
-    "SEARCH": "Search with Company Name"
+    "ERROR": "Error",
+    "SUCCESS": "Success",
+    "SEARCH": "Search",
+    "APP_SUBTITLE": "Vehicle Management System"
   },
+
+  "Table": {
+    "NO_DATA": "No data",
+    "CREATED_AT": "Created At",
+    "UPDATED_AT": "Updated At",
+    "STATUS": "Status",
+    "ACTIONS": "Action"
+  },
+
+  "Errors": {
+    "OPERATION_FAILED": "Operation Failed",
+    "UNEXPECTED_ERROR": "An unexpected error occurred.",
+    "DELETE_FAILED": "Deletion failed."
+  },
+
+  "Validation": {
+    "REQUIRED": "This field is required!"
+  },
+
+  "Companies": {
+    "COMPANY_NAME": "Company Name",
+    "SEARCH": "Search Company",
+    "ADD_BUTTON": "Add Company",
+    "EDIT_FORM_TITLE": "Edit Company Form",
+    "ADD_FORM_TITLE": "New Company Form",
+    "NAME_REQUIRED": "Please enter the company name!",
+    "SAVE_CHANGES": "Save Changes",
+    "DELETE_CONFIRM_TITLE": "Deletion",
+    "DELETE_CONFIRM_DESC": "Are you sure you want to delete <bold>{{name}}</bold>?",
+    "CREATE_SUCCESS": "{{name}} created successfully.",
+    "UPDATE_SUCCESS": "{{name}} updated successfully.",
+    "DELETE_SUCCESS": "{{name}} deleted successfully.",
+    "TOTAL": "total companies"
+  },
+
   "Drivers": {
     "FULL_NAME": "Full Name",
     "PHONE_NUMBER": "Phone Number",
     "COMPANY_NAME": "Company Name",
-    "CREATED_AT": "Created At",
-    "UPDATED_AT": "Updated At",
-    "STATUS": "Status",
-    "ACTIONS": "Action",
-    "EDIT": "Edit",
-    "DELETE": "Delete",
-    "ACTIVE": "Active",
-    "PASSIVE": "Passive"
+    "SEARCH": "Search Driver",
+    "ADD_BUTTON": "Add Driver",
+    "EDIT_FORM_TITLE": "Edit Driver Form",
+    "ADD_FORM_TITLE": "New Driver Form",
+    "FULL_NAME_REQUIRED": "Please enter the driver name!",
+    "PHONE_REQUIRED": "Please enter the phone number!",
+    "COMPANY_REQUIRED": "Please select a company!",
+    "DELETE_CONFIRM_TITLE": "Deletion",
+    "DELETE_CONFIRM_DESC": "Are you sure you want to delete driver <bold>{{name}}</bold>?",
+    "CREATE_SUCCESS": "{{name}} created successfully.",
+    "UPDATE_SUCCESS": "{{name}} updated successfully.",
+    "DELETE_SUCCESS": "{{name}} deleted successfully.",
+    "TOTAL": "total drivers"
   },
+
   "Vehicles": {
     "LICENSE_PLATE": "License Plate",
     "VEHICLE_TYPE": "Vehicle Type",
-    "CREATED_AT": "Created At",
-    "UPDATED_AT": "Updated At",
-    "STATUS": "Status",
-    "ACTIONS": "Action",
-    "EDIT": "Edit",
-    "DELETE": "Delete",
-    "ACTIVE": "Active",
-    "PASSIVE": "Passive"
+    "SEARCH": "Search Vehicle",
+    "ADD_BUTTON": "Add Vehicle",
+    "EDIT_FORM_TITLE": "Edit Vehicle Form",
+    "ADD_FORM_TITLE": "New Vehicle Form",
+    "PLATE_REQUIRED": "Please enter the license plate!",
+    "TYPE_REQUIRED": "Please select a vehicle type!",
+    "DELETE_CONFIRM_TITLE": "Deletion",
+    "DELETE_CONFIRM_DESC": "Are you sure you want to delete vehicle <bold>{{plate}}</bold>?",
+    "CREATE_SUCCESS": "Vehicle {{plate}} created successfully.",
+    "UPDATE_SUCCESS": "Vehicle {{plate}} updated successfully.",
+    "DELETE_SUCCESS": "Vehicle {{plate}} deleted successfully.",
+    "TOTAL": "total vehicles"
   },
+
   "Trips": {
     "ARRIVAL_TIME": "Arrival Time",
-    "FULL_NAME": "Full Name",
-    "PHONE_NUMBER": "Phone Number",
+    "DEPARTURE_TIME": "Departure Time",
+    "FULL_NAME": "Driver Name",
+    "PHONE_NUMBER": "Driver Phone",
     "COMPANY_NAME": "Company Name",
     "LICENSE_PLATE": "License Plate",
-    "UNLOAD_STATUS": "Unloading Status",
+    "UNLOAD_STATUS": "Unload Status",
+    "GPS_TRACKING": "GPS Tracking",
+    "TEMP_PARKING": "Temp. Parking",
     "TRIP_CANCELED": "Trip Canceled",
-    "CREATED_AT": "Created At",
-    "UPDATED_AT": "Updated At",
-    "STATUS": "Status",
-    "ACTIONS": "Action",
-    "CANCEL": "Canceled",
-    "EDIT": "Edit",
-    "DELETE": "Delete",
-    "ACTIVE": "Active",
-    "PASSIVE": "Passive"
+    "NOTES": "Notes",
+    "SEARCH": "Search Trip, Plate or Driver",
+    "ADD_BUTTON": "Add Trip",
+    "EDIT_FORM_TITLE": "Edit Trip Form",
+    "ADD_FORM_TITLE": "New Trip Form",
+    "DRIVER_REQUIRED": "Please select a driver!",
+    "COMPANY_REQUIRED": "Please select a company!",
+    "VEHICLE_REQUIRED": "Please select a vehicle!",
+    "DELETE_CONFIRM_TITLE": "Deletion",
+    "DELETE_CONFIRM_DESC": "Are you sure you want to delete the trip for <bold>{{plate}}</bold>?",
+    "CREATE_SUCCESS": "Trip created successfully.",
+    "UPDATE_SUCCESS": "Trip updated successfully.",
+    "DELETE_SUCCESS": "Trip record deleted.",
+    "TOTAL": "total trips"
   },
-  "Table": {
-    "NO_DATA": "No data"
-  },
+  
   "Others": {
     "FAQ": "Frequently Asked Questions"
   }
