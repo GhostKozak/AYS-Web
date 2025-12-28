@@ -1,9 +1,10 @@
-import { Table, Empty, Tag, Popconfirm, Button, Space } from "antd";
+import { Table, Tag, Popconfirm, Button, Space } from "antd";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import type { DriverType } from "../../../types";
 import { Trans, useTranslation } from "react-i18next";
-import { formatPhoneNumber } from "../../../utils";
+import { formatPhoneNumber, getUniqueOptions } from "../../../utils";
+import { useMemo } from "react";
 
 type Props = {
   drivers: DriverType[];
@@ -20,31 +21,61 @@ export default function DriverTable({
 }: Props) {
   const { t } = useTranslation();
 
+  const filters = useMemo(() => {
+    return {
+      name: getUniqueOptions(drivers, (driver) => driver.full_name),
+      phone: getUniqueOptions(
+        drivers,
+        (driver) => driver.phone_number,
+        formatPhoneNumber
+      ),
+      company: getUniqueOptions(drivers, (driver) => driver.company.name),
+    };
+  }, [drivers]);
+
   const columns: ColumnsType<DriverType> = [
-    { title: t("Drivers.FULL_NAME"), dataIndex: "full_name", key: "full_name" },
+    {
+      title: t("Drivers.FULL_NAME"),
+      dataIndex: "full_name",
+      key: "full_name",
+      filters: filters.name,
+      onFilter: (value, record) => record.full_name === value,
+      filterSearch: true,
+    },
     {
       title: t("Drivers.PHONE_NUMBER"),
       dataIndex: "phone_number",
       key: "phone_number",
       render: formatPhoneNumber,
+      filters: filters.phone,
+      onFilter: (value, record) => record.phone_number === value,
+      filterSearch: true,
     },
     {
       title: t("Drivers.COMPANY_NAME"),
-      dataIndex: "company",
+      dataIndex: ["company", "name"],
       key: "company",
-      render: (company: { name: string }) => company?.name || "Şirket Yok",
+      filters: filters.company,
+      onFilter: (value, record) => record.company.name === value,
+      filterSearch: true,
     },
     {
       title: t("Table.CREATED_AT"),
       dataIndex: "createdAt",
       key: "createdAt",
       render: (date: string) => new Date(date).toLocaleString("tr-TR"),
+      sorter: (a, b) =>
+        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+      responsive: ["lg"],
     },
     {
       title: t("Table.UPDATED_AT"),
       dataIndex: "updatedAt",
       key: "updatedAt",
       render: (date: string) => new Date(date).toLocaleString("tr-TR"),
+      sorter: (a, b) =>
+        new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime(),
+      responsive: ["lg"],
     },
     {
       title: t("Table.STATUS"),
@@ -55,6 +86,11 @@ export default function DriverTable({
           {deleted ? t("Common.PASSIVE") : t("Common.ACTIVE")}
         </Tag>
       ),
+      filters: [
+        { text: t("Common.ACTIVE"), value: false },
+        { text: t("Common.PASSIVE"), value: true },
+      ],
+      onFilter: (value, record) => record.deleted === value,
     },
     {
       title: t("Table.ACTIONS"),

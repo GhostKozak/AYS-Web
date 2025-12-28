@@ -1,9 +1,10 @@
-import { Table, Empty, Tag, Popconfirm, Button, Space } from "antd";
+import { Table, Tag, Popconfirm, Button, Space } from "antd";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import type { VehicleType } from "../../../types";
 import { Trans, useTranslation } from "react-i18next";
-import { formatLicencePlate } from "../../../utils";
+import { formatLicencePlate, getUniqueOptions } from "../../../utils";
+import { useMemo } from "react";
 
 type Props = {
   vehicles: VehicleType[];
@@ -20,29 +21,52 @@ export default function VehicleTable({
 }: Props) {
   const { t } = useTranslation();
 
+  const filters = useMemo(() => {
+    return {
+      plate: getUniqueOptions(
+        vehicles,
+        (v) => v.licence_plate,
+        formatLicencePlate
+      ),
+      type: getUniqueOptions(vehicles, (v) => v.vehicle_type),
+    };
+  }, [vehicles]);
+
   const columns: ColumnsType<VehicleType> = [
     {
       title: t("Vehicles.LICENSE_PLATE"),
       dataIndex: "licence_plate",
       key: "licence_plate",
       render: formatLicencePlate,
+      filters: filters.plate,
+      onFilter: (value, record) => record.licence_plate === value,
+      filterSearch: true,
     },
     {
       title: t("Vehicles.VEHICLE_TYPE"),
       dataIndex: "vehicle_type",
       key: "vehicle_type",
+      filters: filters.type,
+      onFilter: (value, record) => record.vehicle_type === value,
+      filterSearch: true,
     },
     {
       title: t("Table.CREATED_AT"),
       dataIndex: "createdAt",
       key: "createdAt",
       render: (date: string) => new Date(date).toLocaleString("tr-TR"),
+      sorter: (a, b) =>
+        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+      responsive: ["lg"],
     },
     {
       title: t("Table.UPDATED_AT"),
       dataIndex: "updatedAt",
       key: "updatedAt",
       render: (date: string) => new Date(date).toLocaleString("tr-TR"),
+      sorter: (a, b) =>
+        new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime(),
+      responsive: ["lg"],
     },
     {
       title: t("Table.STATUS"),
@@ -53,6 +77,11 @@ export default function VehicleTable({
           {deleted ? t("Common.PASSIVE") : t("Common.ACTIVE")}
         </Tag>
       ),
+      filters: [
+        { text: t("Common.ACTIVE"), value: false },
+        { text: t("Common.PASSIVE"), value: true },
+      ],
+      onFilter: (value, record) => record.deleted === value,
     },
     {
       title: t("Table.ACTIONS"),

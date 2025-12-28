@@ -1,9 +1,14 @@
-import { Table, Empty, Tag, Popconfirm, Button, Space, Tooltip } from "antd";
+import { Table, Tag, Popconfirm, Button, Space, Tooltip } from "antd";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import type { TripType } from "../../../types";
 import { Trans, useTranslation } from "react-i18next";
-import { formatLicencePlate, formatPhoneNumber } from "../../../utils";
+import {
+  formatLicencePlate,
+  formatPhoneNumber,
+  getUniqueOptions,
+} from "../../../utils";
+import { useMemo } from "react";
 
 type Props = {
   trips: TripType[];
@@ -20,6 +25,34 @@ export default function TripTable({
 }: Props) {
   const { t } = useTranslation();
 
+  const filters = useMemo(() => {
+    return {
+      driverName: getUniqueOptions(trips, (t) => t.driver?.full_name),
+      driverPhone: getUniqueOptions(
+        trips,
+        (t) => t.driver?.phone_number,
+        formatPhoneNumber
+      ),
+      company: getUniqueOptions(trips, (t) => t.company?.name),
+      vehicle: getUniqueOptions(
+        trips,
+        (t) => t.vehicle?.licence_plate,
+        formatLicencePlate
+      ),
+      arrivalDate: Array.from(
+        new Set(
+          trips
+            .map((t) =>
+              t.arrival_time
+                ? new Date(t.arrival_time).toLocaleDateString("tr-TR")
+                : null
+            )
+            .filter((date): date is string => date !== null)
+        )
+      ).map((date) => ({ text: date, value: date })),
+    };
+  }, [trips]);
+
   const columns: ColumnsType<TripType> = [
     {
       title: t("Trips.ARRIVAL_TIME"),
@@ -35,6 +68,15 @@ export default function TripTable({
               minute: "2-digit",
             })
           : "-",
+      filters: filters.arrivalDate,
+      onFilter: (value, record) => {
+        if (!record.arrival_time) return false;
+        return (
+          new Date(record.arrival_time).toLocaleDateString("tr-TR") === value
+        );
+      },
+      filterSearch: true,
+      width: 150,
     },
     {
       title: t("Trips.DEPARTURE_TIME"),
@@ -50,32 +92,41 @@ export default function TripTable({
               minute: "2-digit",
             })
           : "-",
+      width: 150,
     },
     {
       title: t("Trips.FULL_NAME"),
-      dataIndex: "driver",
+      dataIndex: ["driver", "full_name"],
       key: "driver",
-      render: (driver: any) => driver?.full_name || "-",
+      filters: filters.driverName,
+      onFilter: (value, record) => record.driver.full_name === value,
+      filterSearch: true,
     },
     {
       title: t("Trips.PHONE_NUMBER"),
-      dataIndex: "driver",
+      dataIndex: ["driver", "phone_number"],
       key: "driver_phone",
-      render: (driver: any) => formatPhoneNumber(driver?.phone_number) || "-",
+      render: (phoneNumber: string) => formatPhoneNumber(phoneNumber) || "-",
+      filters: filters.driverPhone,
+      onFilter: (value, record) => record.driver.phone_number === value,
+      filterSearch: true,
     },
     {
       title: t("Trips.COMPANY_NAME"),
-      dataIndex: "company",
+      dataIndex: ["company", "name"],
       key: "company",
-      render: (company: { _id: string; name: string }) =>
-        company?.name || "Şirket bulunamadı",
+      filters: filters.company,
+      onFilter: (value, record) => record.company.name === value,
+      filterSearch: true,
     },
     {
       title: t("Trips.LICENSE_PLATE"),
-      dataIndex: "vehicle",
+      dataIndex: ["vehicle", "licence_plate"],
       key: "vehicle",
-      render: (vehicle: any) =>
-        formatLicencePlate(vehicle?.licence_plate) || "-",
+      render: (plate: string) => (plate ? formatLicencePlate(plate) : "-"),
+      filters: filters.vehicle,
+      onFilter: (value, record) => record.vehicle.licence_plate === value,
+      filterSearch: true,
     },
     {
       title: t("Trips.UNLOAD_STATUS"),
@@ -91,6 +142,11 @@ export default function TripTable({
           {val ? t("Common.YES") : t("Common.NO")}
         </Tag>
       ),
+      filters: [
+        { text: t("Common.YES"), value: true },
+        { text: t("Common.NO"), value: false },
+      ],
+      onFilter: (value, record) => record.has_gps_tracking === value,
     },
     {
       title: (
@@ -101,6 +157,11 @@ export default function TripTable({
       dataIndex: "is_in_temporary_parking_lot",
       key: "is_in_temporary_parking_lot",
       render: (val: boolean) => (val ? <Tag color="green">Kesik</Tag> : null),
+      filters: [
+        { text: "Kesik", value: true },
+        { text: t("Common.NO"), value: false },
+      ],
+      onFilter: (value, record) => record.is_in_temporary_parking_lot === value,
     },
     {
       title: t("Trips.TRIP_CANCELED"),
@@ -108,6 +169,11 @@ export default function TripTable({
       key: "is_trip_canceled",
       render: (val: boolean) =>
         val ? <Tag color="red">{t("Common.CANCEL")}</Tag> : null,
+      filters: [
+        { text: "İptal", value: true },
+        { text: t("Common.NO"), value: false },
+      ],
+      onFilter: (value, record) => record.is_trip_canceled === value,
     },
     {
       title: t("Table.ACTIONS"),
@@ -130,8 +196,9 @@ export default function TripTable({
                 <Trans
                   i18nKey="Trips.DELETE_CONFIRM_DESC"
                   values={{
-                    plate:
-                      formatLicencePlate(record.vehicle?.licence_plate) || "",
+                    plate: record.vehicle?.licence_plate
+                      ? formatLicencePlate(record.vehicle.licence_plate)
+                      : "",
                   }}
                   components={{ bold: <strong /> }}
                 />
@@ -164,6 +231,8 @@ export default function TripTable({
           `${range[0]}-${range[1]} / ${total} ${t("Trips.TOTAL")}`,
       }}
       expandable={{
+        showExpandColumn: true,
+        expandRowByClick: true,
         expandedRowRender: (record) => (
           <p style={{ margin: 0 }}>
             {t("Trips.NOTES")}: {record.notes}

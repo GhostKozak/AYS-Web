@@ -1,8 +1,10 @@
-import { Table, Empty, Tag, Popconfirm, Button, Space } from "antd";
+import { Table, Tag, Popconfirm, Button, Space } from "antd";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import type { CompanyType } from "../../../types";
 import { Trans, useTranslation } from "react-i18next";
+import { getUniqueOptions } from "../../../utils";
+import { useMemo } from "react";
 
 type Props = {
   companies: CompanyType[];
@@ -19,17 +21,18 @@ export default function CompaniesTable({
 }: Props) {
   const { t } = useTranslation();
 
-  const nameFilters = companies
-    .map((c) => c.name)
-    .filter((value, index, self) => self.indexOf(value) === index) // Benzersizleri al
-    .map((name) => ({ text: name, value: name })); // AntD formatına çevir
+  const filters = useMemo(() => {
+    return {
+      name: getUniqueOptions(companies, (company) => company.name),
+    };
+  }, [companies]);
 
   const columns: ColumnsType<CompanyType> = [
     {
       title: t("Companies.COMPANY_NAME"),
       dataIndex: "name",
       key: "name",
-      filters: nameFilters,
+      filters: filters.name,
       onFilter: (value, record) => record.name === value,
       filterSearch: true,
     },
@@ -40,6 +43,7 @@ export default function CompaniesTable({
       render: (d: string) => new Date(d).toLocaleString("tr-TR"),
       sorter: (a, b) =>
         new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+      responsive: ["lg"],
     },
     {
       title: t("Table.UPDATED_AT"),

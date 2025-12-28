@@ -66,3 +66,15 @@ export const checkTokenValidity = (navigate: NavigateFunction) => {
     navigate(ROUTES.LOGIN);
   }
 };
+
+export const getUniqueOptions = <T,>(
+  data: T[],
+  selector: (item: T) => string | undefined,
+  formatter?: (val: string) => string
+) => {
+  const uniqueValues = new Set(data.map(selector).filter(Boolean) as string[]);
+  return Array.from(uniqueValues).map((val) => ({
+    text: formatter ? formatter(val) : val,
+    value: val,
+  }));
+};
