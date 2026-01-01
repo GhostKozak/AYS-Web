@@ -37,10 +37,10 @@ function Companies() {
     }
   };
 
-  const handleFormSubmit = async (values: { inputName: string }) => {
+  const handleFormSubmit = async (values: { name: string }) => {
     try {
       if (selectedRecord) {
-        await updateCompany({ id: selectedRecord._id, name: values.inputName });
+        await updateCompany({ id: selectedRecord._id, name: values.name });
         notification.info({
           message: (
             <span>
@@ -49,12 +49,10 @@ function Companies() {
           ),
         });
       } else {
-        await createCompany({ name: values.inputName });
+        await createCompany({ name: values.name });
         notification.success({
           message: (
-            <span>
-              {t("Companies.CREATE_SUCCESS", { name: values.inputName })}
-            </span>
+            <span>{t("Companies.CREATE_SUCCESS", { name: values.name })}</span>
           ),
         });
       }

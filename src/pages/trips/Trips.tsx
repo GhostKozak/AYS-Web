@@ -60,11 +60,11 @@ function Trips() {
   };
 
   const handleFormSubmit = async (values: {
-    inputName: string;
-    inputPhone: string;
-    inputCompany: string;
-    inputVehicle: string;
-    inputDriver?: string;
+    driver_full_name: string;
+    driver_phone_number: string;
+    company: string;
+    vehicle: string;
+    driver?: string;
     departure_time?: string;
     arrival_time?: string;
     unload_status?: string;
@@ -75,11 +75,11 @@ function Trips() {
   }) => {
     try {
       const payload = {
-        driver: values.inputDriver,
-        company: values.inputCompany,
-        vehicle: values.inputVehicle,
-        driver_full_name: values.inputName,
-        driver_phone_number: values.inputPhone,
+        driver: values.driver,
+        company: values.company,
+        vehicle: values.vehicle,
+        driver_full_name: values.driver_full_name,
+        driver_phone_number: values.driver_phone_number,
         departure_time: values.departure_time,
         arrival_time: values.arrival_time,
         unload_status: values.unload_status,

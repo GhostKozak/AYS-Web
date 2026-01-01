@@ -117,7 +117,11 @@
     "CREATE_SUCCESS": "Vehicle {{plate}} created successfully.",
     "UPDATE_SUCCESS": "Vehicle {{plate}} updated successfully.",
     "DELETE_SUCCESS": "Vehicle {{plate}} deleted successfully.",
-    "TOTAL": "total vehicles"
+    "TOTAL": "total vehicles",
+    "TYPE_TRUCK": "TRUCK",
+    "TYPE_VAN": "VAN",
+    "TYPE_LORRY": "LORRY",
+    "TYPE_TRAILER": "TRAILER"
   },
 
   "Trips": {

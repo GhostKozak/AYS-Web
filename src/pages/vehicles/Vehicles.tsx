@@ -41,35 +41,35 @@ function Vehicles() {
   };
 
   const handleFormSubmit = async (values: {
-    inputLicencePlate: string;
-    inputVehicleType: VehicleTypeEnum;
+    licence_plate: string;
+    vehicle_type: VehicleTypeEnum;
   }) => {
     try {
       if (selectedRecord) {
         await updateVehicle({
           id: selectedRecord._id,
-          licence_plate: values.inputLicencePlate,
-          vehicle_type: values.inputVehicleType,
+          licence_plate: values.licence_plate,
+          vehicle_type: values.vehicle_type,
         });
         notification.info({
           message: (
             <span>
               {t("Vehicles.UPDATE_SUCCESS", {
-                plate: values.inputLicencePlate,
+                plate: values.licence_plate,
               })}
             </span>
           ),
         });
       } else {
         await createVehicle({
-          licence_plate: values.inputLicencePlate,
-          vehicle_type: values.inputVehicleType,
+          licence_plate: values.licence_plate,
+          vehicle_type: values.vehicle_type,
         });
         notification.success({
           message: (
             <span>
               {t("Vehicles.CREATE_SUCCESS", {
-                plate: values.inputLicencePlate,
+                plate: values.licence_plate,
               })}
             </span>
           ),

@@ -52,19 +52,20 @@ function Drivers() {
 
   const handleEdit = (record: DriverType) => {
     setSelectedRecord(record);
+    console.table(record);
     setIsModalOpen(true);
   };
 
   const handleFormSubmit = async (values: {
-    inputName: string;
-    inputPhone: string;
-    inputCompany: string;
+    full_name: string;
+    phone_number: string;
+    company: string;
   }) => {
     try {
       const payload = {
-        full_name: values.inputName,
-        phone_number: values.inputPhone,
-        company: values.inputCompany,
+        full_name: values.full_name,
+        phone_number: values.phone_number,
+        company: values.company,
       };
 
       if (selectedRecord) {
@@ -72,7 +73,7 @@ function Drivers() {
         notification.info({
           message: (
             <span>
-              {t("Drivers.UPDATE_SUCCESS", { name: values.inputName })}
+              {t("Drivers.UPDATE_SUCCESS", { name: values.full_name })}
             </span>
           ),
         });
@@ -81,7 +82,7 @@ function Drivers() {
         notification.success({
           message: (
             <span>
-              {t("Drivers.CREATE_SUCCESS", { name: values.inputName })}
+              {t("Drivers.CREATE_SUCCESS", { name: values.full_name })}
             </span>
           ),
         });

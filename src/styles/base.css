@@ -1,3 +1,7 @@
+* {
+    box-sizing: border-box;
+}
+
 body, #root {
     margin: 0;
     padding: 0;
@@ -10,4 +14,17 @@ body .ant-layout:first-child {
 
 textarea {
     resize: vertical;
+}
+
+#diffViewer {
+    height: 100%;
+}
+
+.fadeIn {
+    animation: fadeIn 0.5s ease-in-out forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateX(20px); }
+    to { opacity: 1; transform: translateX(0); }
 }

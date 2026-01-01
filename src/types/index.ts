@@ -91,3 +91,26 @@ export interface CreateVehiclePayload {
 export interface CreateCompanyPayload {
   name: string;
 }
+
+export type DiffChange = {
+  key: string;
+  oldValue: any;
+  newValue: any;
+};
+
+export type DiffConfigItem<T, F> = {
+  label?: string;
+
+  // 1. YÖNTEM: Basit Key Eşleşmesi
+  // DB ve Form key'leri aynıysa sadece 'key' yeterli
+  key?: keyof T;
+
+  // 2. YÖNTEM: Farklı Keyler
+  dbKey?: keyof T; // Veritabanındaki alan adı
+  formKey?: keyof F; // Formdaki alan adı
+
+  // 3. YÖNTEM: Özel Dönüştürücüler (ID -> İsim gibi durumlar için)
+  // Veriyi okurken işlemek isterseniz bunları kullanırsınız
+  getOldValue?: (record: T) => any;
+  getNewValue?: (formValues: F) => any;
+};

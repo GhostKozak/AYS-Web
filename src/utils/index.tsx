@@ -1,5 +1,6 @@
 import type { NavigateFunction } from "react-router";
 import { ROUTES, STORAGE_KEYS } from "../constants";
+import type { DiffChange, DiffConfigItem } from "../types";
 
 export const formatPhoneNumber = (phone_number: string): string => {
   const cleanNumber = String(phone_number).replace(/\D/g, "");
@@ -77,4 +78,59 @@ export const getUniqueOptions = <T,>(
     text: formatter ? formatter(val) : val,
     value: val,
   }));
+};
+
+export const calculateDiffs = <
+  T extends Record<string, any>,
+  F extends Record<string, any>
+>(
+  initialValues: T | undefined,
+  currentValues: F | undefined,
+  config: (keyof T | DiffConfigItem<T, F>)[]
+): DiffChange[] => {
+  if (!initialValues || !currentValues) return [];
+
+  const changes: DiffChange[] = [];
+
+  config.forEach((item) => {
+    let key: string;
+    let oldVal: any;
+    let newVal: any;
+
+    // A) Eğer item sadece bir string ise (Basit kullanım: ["name", "phone"])
+    if (typeof item === "string") {
+      key = item;
+      oldVal = initialValues[item];
+      newVal = currentValues[item];
+    }
+    // B) Eğer item bir obje ise (Gelişmiş kullanım)
+    else {
+      const conf = item as DiffConfigItem<T, F>;
+
+      // Key ismini belirle (DiffViewer'da görünecek ID)
+      key = (conf.label || conf.key || conf.dbKey) as string;
+
+      // Eski Değeri Bul
+      if (conf.getOldValue) {
+        oldVal = conf.getOldValue(initialValues);
+      } else {
+        oldVal = initialValues[conf.dbKey || (conf.key as keyof T)];
+      }
+
+      // Yeni Değeri Bul
+      if (conf.getNewValue) {
+        newVal = conf.getNewValue(currentValues);
+      } else {
+        newVal = currentValues[conf.formKey || (conf.key as keyof F)]; // Cast gerekebilir
+      }
+    }
+
+    // Eşitlik Kontrolü (Boşluk/Null yönetimi dahil)
+    if (oldVal != newVal && (oldVal || newVal)) {
+      if (!oldVal && !newVal) return;
+      changes.push({ key, oldValue: oldVal, newValue: newVal });
+    }
+  });
+
+  return changes;
 };
