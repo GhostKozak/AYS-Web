@@ -148,7 +148,10 @@
     "CREATE_SUCCESS": "Trip created successfully.",
     "UPDATE_SUCCESS": "Trip updated successfully.",
     "DELETE_SUCCESS": "Trip record deleted.",
-    "TOTAL": "total trips"
+    "TOTAL": "total trips",
+    "STATUS_WAITING": "Waiting",
+    "STATUS_UNLOADED": "Unloaded",
+    "STATUS_IN_PROGRESS": "In Progress"
   },
   
   "Others": {

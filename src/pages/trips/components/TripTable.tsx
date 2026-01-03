@@ -132,6 +132,7 @@ export default function TripTable({
       title: t("Trips.UNLOAD_STATUS"),
       dataIndex: "unload_status",
       key: "unload_status",
+      render: (val: string) => (val ? t(`Trips.STATUS_${val}`) : "-"),
     },
     {
       title: t("Trips.GPS_TRACKING"),

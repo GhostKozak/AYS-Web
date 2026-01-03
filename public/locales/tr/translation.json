@@ -148,7 +148,10 @@
     "CREATE_SUCCESS": "Sefer başarıyla oluşturuldu.",
     "UPDATE_SUCCESS": "Sefer başarıyla güncellendi.",
     "DELETE_SUCCESS": "Sefer kaydı silindi.",
-    "TOTAL": "adet sefer"
+    "TOTAL": "adet sefer",
+    "STATUS_WAITING": "Bekliyor",
+    "STATUS_UNLOADED": "Boşaltıldı",
+    "STATUS_IN_PROGRESS": "Devam Ediyor"
   },
   
   "Other": {

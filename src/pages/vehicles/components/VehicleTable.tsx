@@ -46,6 +46,7 @@ export default function VehicleTable({
       title: t("Vehicles.VEHICLE_TYPE"),
       dataIndex: "vehicle_type",
       key: "vehicle_type",
+      render: (val) => (val ? t(`Vehicles.TYPE_${val}`) : "-"),
       filters: filters.type,
       onFilter: (value, record) => record.vehicle_type === value,
       filterSearch: true,
