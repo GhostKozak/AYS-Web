@@ -1,61 +1,38 @@
-import { Card, Row, Col, Statistic, Skeleton } from "antd";
-import {
-  UserOutlined,
-  CarOutlined,
-  TeamOutlined,
-  AppstoreOutlined,
-} from "@ant-design/icons";
+import { Col, Row } from "antd";
+import { useTrips } from "../../hooks/useTrips";
+import CompanyDistribution from "./components/CompanyDistribution";
+import MonthlyCompanyDistribution from "./components/MonthlyCompanyDistribution";
+import StatsOverview from "./components/StatsOverview";
+import UnloadedStatus from "./components/UnloadedStatus";
+import WeeklyActivityChart from "./components/WeeklyActivityChart";
+import YearlyActivityMap from "./components/YearlyActivityMap";
+import LiveOperationsList from "./components/LiveOperationsList";
 
 function DashboardPage() {
-  const isLoading = false;
-
+  const { trips } = useTrips();
+  // TODO: tablolari excel export edecek bir yol bulun
   return (
     <div style={{ padding: "24px" }}>
       <h1>Dashboard</h1>
-      <Row gutter={[16, 16]}>
-        <Col xs={24} sm={12} md={6}>
-          <Card>
-            <Skeleton loading={isLoading} active paragraph={{ rows: 1 }}>
-              <Statistic
-                title="Toplam Şirket"
-                value={12}
-                prefix={<TeamOutlined />}
-              />
-            </Skeleton>
-          </Card>
+      <StatsOverview />
+      <Row>
+        <Col span={6}>
+          <CompanyDistribution trips={trips} />
         </Col>
-        <Col xs={24} sm={12} md={6}>
-          <Card>
-            <Skeleton loading={isLoading} active paragraph={{ rows: 1 }}>
-              <Statistic
-                title="Toplam Sürücü"
-                value={48}
-                prefix={<UserOutlined />}
-              />
-            </Skeleton>
-          </Card>
+        <Col span={6}>
+          <MonthlyCompanyDistribution trips={trips} />
         </Col>
-        <Col xs={24} sm={12} md={6}>
-          <Card>
-            <Skeleton loading={isLoading} active paragraph={{ rows: 1 }}>
-              <Statistic
-                title="Toplam Araç"
-                value={156}
-                prefix={<CarOutlined />}
-              />
-            </Skeleton>
-          </Card>
+        <Col span={6}>
+          <UnloadedStatus trips={trips} />
         </Col>
-        <Col xs={24} sm={12} md={6}>
-          <Card>
-            <Skeleton loading={isLoading} active paragraph={{ rows: 1 }}>
-              <Statistic
-                title="Aktif Sefer"
-                value={8}
-                prefix={<AppstoreOutlined />}
-              />
-            </Skeleton>
-          </Card>
+        <Col span={6}>
+          <LiveOperationsList trips={trips} />
+        </Col>
+        <Col span={24}>
+          <WeeklyActivityChart trips={trips} />
+        </Col>
+        <Col span={18}>
+          <YearlyActivityMap trips={trips} />
         </Col>
       </Row>
     </div>
