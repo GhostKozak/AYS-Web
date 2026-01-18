@@ -62,19 +62,19 @@ const LiveOperationsList = ({ trips }: { trips: TripType[] }) => {
 
   return (
     <Card
-      title={
-        <Space>
-          {/* Yanıp sönen yeşil nokta efekti için AntD Badge */}
-          <Badge status="processing" color="green" />
-          <Text strong style={{ fontSize: 16 }}>
-            Son Hareketler
-          </Text>
-        </Space>
-      }
+      // title={
+      //   <Space>
+      //     {/* Yanıp sönen yeşil nokta efekti için AntD Badge */}
+      //     <Badge status="processing" color="green" />
+      //     <Text strong style={{ fontSize: 16 }}>
+      //       Son Hareketler
+      //     </Text>
+      //   </Space>
+      // }
       bordered={false}
       style={{
-        height: "100%",
-        marginBlock: 60,
+        maxHeight: "350px",
+        overflow: "scroll",
         // Eğer kartın arka planını özel bir koyu renk yapmak istersen:
         // backgroundColor: '#1f2937'
       }}

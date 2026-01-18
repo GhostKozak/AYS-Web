@@ -1,19 +1,8 @@
 import { useMemo } from "react";
-import type { TripType } from "../types";
+import type { DailyStat, TripType } from "../types";
 import { useTranslation } from "react-i18next";
-
-interface ChartData {
-  [key: string]: any
-}
-
-const COLORS = [
-  "#0088FE",
-  "#00C49F",
-  "#FFBB28",
-  "#FF8042",
-  "#AF19FF",
-  "#8884d8",
-];
+import { getTopResultsWithOthers } from "../utils/stats.utils";
+import { getNow, isSameDay, isSameMonth, getLast7Days } from "../utils/date.utils";
 
 const STATUS_COLORS: Record<string, string> = {
   WAITING: "#faad14", // Sarı
@@ -23,222 +12,145 @@ const STATUS_COLORS: Record<string, string> = {
   UNKNOWN: "#d9d9d9", // Gri
 };
 
+const countTripsBy = (trips: TripType[], keyExtractor: (t: TripType) => string | null) => {
+  return trips.reduce((acc: Record<string, number>, trip) => {
+    const key = keyExtractor(trip);
+    if (key) {
+      acc[key] = (acc[key] || 0) + 1;
+    }
+    return acc;
+  }, {});
+};
+
 export const useCompanyStats = (trips: TripType[]) => {
+  return useMemo(() => {
+    if (!trips?.length) return [];
 
-  const companyChartData = useMemo(() => {
-    if (!trips || trips.length === 0) return [];
+    const counts = countTripsBy(trips, (trip) => trip.company?.name || "Bilinmeyen Firma")
 
-    const counts = trips.reduce((acc: Record<string, number>, trip) => {
-      const companyName = trip.company?.name || "Bilinmeyen Firma";
-
-      acc[companyName] = (acc[companyName] || 0) + 1;
-      
-      return acc;
-    }, {});
-
-    const formattedData: ChartData[] = Object.entries(counts).map(([id, value]) => ({
-      id,
-      value,
-    }));
-
-    formattedData.sort((a, b) => b.value - a.value);
-
-    const TOP_COUNT = 5;
+    const formatted = Object.entries(counts)
+      .map(([id, value]) => ({id, value}))
+      .sort((a, b) => b.value - a.value);
     
-    if (formattedData.length <= TOP_COUNT) {
-      return formattedData;
-    }
-
-    const topCompanies = formattedData.slice(0, TOP_COUNT);
-    
-    const otherCount = formattedData
-      .slice(TOP_COUNT)
-      .reduce((sum, item) => sum + item.value, 0);
-
-    if (otherCount > 0) {
-      topCompanies.push({ name: "Diğerleri", value: otherCount });
-    }
-
-    return topCompanies;
-
+    return getTopResultsWithOthers(formatted, 5, "Diğerleri");
   }, [trips]);
-
-  return companyChartData;
 };
 
 export const useMonthCompanyStats = (trips: TripType[]) => {
-  const d = new Date();
-  const targetMonth = d.getMonth();
-  const targetYear = d.getFullYear();
+  return useMemo(() => {
+    if (!trips?.length) return [{ id: "Veri Yok", value: 1 }];
 
-  const companyChartData = useMemo(() => {
-    if (!trips || trips.length === 0) {
-        return [{ id: "Veri Yok", value: 1 }];
-    }
+    const now = getNow();
 
     const counts = trips.reduce((acc: Record<string, number>, trip) => {
-      const companyName = trip.company?.name || "Bilinmeyen Firma";
-
       if (!trip.arrival_time) return acc;
-      const companyArrivalDate = new Date(trip.arrival_time);
 
-      if (isNaN(companyArrivalDate.getTime())) return acc;
+      const arrivalDate = new Date(trip.arrival_time);
 
-      const companyArrivalMonth = companyArrivalDate.getMonth();
-      const companyArrivalYear = companyArrivalDate.getFullYear();
-
-      if (targetMonth === companyArrivalMonth && targetYear === companyArrivalYear) {
-        acc[companyName] = (acc[companyName] || 0) + 1;
+      if (isSameMonth(arrivalDate, now)) {
+        const name = trip.company?.name || "Bilinmeyen Firma";
+        acc[name] = (acc[name] || 0) + 1;
       }
 
       return acc;
     }, {});
 
-    const formattedData: ChartData[] = Object.entries(counts).map(([id, value]) => ({
-      id,
-      value,
-    }));
+    const formatted = Object.entries(counts).map(([id, value]) => ({ id, value }));
 
-    formattedData.sort((a, b) => b.value - a.value);
+    if (!formatted?.length) return [{ id: "Bu Ay Sefer Yok", value: 1 }];
 
-    if (formattedData.length === 0) {
-      return [{ id: "Bu Ay Sefer Yok", value: 1 }]; 
-    }
-
-    const TOP_COUNT = 5;
-    
-    if (formattedData.length <= TOP_COUNT) {
-      return formattedData;
-    }
-
-    const topCompanies = formattedData.slice(0, TOP_COUNT);
-    
-    const otherCount = formattedData
-      .slice(TOP_COUNT)
-      .reduce((sum, item) => sum + item.value, 0);
-
-    if (otherCount > 0) {
-      topCompanies.push({ name: "Diğerleri", value: otherCount });
-    }
-
-    return topCompanies;
-
-  }, [trips, targetMonth, targetYear]);
-
-  return companyChartData;
+    return getTopResultsWithOthers(formatted, 5, "Diğerleri");
+  }, [trips]);
 };
 
 export const useVehicleUnloadStats = (trips: TripType[]) => {
   const {t} = useTranslation();
-  const d = new Date();
-  const targetDay = d.getDay();
-  const targetMonth = d.getMonth();
-  const targetYear = d.getFullYear();
 
-  const vehicleChartData = useMemo(() => {
-    if (!trips || trips.length === 0) {
-      return [{ id: "Veri Yok", value: 1 }];
-    }
+  return useMemo(() => {
+    if (!trips?.length) return [{ id: "Veri Yok", value: 1,color: STATUS_COLORS["UNKNOWN"]  }];
+    
+    const now = getNow();
 
-    const counts = trips.reduce((accumulator: Record<string,number>, trip) => {
-      const vehicleStatus = trip.unload_status || "-";
+    const counts = trips.reduce((acc: Record<string,number>, trip) => {
+      if (!trip.arrival_time) return acc;
 
-      if (!trip.arrival_time) return accumulator;
-      const vehicleArrivalDate = new Date(trip.arrival_time);
-      
-      if (isNaN(vehicleArrivalDate.getTime())) return accumulator;
-
-      const vehicleArrivalMonth = vehicleArrivalDate.getMonth();
-      const vehicleArrivalYear = vehicleArrivalDate.getFullYear();
-      const vehicleArrivalDay = vehicleArrivalDate.getDay();
-
-      if (targetDay === vehicleArrivalDay && targetMonth === vehicleArrivalMonth && targetYear === vehicleArrivalYear) {
-        accumulator[vehicleStatus] = (accumulator[vehicleStatus] || 0) + 1;
+      const arrivalDate = new Date(trip.arrival_time);
+      if (isSameDay(arrivalDate, now)) {
+        const status = trip.unload_status;
+        acc[status] = (acc[status] || 0) + 1;
       }
-      
-      return accumulator; 
+
+      return acc;
     },{});
 
-    const formattedData: ChartData[] = Object.entries(counts).map(([id, value]) => ({
-      id: t(`Trips.STATUS_${id}`),
-      value,
-      color: STATUS_COLORS[id] || STATUS_COLORS.UNKNOWN
-    }));
+    const formatted = Object.entries(counts)
+      .map(([id, value]) => ({
+        id: t(`Trips.STATUS_${id}`),
+        value,
+        color: STATUS_COLORS[id] || STATUS_COLORS.UNKNOWN
+      }));
 
-    if (formattedData.length === 0) {
-      return [{ id: "Araba kaydı yok", value: 1 }]; 
-    }
+    if (!formatted?.length) return [{ id: "Araba kaydı yok", value: 1, color: STATUS_COLORS["UNKNOWN"] }];    
 
-    return formattedData;
-
-  }, [trips, t])
-
-  return vehicleChartData;
-}
+    return formatted;
+  }, [trips, t]);
+} 
 
 export const useDailyTripStats = (trips: TripType[]) => {
-  const dailyStats = useMemo(() => {
-    const days: any[] = [];
-    const today = new Date();
+  return useMemo(() => {
+    const days: DailyStat[] = getLast7Days().map((d) => ({
+      date: d.dateStr,
+      dayName: d.dayName,
+      WAITING: 0,
+      COMPLETED: 0,
+      UNLOADED: 0,
+      CANCELED: 0,
+      UNKNOWN: 0,
+    }));
 
-    for (let i = 6; i >= 0; i--) {
-      const d = new Date();
-      d.setDate(today.getDate() - i);
-      days.push({
-        date: d.toISOString().split("T")[0],
-        dayName: d.toLocaleDateString("tr-TR", { weekday: "short"}),
-        WAITING: 0,
-        COMPLETED: 0,
-        UNLOADED: 0,
-        CANCELED: 0,
-        UNKNOWN: 0
-      });
-    }
+    const dayIndexMap = days.reduce((acc, day, index) => {
+      acc[day.date] = index;
+      return acc;
+    }, {} as Record<string, number>);
 
     trips?.forEach((trip) => {
       if (!trip.arrival_time) return;
 
-      const tripDate = trip.arrival_time.split("T")[0];
-      const status = trip.unload_status ? trip.unload_status.toLocaleUpperCase() : "UNKNOWN";
+      const tripDateStr = new Date(trip.arrival_time).toISOString().split('T')[0];
+      
+      const status = trip.unload_status ? trip.unload_status.toUpperCase() : "UNKNOWN";
+      
+      const index = dayIndexMap[tripDateStr];
 
-      const dayStat = days.find(d => d.date === tripDate);
-
-      if(dayStat) {
-        if (dayStat[status]  !== undefined) {
-          dayStat[status]++;
+      if (index !== undefined) {
+        if (days[index][status] !== undefined) {
+           (days[index][status] as number)++;
         } else {
-          dayStat.UNKNOWN++;
+           days[index].UNKNOWN++;
         }
       }
     });
 
     return days;
   }, [trips]);
-
-  return dailyStats;
-}
+};
 
 export const useCalendarStats = (trips: TripType[]) => {
-  const calendarData = useMemo(() => {
+  return useMemo(() => {
     if (!trips) return [];
 
-    // 1. Gruplama: { "2026-01-17": 5, "2026-01-18": 2 }
     const dayMap = trips.reduce((acc: Record<string, number>, trip) => {
       if (!trip.arrival_time) return acc;
       
-      // Sadece YYYY-MM-DD kısmını alıyoruz
       const dateKey = new Date(trip.arrival_time).toISOString().split('T')[0];
       
       acc[dateKey] = (acc[dateKey] || 0) + 1;
       return acc;
     }, {});
 
-    // 2. Nivo Formatına Çevirme
     return Object.entries(dayMap).map(([day, value]) => ({
       day,
       value
     }));
   }, [trips]);
-
-  return calendarData;
 };

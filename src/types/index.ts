@@ -114,3 +114,14 @@ export type DiffConfigItem<T, F> = {
   getOldValue?: (record: T) => any;
   getNewValue?: (formValues: F) => any;
 };
+
+export type DailyStat = {
+  date: string;
+  dayName: string;
+  WAITING: number;
+  COMPLETED: number;
+  UNLOADED: number;
+  CANCELED: number;
+  UNKNOWN: number;
+  [key: string]: string | number; 
+};

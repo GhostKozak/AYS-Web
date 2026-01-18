@@ -13,8 +13,7 @@ const YearlyActivityMap = ({ trips }: { trips: TripType[] }) => {
 
   return (
     // Calendar genelde geniş olduğu için yükseklik 200-250px yeterlidir
-    <div style={{ height: 220, width: "100%", marginBlock: 60 }}>
-      <h3>Yıllık Operasyon Yoğunluğu</h3>
+    <div style={{ height: 220, width: "100%", marginBlock: 30 }}>
       <ResponsiveCalendar
         data={data}
         from={fromDate}

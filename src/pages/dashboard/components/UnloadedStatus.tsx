@@ -6,8 +6,7 @@ function UnloadedStatus({ trips }: { trips: TripType[] }) {
   const data = useVehicleUnloadStats(trips);
 
   return (
-    <div style={{ width: "100%", height: 300, marginBlock: 60 }}>
-      <h3>Bugünkü Boşalma Durumu</h3>
+    <div style={{ width: "100%", height: 300, marginBlock: 25 }}>
       <ResponsivePie
         data={data}
         margin={{ top: 40, right: 80, bottom: 80, left: 80 }}

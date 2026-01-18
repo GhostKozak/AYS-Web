@@ -14,8 +14,7 @@ const WeeklyActivityChart = ({ trips }: { trips: any[] }) => {
   const data = useDailyTripStats(trips);
 
   return (
-    <div style={{ height: 400, width: "100%", marginBlock: 60 }}>
-      <h3>Haftalık Aktivite</h3>
+    <div style={{ height: 370, width: "100%" }}>
       <ResponsiveBar
         data={data}
         // Hangi verileri üst üste yığacağız?
@@ -53,7 +52,7 @@ const WeeklyActivityChart = ({ trips }: { trips: any[] }) => {
           tickRotation: 0,
           legend: "Son 7 Gün", // Alt başlık
           legendPosition: "middle",
-          legendOffset: 32,
+          legendOffset: 45,
         }}
         axisLeft={{
           tickSize: 5,
