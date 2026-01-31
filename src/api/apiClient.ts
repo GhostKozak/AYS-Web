@@ -1,8 +1,8 @@
 import axios from 'axios';
-import { ROUTES, STORAGE_KEYS } from '../constants';
+import { STORAGE_KEYS, CONFIG } from '../constants';
 
 const apiClient = axios.create({
-  baseURL: 'http://localhost:3000',
+  baseURL: CONFIG.API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },

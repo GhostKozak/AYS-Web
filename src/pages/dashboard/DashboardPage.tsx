@@ -93,7 +93,6 @@ function DashboardPage() {
         rowHeight={100} // Her bir kare 100px yüksekliğinde olsun
         draggableHandle=".drag-handle" // Sadece bu class'a sahip yerden tutunca sürüklensin
         style={{ marginInline: -10 }}
-        onLayoutChange={(layout, allLayouts) => setLayouts(allLayouts)}
       >
         {visibleWidgets.company && (
           <div key="company" data-grid={{ x: 0, y: 0, w: 3, h: 4 }}>

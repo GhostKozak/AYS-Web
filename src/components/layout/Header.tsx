@@ -89,7 +89,7 @@ function Header() {
         label: <Link to={ROUTES.TRIPS}>{t("Breadcrumbs.TRIPS")}</Link>,
       },
     ],
-    [t]
+    [t],
   );
 
   const userMenuItems: MenuProps["items"] = useMemo(
@@ -145,7 +145,7 @@ function Header() {
         ),
       },
     ],
-    [t]
+    [t],
   );
 
   return (
