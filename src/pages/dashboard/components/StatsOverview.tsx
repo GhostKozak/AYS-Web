@@ -5,8 +5,10 @@ import {
   TeamOutlined,
   AppstoreOutlined,
 } from "@ant-design/icons";
+import { useTranslation } from "react-i18next";
 
 function StatsOverview() {
+  const { t } = useTranslation();
   const isLoading = false;
 
   return (
@@ -15,7 +17,7 @@ function StatsOverview() {
         <Card>
           <Skeleton loading={isLoading} active paragraph={{ rows: 1 }}>
             <Statistic
-              title="Toplam Şirket"
+              title={t("Stats.TOTAL_COMPANY")}
               value={12}
               prefix={<TeamOutlined />}
             />
@@ -26,7 +28,7 @@ function StatsOverview() {
         <Card>
           <Skeleton loading={isLoading} active paragraph={{ rows: 1 }}>
             <Statistic
-              title="Toplam Sürücü"
+              title={t("Stats.TOTAL_DRIVER")}
               value={48}
               prefix={<UserOutlined />}
             />
@@ -37,7 +39,7 @@ function StatsOverview() {
         <Card>
           <Skeleton loading={isLoading} active paragraph={{ rows: 1 }}>
             <Statistic
-              title="Toplam Araç"
+              title={t("Stats.TOTAL_VEHICLE")}
               value={156}
               prefix={<CarOutlined />}
             />
@@ -48,7 +50,7 @@ function StatsOverview() {
         <Card>
           <Skeleton loading={isLoading} active paragraph={{ rows: 1 }}>
             <Statistic
-              title="Aktif Sefer"
+              title={t("Stats.ACTIVE_TRIP")}
               value={8}
               prefix={<AppstoreOutlined />}
             />

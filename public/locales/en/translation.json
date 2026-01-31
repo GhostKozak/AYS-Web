@@ -2,6 +2,7 @@
   "HELLO": "HELLO WORLD",
 
   "Breadcrumbs": {
+    "HOMEPAGE": "Homepage",
     "DASHBOARD": "Dashboard",
     "LOGIN": "Login",
     "COMPANIES": "Companies",
@@ -27,6 +28,24 @@
     "MENU": "Menu"
   },
 
+  "Stats": {
+    "TOTAL_COMPANY": "Total Companies",
+    "TOTAL_DRIVER": "Total Drivers",
+    "TOTAL_VEHICLE": "Total Vehicles",
+    "ACTIVE_TRIP": "Active Trips"
+  },
+
+  "Login": {
+    "TITLE": "Login",
+    "EMAIL_PLACEHOLDER": "Email",
+    "PASSWORD_PLACEHOLDER": "Password",
+    "SUCCESS": "Login Successful!",
+    "ERROR": "Invalid email or password!",
+    "EMAIL_REQUIRED": "Enter your email!",
+    "PASSWORD_REQUIRED": "Enter your password!",
+    "BUTTON": "Log In"
+  },
+
   "Common": {
     "ADD": "Add",
     "EDIT": "Edit",
@@ -40,20 +59,26 @@
     "RESET": "Reset",
     "SAVE": "Save",
     "ACTIVE": "Active",
-    "PASSIVE": "Passive",
+    "PASSIVE": "Inactive",
     "BACK_HOME": "Back to Home",
     "ARE_YOU_SURE": "Are you sure?",
     "SEARCH_IN_FILTERS": "Search in filters",
     "CLEAR_FILTERS": "Clear filters",
-    "APP_SUBTITLE": "Vehicle Management System"
+    "APP_SUBTITLE": "Vehicle Management System",
+    "UNKNOWN_COMPANY": "Unknown Company",
+    "OTHERS": "Others",
+    "NO_PLATE": "No Plate",
+    "NO_DATA_YET": "No data yet...",
+    "NO_DATA_THIS_MONTH": "No data this month",
+    "CHANGES": "Changes"
   },
 
   "Table": {
     "CREATED_AT": "Created At",
     "UPDATED_AT": "Updated At",
     "STATUS": "Status",
-    "ACTIONS": "Action",
-    "NO_DATA": "No data"
+    "ACTIONS": "Actions",
+    "NO_DATA": "No data available"
   },
 
   "Errors": {
@@ -68,15 +93,32 @@
     "REQUIRED": "This field is required!"
   },
 
+  "Dashboard": {
+    "TITLE": "Dashboard",
+    "TOP_COMPANIES": "Top Companies",
+    "MONTHLY_COMPANIES": "Companies This Month",
+    "TODAY_UNLOAD_STATUS": "Unloading Status Today",
+    "LATEST_TRIPS": "Recent Trips",
+    "WEEKLY_ACTIVITY": "Weekly Activity",
+    "YEARLY_ACTIVITY": "Yearly Activity",
+    "SETTINGS_TITLE": "Display Settings",
+    "SETTINGS_DESC": "Select the charts you want to view:",
+    "RESET_LAYOUT": "Reset Layout",
+    "NO_DATA_THIS_MONTH": "No trips this month",
+    "NO_VEHICLE_RECORD": "No vehicle records found",
+    "LAST_7_DAYS": "Last 7 Days",
+    "TRIP_COUNT": "Trip Count"
+  },
+
   "Companies": {
     "COMPANY_NAME": "Company Name",
-    "SEARCH": "Search Company...",
+    "SEARCH": "Search companies...",
     "ADD_BUTTON": "Add New Company",
-    "EDIT_FORM_TITLE": "Edit Company Form",
-    "ADD_FORM_TITLE": "New Company Form",
+    "EDIT_FORM_TITLE": "Edit Company",
+    "ADD_FORM_TITLE": "New Company",
     "NAME_REQUIRED": "Please enter the company name!",
     "SAVE_CHANGES": "Save Changes",
-    "DELETE_CONFIRM_TITLE": "Delete the Company",
+    "DELETE_CONFIRM_TITLE": "Delete Company",
     "DELETE_CONFIRM_DESC": "Are you sure you want to delete <bold>{{name}}</bold>?",
     "CREATE_SUCCESS": "{{name}} created successfully.",
     "UPDATE_SUCCESS": "{{name}} updated successfully.",
@@ -88,14 +130,14 @@
     "FULL_NAME": "Full Name",
     "PHONE_NUMBER": "Phone Number",
     "COMPANY_NAME": "Company Name",
-    "SEARCH": "Search Driver...",
+    "SEARCH": "Search drivers...",
     "ADD_BUTTON": "Add Driver",
-    "EDIT_FORM_TITLE": "Edit Driver Form",
-    "ADD_FORM_TITLE": "New Driver Form",
-    "FULL_NAME_REQUIRED": "Please enter the driver name!",
+    "EDIT_FORM_TITLE": "Edit Driver",
+    "ADD_FORM_TITLE": "New Driver",
+    "FULL_NAME_REQUIRED": "Please enter the driver's name!",
     "PHONE_REQUIRED": "Please enter the phone number!",
     "COMPANY_REQUIRED": "Please select a company!",
-    "DELETE_CONFIRM_TITLE": "Delete the Driver",
+    "DELETE_CONFIRM_TITLE": "Delete Driver",
     "DELETE_CONFIRM_DESC": "Are you sure you want to delete driver <bold>{{name}}</bold>?",
     "CREATE_SUCCESS": "{{name}} created successfully.",
     "UPDATE_SUCCESS": "{{name}} updated successfully.",
@@ -106,22 +148,22 @@
   "Vehicles": {
     "LICENSE_PLATE": "License Plate",
     "VEHICLE_TYPE": "Vehicle Type",
-    "SEARCH": "Search Vehicle...",
+    "SEARCH": "Search vehicles...",
     "ADD_BUTTON": "Add Vehicle",
-    "EDIT_FORM_TITLE": "Edit Vehicle Form",
-    "ADD_FORM_TITLE": "New Vehicle Form",
+    "EDIT_FORM_TITLE": "Edit Vehicle",
+    "ADD_FORM_TITLE": "New Vehicle",
     "PLATE_REQUIRED": "Please enter the license plate!",
     "TYPE_REQUIRED": "Please select a vehicle type!",
-    "DELETE_CONFIRM_TITLE": "Delete the Vehicle",
+    "DELETE_CONFIRM_TITLE": "Delete Vehicle",
     "DELETE_CONFIRM_DESC": "Are you sure you want to delete vehicle <bold>{{plate}}</bold>?",
     "CREATE_SUCCESS": "Vehicle {{plate}} created successfully.",
     "UPDATE_SUCCESS": "Vehicle {{plate}} updated successfully.",
     "DELETE_SUCCESS": "Vehicle {{plate}} deleted successfully.",
     "TOTAL": "total vehicles",
-    "TYPE_TRUCK": "TRUCK",
-    "TYPE_VAN": "VAN",
-    "TYPE_LORRY": "LORRY",
-    "TYPE_TRAILER": "TRAILER"
+    "TYPE_TRUCK": "Truck",
+    "TYPE_VAN": "Van",
+    "TYPE_LORRY": "Lorry",
+    "TYPE_TRAILER": "Trailer"
   },
 
   "Trips": {
@@ -136,14 +178,14 @@
     "TEMP_PARKING": "Temp. Parking",
     "TRIP_CANCELED": "Trip Canceled",
     "NOTES": "Notes",
-    "SEARCH": "Search Trip, Plate or Driver...",
+    "SEARCH": "Search trip, plate or driver...",
     "ADD_BUTTON": "Add Trip",
-    "EDIT_FORM_TITLE": "Edit Trip Form",
-    "ADD_FORM_TITLE": "New Trip Form",
+    "EDIT_FORM_TITLE": "Edit Trip",
+    "ADD_FORM_TITLE": "New Trip",
     "DRIVER_REQUIRED": "Please select a driver!",
     "COMPANY_REQUIRED": "Please select a company!",
     "VEHICLE_REQUIRED": "Please select a vehicle!",
-    "DELETE_CONFIRM_TITLE": "Delete the Trip",
+    "DELETE_CONFIRM_TITLE": "Delete Trip",
     "DELETE_CONFIRM_DESC": "Are you sure you want to delete the trip for <bold>{{plate}}</bold>?",
     "CREATE_SUCCESS": "Trip created successfully.",
     "UPDATE_SUCCESS": "Trip updated successfully.",
@@ -151,9 +193,12 @@
     "TOTAL": "total trips",
     "STATUS_WAITING": "Waiting",
     "STATUS_UNLOADED": "Unloaded",
-    "STATUS_IN_PROGRESS": "In Progress"
+    "STATUS_IN_PROGRESS": "In Progress",
+    "STATUS_COMPLETED": "Completed",
+    "STATUS_CANCELED": "Canceled",
+    "STATUS_UNKNOWN": "Unknown"
   },
-  
+
   "Others": {
     "FAQ": "Frequently Asked Questions"
   }

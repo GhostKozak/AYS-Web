@@ -26,7 +26,7 @@ export default function DiffViewer({ diffs }: Props) {
       >
         <HistoryOutlined style={{ color: "#1890ff", fontSize: 18 }} />
         <Text strong style={{ fontSize: 16 }}>
-          {t("Common.CHANGES", "Değişiklikler")}
+          {t("Common.CHANGES")}
         </Text>
       </div>
 

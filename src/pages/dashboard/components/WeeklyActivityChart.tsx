@@ -1,5 +1,6 @@
 import { ResponsiveBar } from "@nivo/bar";
 import { useDailyTripStats } from "../../../hooks/useDashboard";
+import { useTranslation } from "react-i18next";
 
 // Senin renk paletin (Yukarıda tanımladığın)
 const STATUS_COLORS: Record<string, string> = {
@@ -12,6 +13,7 @@ const STATUS_COLORS: Record<string, string> = {
 
 const WeeklyActivityChart = ({ trips }: { trips: any[] }) => {
   const data = useDailyTripStats(trips);
+  const { t } = useTranslation();
 
   return (
     <div style={{ height: 370, width: "100%" }}>
@@ -50,7 +52,7 @@ const WeeklyActivityChart = ({ trips }: { trips: any[] }) => {
           tickSize: 5,
           tickPadding: 5,
           tickRotation: 0,
-          legend: "Son 7 Gün", // Alt başlık
+          legend: t("Dashboard.LAST_7_DAYS"), // Alt başlık
           legendPosition: "middle",
           legendOffset: 45,
         }}
@@ -58,7 +60,7 @@ const WeeklyActivityChart = ({ trips }: { trips: any[] }) => {
           tickSize: 5,
           tickPadding: 5,
           tickRotation: 0,
-          legend: "Sefer Sayısı", // Sol başlık
+          legend: t("Dashboard.TRIP_COUNT"), // Sol başlık
           legendPosition: "middle",
           legendOffset: -40,
         }}
@@ -78,6 +80,17 @@ const WeeklyActivityChart = ({ trips }: { trips: any[] }) => {
             itemOpacity: 0.85,
             symbolSize: 20,
             itemTextColor: "#ffffff", // Legend yazı rengi
+            data: [
+              "UNLOADED",
+              "COMPLETED",
+              "WAITING",
+              "CANCELED",
+              "UNKNOWN",
+            ].map((key) => ({
+              id: key,
+              label: t(`Trips.STATUS_${key}`), // Durumları çeviriyoruz
+              color: STATUS_COLORS[key],
+            })),
           },
         ]}
         // Animasyon ve Etkileşim

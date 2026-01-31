@@ -24,7 +24,7 @@ function Trips() {
   const [searchText, setSearchText] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState<TripType | undefined>(
-    undefined
+    undefined,
   );
 
   const { trips, isLoading, createTrip, updateTrip, deleteTrip } = useTrips();

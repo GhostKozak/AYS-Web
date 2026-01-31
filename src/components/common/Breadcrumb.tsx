@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { ROUTES } from "../../constants";
 
 function Breadcrumb() {
+  const { t } = useTranslation();
   const location = useLocation();
 
   // URL path'ini parçalara ayır
@@ -17,7 +18,7 @@ function Breadcrumb() {
     {
       title: (
         <Link to={ROUTES.DASHBOARD}>
-          <HomeOutlined /> Ana Sayfa
+          <HomeOutlined /> {t("Breadcrumbs.HOMEPAGE")}
         </Link>
       ),
       key: "home",

@@ -23,22 +23,26 @@ const countTripsBy = (trips: TripType[], keyExtractor: (t: TripType) => string |
 };
 
 export const useCompanyStats = (trips: TripType[]) => {
+  const {t} = useTranslation();
+
   return useMemo(() => {
     if (!trips?.length) return [];
 
-    const counts = countTripsBy(trips, (trip) => trip.company?.name || "Bilinmeyen Firma")
+    const counts = countTripsBy(trips, (trip) => trip.company?.name || t("Common.UNKNOWN_COMPANY"))
 
     const formatted = Object.entries(counts)
       .map(([id, value]) => ({id, value}))
       .sort((a, b) => b.value - a.value);
     
-    return getTopResultsWithOthers(formatted, 5, "Diğerleri");
+    return getTopResultsWithOthers(formatted, 5, t("Common.OTHERS"));
   }, [trips]);
 };
 
 export const useMonthCompanyStats = (trips: TripType[]) => {
+  const {t} = useTranslation();
+
   return useMemo(() => {
-    if (!trips?.length) return [{ id: "Veri Yok", value: 1 }];
+    if (!trips?.length) return [{ id: t("Table.NO_DATA"), value: 1 }];
 
     const now = getNow();
 
@@ -48,7 +52,7 @@ export const useMonthCompanyStats = (trips: TripType[]) => {
       const arrivalDate = new Date(trip.arrival_time);
 
       if (isSameMonth(arrivalDate, now)) {
-        const name = trip.company?.name || "Bilinmeyen Firma";
+        const name = trip.company?.name || t("Common.UNKNOWN_COMPANY");
         acc[name] = (acc[name] || 0) + 1;
       }
 
@@ -57,9 +61,9 @@ export const useMonthCompanyStats = (trips: TripType[]) => {
 
     const formatted = Object.entries(counts).map(([id, value]) => ({ id, value }));
 
-    if (!formatted?.length) return [{ id: "Bu Ay Sefer Yok", value: 1 }];
+    if (!formatted?.length) return [{ id: t("Common.NO_DATA_THIS_MONTH"), value: 1 }];
 
-    return getTopResultsWithOthers(formatted, 5, "Diğerleri");
+    return getTopResultsWithOthers(formatted, 5, t("Common.OTHERS"));
   }, [trips]);
 };
 
@@ -67,7 +71,7 @@ export const useVehicleUnloadStats = (trips: TripType[]) => {
   const {t} = useTranslation();
 
   return useMemo(() => {
-    if (!trips?.length) return [{ id: "Veri Yok", value: 1,color: STATUS_COLORS["UNKNOWN"]  }];
+    if (!trips?.length) return [{ id: t("Table.NO_DATA"), value: 1,color: STATUS_COLORS["UNKNOWN"]  }];
     
     const now = getNow();
 
@@ -90,7 +94,7 @@ export const useVehicleUnloadStats = (trips: TripType[]) => {
         color: STATUS_COLORS[id] || STATUS_COLORS.UNKNOWN
       }));
 
-    if (!formatted?.length) return [{ id: "Araba kaydı yok", value: 1, color: STATUS_COLORS["UNKNOWN"] }];    
+    if (!formatted?.length) return [{ id: t("Table.NO_DATA"), value: 1, color: STATUS_COLORS["UNKNOWN"] }];    
 
     return formatted;
   }, [trips, t]);

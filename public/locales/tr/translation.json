@@ -2,12 +2,13 @@
   "HELLO": "Merhaba Dünya",
 
   "Breadcrumbs": {
+    "HOMEPAGE": "Ana Sayfa",
     "DASHBOARD": "Gösterge Paneli",
     "LOGIN": "Giriş Yap",
-    "COMPANIES": "Şirketler",
+    "COMPANIES": "Firmalar",
     "DRIVERS": "Sürücüler",
     "VEHICLES": "Araçlar",
-    "TRIPS": "Yolculuklar",
+    "TRIPS": "Seferler",
     "FAQ": "SSS"
   },
 
@@ -25,6 +26,24 @@
     "EMAIL": "E-posta",
     "MESSAGE": "Mesajınız",
     "MENU": "Menü"
+  },
+
+  "Stats": {
+    "TOTAL_COMPANY": "Toplam Firma",
+    "TOTAL_DRIVER": "Toplam Sürücü",
+    "TOTAL_VEHICLE": "Toplam Araç",
+    "ACTIVE_TRIP": "Aktif Sefer"
+  },
+
+  "Login": {
+    "TITLE": "Giriş Yap",
+    "EMAIL_PLACEHOLDER": "E-posta",
+    "PASSWORD_PLACEHOLDER": "Şifre",
+    "SUCCESS": "Giriş başarılı!",
+    "ERROR": "E-posta veya şifre hatalı!",
+    "EMAIL_REQUIRED": "Lütfen e-postanızı girin!",
+    "PASSWORD_REQUIRED": "Lütfen şifrenizi girin!",
+    "BUTTON": "Giriş Yap"
   },
 
   "Common": {
@@ -45,7 +64,13 @@
     "ARE_YOU_SURE": "Emin misiniz?",
     "SEARCH_IN_FILTERS": "Filtrelerde ara",
     "CLEAR_FILTERS": "Filtreleri Temizle",
-    "APP_SUBTITLE": "Araç Yönetim Sistemi"
+    "APP_SUBTITLE": "Araç Yönetim Sistemi",
+    "UNKNOWN_COMPANY": "Bilinmeyen Firma",
+    "OTHERS": "Diğerleri",
+    "NO_PLATE": "Plaka Yok",
+    "NO_DATA_YET": "Henüz veri yok...",
+    "NO_DATA_THIS_MONTH": "Bu ay veri yok",
+    "CHANGES": "Değişiklikler"
   },
 
   "Table": {
@@ -53,7 +78,7 @@
     "UPDATED_AT": "Güncellenme Tarihi",
     "STATUS": "Durum",
     "ACTIONS": "İşlemler",
-    "NO_DATA": "Veri Yok"
+    "NO_DATA": "Veri bulunamadı"
   },
 
   "Errors": {
@@ -67,19 +92,36 @@
   "Validation": {
     "REQUIRED": "Bu alan zorunludur!"
   },
-  
+
+  "Dashboard": {
+    "TITLE": "Gösterge Paneli",
+    "TOP_COMPANIES": "En Çok Gelen Firmalar",
+    "MONTHLY_COMPANIES": "Bu Ay Gelen Firmalar",
+    "TODAY_UNLOAD_STATUS": "Bugünkü Boşaltma Durumu",
+    "LATEST_TRIPS": "Son Hareketler",
+    "WEEKLY_ACTIVITY": "Haftalık Aktivite",
+    "YEARLY_ACTIVITY": "Yıllık Yoğunluk",
+    "SETTINGS_TITLE": "Görünüm Ayarları",
+    "SETTINGS_DESC": "Görmek istediğiniz grafikleri seçin:",
+    "RESET_LAYOUT": "Yerleşimi Sıfırla",
+    "NO_DATA_THIS_MONTH": "Bu ay sefer yok",
+    "NO_VEHICLE_RECORD": "Araç kaydı yok",
+    "LAST_7_DAYS": "Son 7 Gün",
+    "TRIP_COUNT": "Sefer Sayısı"
+  },
+
   "Companies": {
-    "COMPANY_NAME": "Şirket Adı",
-    "SEARCH": "Şirket Ara...",
-    "ADD_BUTTON": "Yeni Şirket Ekle",
-    "EDIT_FORM_TITLE": "Firma Düzenleme Formu",
-    "ADD_FORM_TITLE": "Yeni Firma Ekleme Formu",
+    "COMPANY_NAME": "Firma Adı",
+    "SEARCH": "Firma Ara...",
+    "ADD_BUTTON": "Yeni Firma Ekle",
+    "EDIT_FORM_TITLE": "Firma Düzenleme",
+    "ADD_FORM_TITLE": "Yeni Firma Ekleme",
     "NAME_REQUIRED": "Lütfen firma ismini giriniz!",
     "SAVE_CHANGES": "Değişiklikleri Kaydet",
-    "DELETE_CONFIRM_TITLE": "Şirketi Sil",
+    "DELETE_CONFIRM_TITLE": "Firmayı Sil",
     "DELETE_CONFIRM_DESC": "<bold>{{name}}</bold> firmasını silmek istediğinize emin misiniz?",
     "CREATE_SUCCESS": "{{name}} firması başarıyla eklendi.",
-    "UPDATE_SUCCESS": "{{name}} firması başarıyla düzenlendi.",
+    "UPDATE_SUCCESS": "{{name}} firması başarıyla güncellendi.",
     "DELETE_SUCCESS": "{{name}} firması başarıyla silindi.",
     "TOTAL": "adet firma"
   },
@@ -87,15 +129,15 @@
   "Drivers": {
     "FULL_NAME": "Ad Soyad",
     "PHONE_NUMBER": "Telefon Numarası",
-    "COMPANY_NAME": "Şirket Adı",
+    "COMPANY_NAME": "Firma Adı",
     "SEARCH": "Sürücü Ara...",
     "ADD_BUTTON": "Sürücü Ekle",
-    "EDIT_FORM_TITLE": "Sürücü Düzenleme Formu",
-    "ADD_FORM_TITLE": "Yeni Sürücü Ekleme Formu",
+    "EDIT_FORM_TITLE": "Sürücü Düzenleme",
+    "ADD_FORM_TITLE": "Yeni Sürücü Ekleme",
     "FULL_NAME_REQUIRED": "Lütfen sürücü ismini giriniz!",
     "PHONE_REQUIRED": "Lütfen telefon numarasını giriniz!",
     "COMPANY_REQUIRED": "Lütfen bir firma seçin!",
-    "DELETE_CONFIRM_TITLE": "Sürücüyi Sil",
+    "DELETE_CONFIRM_TITLE": "Sürücüyü Sil",
     "DELETE_CONFIRM_DESC": "<bold>{{name}}</bold> sürücüsünü silmek istediğinize emin misiniz?",
     "CREATE_SUCCESS": "{{name}} sürücüsü başarıyla eklendi.",
     "UPDATE_SUCCESS": "{{name}} sürücüsü başarıyla güncellendi.",
@@ -108,8 +150,8 @@
     "VEHICLE_TYPE": "Araç Tipi",
     "SEARCH": "Araç Ara...",
     "ADD_BUTTON": "Araç Ekle",
-    "EDIT_FORM_TITLE": "Araç Düzenleme Formu",
-    "ADD_FORM_TITLE": "Yeni Araç Ekleme Formu",
+    "EDIT_FORM_TITLE": "Araç Düzenleme",
+    "ADD_FORM_TITLE": "Yeni Araç Ekleme",
     "PLATE_REQUIRED": "Lütfen plaka giriniz!",
     "TYPE_REQUIRED": "Lütfen araç tipi seçiniz!",
     "DELETE_CONFIRM_TITLE": "Aracı Sil",
@@ -129,7 +171,7 @@
     "DEPARTURE_TIME": "Çıkış Zamanı",
     "FULL_NAME": "Sürücü Adı",
     "PHONE_NUMBER": "Sürücü Telefonu",
-    "COMPANY_NAME": "Şirket Adı",
+    "COMPANY_NAME": "Firma Adı",
     "LICENSE_PLATE": "Plaka",
     "UNLOAD_STATUS": "Boşaltma Durumu",
     "GPS_TRACKING": "ATS",
@@ -138,8 +180,8 @@
     "NOTES": "Notlar",
     "SEARCH": "Sefer, Plaka veya Sürücü Ara...",
     "ADD_BUTTON": "Sefer Ekle",
-    "EDIT_FORM_TITLE": "Sefer Düzenleme Formu",
-    "ADD_FORM_TITLE": "Yeni Sefer Ekleme Formu",
+    "EDIT_FORM_TITLE": "Sefer Düzenleme",
+    "ADD_FORM_TITLE": "Yeni Sefer Ekleme",
     "DRIVER_REQUIRED": "Lütfen bir sürücü seçin!",
     "COMPANY_REQUIRED": "Lütfen bir firma seçin!",
     "VEHICLE_REQUIRED": "Lütfen bir araç seçin!",
@@ -151,9 +193,12 @@
     "TOTAL": "adet sefer",
     "STATUS_WAITING": "Bekliyor",
     "STATUS_UNLOADED": "Boşaltıldı",
-    "STATUS_IN_PROGRESS": "Devam Ediyor"
+    "STATUS_IN_PROGRESS": "Devam Ediyor",
+    "STATUS_COMPLETED": "Tamamlandı",
+    "STATUS_CANCELED": "İptal Edildi",
+    "STATUS_UNKNOWN": "Belirsiz"
   },
-  
+
   "Other": {
     "FAQ": "Sıkça Sorulan Sorular"
   }

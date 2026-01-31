@@ -1,52 +1,54 @@
 import { useMemo } from "react";
-import { Card, List, Avatar, Tag, Typography, Badge, Space, theme } from "antd";
+import { Card, List, Avatar, Tag, Typography, Space, theme } from "antd";
 import { TruckOutlined, ClockCircleOutlined } from "@ant-design/icons";
 import type { TripType } from "../../../types";
+import { useTranslation } from "react-i18next";
 
 const { Text } = Typography;
 const { useToken } = theme;
 
-// Durum Rengi Eşleştirmesi (Ant Design Preset Renkleri)
-const getStatusTag = (status: string) => {
+const getStatusTag = (status: string, t: (key: string) => string) => {
   const normalizedStatus = status ? status.toUpperCase() : "UNKNOWN";
+  const label = t(`Trips.STATUS_${normalizedStatus}`);
 
   switch (normalizedStatus) {
     case "WAITING":
       return (
         <Tag color="warning" style={{ margin: 0 }}>
-          Bekliyor
+          {label}
         </Tag>
       ); // Sarı/Turuncu
     case "COMPLETED":
       return (
         <Tag color="success" style={{ margin: 0 }}>
-          Tamamlandı
+          {label}
         </Tag>
       ); // Yeşil
     case "UNLOADED":
       return (
         <Tag color="cyan" style={{ margin: 0 }}>
-          Boşaltıldı
+          {label}
         </Tag>
       ); // Camgöbeği
     case "CANCELED":
       return (
         <Tag color="error" style={{ margin: 0 }}>
-          İptal
+          {label}
         </Tag>
       ); // Kırmızı
     default:
       return (
         <Tag color="default" style={{ margin: 0 }}>
-          Belirsiz
+          {label}
         </Tag>
       ); // Gri
   }
 };
 
 const LiveOperationsList = ({ trips }: { trips: TripType[] }) => {
-  // Ant Design tema tokenlarını çekiyoruz (Dark mode renklerine uyum sağlaması için)
+  // Ant Design theme tokens (for dark mode compatibility)
   const { token } = useToken();
+  const { t } = useTranslation();
 
   // Veriyi sıralama ve son 6 taneyi alma mantığı (Aynı)
   const latestTrips = useMemo(() => {
@@ -83,7 +85,7 @@ const LiveOperationsList = ({ trips }: { trips: TripType[] }) => {
       <List
         itemLayout="horizontal"
         dataSource={latestTrips}
-        locale={{ emptyText: "Henüz veri yok..." }}
+        locale={{ emptyText: t("Common.NO_DATA_YET") }}
         renderItem={(trip) => {
           const timeString = trip.arrival_time
             ? new Date(trip.arrival_time).toLocaleTimeString("tr-TR", {
@@ -114,13 +116,13 @@ const LiveOperationsList = ({ trips }: { trips: TripType[] }) => {
                 // Plaka Bilgisi (Başlık)
                 title={
                   <Text strong style={{ fontSize: 14 }}>
-                    {trip.vehicle?.licence_plate || "Plaka Yok"}
+                    {trip.vehicle?.licence_plate || t("Common.NO_PLATE")}
                   </Text>
                 }
                 // Firma Bilgisi (Alt Başlık)
                 description={
                   <Text type="secondary" style={{ fontSize: 12 }}>
-                    {trip.company?.name || "Bilinmeyen Firma"}
+                    {trip.company?.name || t("Common.UNKNOWN_COMPANY")}
                   </Text>
                 }
               />
@@ -134,7 +136,7 @@ const LiveOperationsList = ({ trips }: { trips: TripType[] }) => {
                   gap: 4,
                 }}
               >
-                {getStatusTag(trip.unload_status)}
+                {getStatusTag(trip.unload_status, t)}
 
                 <Space size={4}>
                   <ClockCircleOutlined
