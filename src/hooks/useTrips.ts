@@ -5,10 +5,12 @@ import { type CreateTripPayload, type TripType } from "../types";
 export const useTrips = () => {
   const queryClient = useQueryClient();
 
-  const { data: trips = [], isLoading, isError } = useQuery<TripType[]>({
+  const { data: trips = [], isLoading, isError, refetch } = useQuery<TripType[]>({
     queryKey: ["trips"],
     queryFn: tripApi.getAll,
     staleTime: 1000 * 60 * 5, // 5 dakika
+    refetchInterval: 30000,   // Polling: Her 30 saniyede bir otomatik yenile
+    refetchIntervalInBackground: true,
   });
 
   const createMutation = useMutation({
@@ -37,6 +39,7 @@ export const useTrips = () => {
     trips,
     isLoading,
     isError,
+    refetch,
     createTrip: createMutation.mutateAsync,
     updateTrip: updateMutation.mutateAsync,
     deleteTrip: deleteMutation.mutateAsync,

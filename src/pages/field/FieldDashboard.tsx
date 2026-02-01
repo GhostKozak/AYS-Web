@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import { useTrips } from "../../hooks/useTrips";
 import {
   Badge,
@@ -43,28 +43,33 @@ function FieldDashboard() {
   };
 
   // --- VERİ FİLTRELEME MANTIĞI ---
-
-  const activeTrips = trips.filter((trip) => !trip.is_trip_canceled);
+  const activeTrips = useMemo(() => {
+    return trips.filter((trip) => !trip.is_trip_canceled);
+  }, [trips]);
 
   // 1. ACİL (Boşalmış -> Parka Gidecek)
-  const urgentTrips = activeTrips.filter(
-    (trip) => trip.unload_status === "UNLOADED",
-  );
+  const urgentTrips = useMemo(() => {
+    return activeTrips.filter((trip) => trip.unload_status === "UNLOADED");
+  }, [activeTrips]);
 
   // 2. SAHADA / RAMPADA
-  const rampTrips = activeTrips.filter(
-    (trip) =>
-      (trip.unload_status === "WAITING" ||
-        trip.unload_status === "IN_PROGRESS") &&
-      trip.is_in_temporary_parking_lot === false,
-  );
+  const rampTrips = useMemo(() => {
+    return activeTrips.filter(
+      (trip) =>
+        (trip.unload_status === "WAITING" ||
+          trip.unload_status === "IN_PROGRESS") &&
+        trip.is_in_temporary_parking_lot === false,
+    );
+  }, [activeTrips]);
 
   // 3. PARKTA
-  const parkTrips = activeTrips.filter(
-    (trip) =>
-      trip.unload_status === "WAITING" &&
-      trip.is_in_temporary_parking_lot === true,
-  );
+  const parkTrips = useMemo(() => {
+    return activeTrips.filter(
+      (trip) =>
+        trip.unload_status === "WAITING" &&
+        trip.is_in_temporary_parking_lot === true,
+    );
+  }, [activeTrips]);
 
   // --- SESLİ BİLDİRİM EFEKTİ ---
   useEffect(() => {
