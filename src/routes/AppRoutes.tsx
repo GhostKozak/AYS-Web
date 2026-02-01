@@ -59,6 +59,18 @@ function AppRoutes() {
           path: "*",
           Component: NotFoundPage,
         },
+        // Example RoleGuard Route
+        // {
+        //   path: ROUTES.COMPANIES,
+        //   element: (
+        //     <RoleGuard
+        //       allowedRoles={[UserRole.ADMIN, UserRole.EDITOR]}
+        //       fallback={<Navigate to={ROUTES.DASHBOARD} replace />}
+        //     >
+        //       <Companies />
+        //     </RoleGuard>
+        //   ),
+        // },
       ],
     },
   ]);

@@ -9,11 +9,12 @@ import {
   SearchOutlined,
 } from "@ant-design/icons";
 import { useVehicles } from "../../hooks/useVehicles";
-import type { VehicleType, VehicleTypeEnum } from "../../types";
+import { UserRole, type VehicleType, type VehicleTypeEnum } from "../../types";
 import VehicleTable from "./components/VehicleTable";
 import { useIsMobile } from "../../hooks/useIsMobile";
 import VehicleCardList from "./components/VehicleCardList";
 import { exportVehiclesToExcel } from "../../utils/excel.utils";
+import { RoleGuard } from "../../components/auth/RoleGuard";
 
 function Vehicles() {
   const { t } = useTranslation();
@@ -120,14 +121,16 @@ function Vehicles() {
         style={{ marginTop: 0, marginBottom: 10 }}
       >
         <h1>{t("Breadcrumbs.VEHICLES")}</h1>
-        <Button
-          type="primary"
-          icon={<FileExcelOutlined />}
-          style={{ backgroundColor: "#217346" }} // Excel yeşili :)
-          onClick={handleExport}
-        >
-          {t("Common.EXPORT_EXCEL")}
-        </Button>
+        <RoleGuard allowedRoles={[UserRole.ADMIN]}>
+          <Button
+            type="primary"
+            icon={<FileExcelOutlined />}
+            style={{ backgroundColor: "#217346" }} // Excel yeşili :)
+            onClick={handleExport}
+          >
+            {t("Common.EXPORT_EXCEL")}
+          </Button>
+        </RoleGuard>
       </Flex>
       <Flex gap={isMobile ? 10 : 25} style={{ marginBottom: 20 }}>
         <Search
@@ -144,10 +147,12 @@ function Vehicles() {
           onSearch={setSearchText}
           onChange={(e) => setSearchText(e.target.value)}
         />
-        <Button color="cyan" variant="solid" size="large" onClick={handleAdd}>
-          <PlusOutlined />{" "}
-          {isMobile ? t("Common.ADD") : t("Vehicles.ADD_BUTTON")}
-        </Button>
+        <RoleGuard allowedRoles={[UserRole.ADMIN, UserRole.EDITOR]}>
+          <Button color="cyan" variant="solid" size="large" onClick={handleAdd}>
+            <PlusOutlined />{" "}
+            {isMobile ? t("Common.ADD") : t("Vehicles.ADD_BUTTON")}
+          </Button>
+        </RoleGuard>
       </Flex>
       {isMobile ? (
         <VehicleCardList

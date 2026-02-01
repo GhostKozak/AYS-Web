@@ -125,3 +125,20 @@ export type DailyStat = {
   UNKNOWN: number;
   [key: string]: string | number; 
 };
+
+export type UserRole = 'admin' | 'editor' | 'viewer' | 'user';
+
+export const UserRole = {
+  ADMIN: 'admin',
+  EDITOR: 'editor',
+  VIEWER: 'viewer',
+  USER: 'user',
+} as const;
+
+export interface User {
+  _id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  role: UserRole;
+}

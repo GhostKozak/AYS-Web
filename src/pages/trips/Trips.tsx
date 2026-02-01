@@ -9,7 +9,7 @@ import {
   SearchOutlined,
 } from "@ant-design/icons";
 
-import type { TripType } from "../../types";
+import { UserRole, type TripType } from "../../types";
 import { useIsMobile } from "../../hooks/useIsMobile";
 import { useTrips } from "../../hooks/useTrips";
 import TripTable from "./components/TripTable";
@@ -21,6 +21,7 @@ import { useCompanies } from "../../hooks/useCompanies";
 import { useVehicles } from "../../hooks/useVehicles";
 import { useDrivers } from "../../hooks/useDrivers";
 import { exportTripsToExcel } from "../../utils/excel.utils";
+import { RoleGuard } from "../../components/auth/RoleGuard";
 
 function Trips() {
   const { t } = useTranslation();
@@ -143,14 +144,16 @@ function Trips() {
         style={{ marginTop: 0, marginBottom: 10 }}
       >
         <h1>{t("Breadcrumbs.TRIPS")}</h1>
-        <Button
-          type="primary"
-          icon={<FileExcelOutlined />}
-          style={{ backgroundColor: "#217346" }} // Excel yeşili :)
-          onClick={handleExport}
-        >
-          {t("Common.EXPORT_EXCEL")}
-        </Button>
+        <RoleGuard allowedRoles={[UserRole.ADMIN]}>
+          <Button
+            type="primary"
+            icon={<FileExcelOutlined />}
+            style={{ backgroundColor: "#217346" }} // Excel yeşili :)
+            onClick={handleExport}
+          >
+            {t("Common.EXPORT_EXCEL")}
+          </Button>
+        </RoleGuard>
       </Flex>
       <Flex gap={isMobile ? 10 : 25} style={{ marginBottom: 20 }}>
         <Search
@@ -167,9 +170,12 @@ function Trips() {
           onSearch={handleSearch}
           onChange={(e) => handleSearch(e.target.value)}
         />
-        <Button color="cyan" variant="solid" size="large" onClick={handleAdd}>
-          <PlusOutlined /> {isMobile ? t("Common.ADD") : t("Trips.ADD_BUTTON")}
-        </Button>
+        <RoleGuard allowedRoles={[UserRole.ADMIN, UserRole.EDITOR]}>
+          <Button color="cyan" variant="solid" size="large" onClick={handleAdd}>
+            <PlusOutlined />{" "}
+            {isMobile ? t("Common.ADD") : t("Trips.ADD_BUTTON")}
+          </Button>
+        </RoleGuard>
       </Flex>
       {isMobile ? (
         <TripCardList

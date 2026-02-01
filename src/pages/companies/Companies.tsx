@@ -12,10 +12,11 @@ import {
 import { useCompanies } from "../../hooks/useCompanies";
 import CompanyModal from "./components/CompanyModal";
 import CompanyTable from "./components/CompanyTable";
-import type { CompanyType } from "../../types";
+import { UserRole, type CompanyType } from "../../types";
 import { useIsMobile } from "../../hooks/useIsMobile";
 import CompanyCardList from "./components/CompanyCardList";
 import { exportCompaniesToExcel } from "../../utils/excel.utils";
+import { RoleGuard } from "../../components/auth/RoleGuard";
 
 function Companies() {
   const { t } = useTranslation();
@@ -99,14 +100,16 @@ function Companies() {
         style={{ marginTop: 0, marginBottom: 10 }}
       >
         <h1>{t("Breadcrumbs.COMPANIES")}</h1>
-        <Button
-          type="primary"
-          icon={<FileExcelOutlined />}
-          style={{ backgroundColor: "#217346" }} // Excel yeşili :)
-          onClick={handleExport}
-        >
-          {t("Common.EXPORT_EXCEL")}
-        </Button>
+        <RoleGuard allowedRoles={[UserRole.ADMIN]}>
+          <Button
+            type="primary"
+            icon={<FileExcelOutlined />}
+            style={{ backgroundColor: "#217346" }} // Excel yeşili :)
+            onClick={handleExport}
+          >
+            {t("Common.EXPORT_EXCEL")}
+          </Button>
+        </RoleGuard>
       </Flex>
       <Flex gap={isMobile ? 10 : 25} style={{ marginBottom: 20 }}>
         <Search
@@ -123,10 +126,12 @@ function Companies() {
           onSearch={setSearchText}
           onChange={(e) => setSearchText(e.target.value)}
         />
-        <Button color="cyan" variant="solid" size="large" onClick={handleAdd}>
-          <PlusOutlined />{" "}
-          {isMobile ? t("Common.ADD") : t("Companies.ADD_BUTTON")}
-        </Button>
+        <RoleGuard allowedRoles={[UserRole.ADMIN, UserRole.EDITOR]}>
+          <Button color="cyan" variant="solid" size="large" onClick={handleAdd}>
+            <PlusOutlined />{" "}
+            {isMobile ? t("Common.ADD") : t("Companies.ADD_BUTTON")}
+          </Button>
+        </RoleGuard>
       </Flex>
       {isMobile ? (
         <CompanyCardList

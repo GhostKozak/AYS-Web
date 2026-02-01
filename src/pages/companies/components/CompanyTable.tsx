@@ -1,10 +1,11 @@
 import { Table, Tag, Popconfirm, Button, Space } from "antd";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
-import type { ColumnsType } from "antd/es/table";
-import type { CompanyType } from "../../../types";
+import { UserRole, type CompanyType } from "../../../types";
 import { Trans, useTranslation } from "react-i18next";
 import { getUniqueOptions } from "../../../utils";
 import { useMemo } from "react";
+import { hasRole } from "../../../utils/auth.utils";
+import type { ColumnType } from "antd/lib/table";
 
 type Props = {
   companies: CompanyType[];
@@ -27,82 +28,94 @@ export default function CompaniesTable({
     };
   }, [companies]);
 
-  const columns: ColumnsType<CompanyType> = [
-    {
-      title: t("Companies.COMPANY_NAME"),
-      dataIndex: "name",
-      key: "name",
-      filters: filters.name,
-      onFilter: (value, record) => record.name === value,
-      filterSearch: true,
-    },
-    {
-      title: t("Table.CREATED_AT"),
-      dataIndex: "createdAt",
-      key: "createdAt",
-      render: (d: string) => new Date(d).toLocaleString("tr-TR"),
-      sorter: (a, b) =>
-        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
-      responsive: ["lg"],
-    },
-    {
-      title: t("Table.UPDATED_AT"),
-      dataIndex: "updatedAt",
-      key: "updatedAt",
-      render: (d: string) => new Date(d).toLocaleString("tr-TR"),
-      sorter: (a, b) =>
-        new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime(),
-      responsive: ["lg"],
-    },
-    {
-      title: t("Table.STATUS"),
-      dataIndex: "deleted",
-      key: "deleted",
-      render: (deleted: boolean) => (
-        <Tag color={deleted ? "red" : "green"}>
-          {deleted ? t("Common.PASSIVE") : t("Common.ACTIVE")}
-        </Tag>
-      ),
-      filters: [
-        { text: t("Common.ACTIVE"), value: false },
-        { text: t("Common.PASSIVE"), value: true },
-      ],
-      onFilter: (value, record) => record.deleted === value,
-    },
-    {
-      title: t("Table.ACTIONS"),
-      key: "action",
-      render: (_: any, record: CompanyType) => (
-        <Space size="middle">
-          <Button
-            type="text"
-            icon={<EditOutlined />}
-            onClick={() => onEdit(record)}
-          >
-            {t("Common.EDIT")}
-          </Button>
-          <Popconfirm
-            title={t("Companies.DELETE_CONFIRM_TITLE")}
-            description={
-              <span>
-                <Trans
-                  i18nKey="Companies.DELETE_CONFIRM_DESC"
-                  values={{ name: record.name }}
-                  components={{ bold: <strong /> }}
-                />
-              </span>
-            }
-            onConfirm={() => onDelete(record)}
-            icon={<DeleteOutlined style={{ color: "red" }} />}
-          >
-            <Button danger type="text">
-              {t("Common.DELETE")}
+  interface AuthenticatedColumnType extends ColumnType<CompanyType> {
+    visible?: boolean;
+  }
+
+  // const columns: ColumnsType<CompanyType> = [
+  const columns = useMemo(() => {
+    const allColumns: AuthenticatedColumnType[] = [
+      {
+        title: t("Companies.COMPANY_NAME"),
+        dataIndex: "name",
+        key: "name",
+        filters: filters.name,
+        onFilter: (value, record) => record.name === value,
+        filterSearch: true,
+      },
+      {
+        title: t("Table.CREATED_AT"),
+        dataIndex: "createdAt",
+        key: "createdAt",
+        visible: hasRole([UserRole.ADMIN, UserRole.EDITOR]),
+        render: (d: string) => new Date(d).toLocaleString("tr-TR"),
+        sorter: (a, b) =>
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+        responsive: ["lg"],
+      },
+      {
+        title: t("Table.UPDATED_AT"),
+        dataIndex: "updatedAt",
+        key: "updatedAt",
+        render: (d: string) => new Date(d).toLocaleString("tr-TR"),
+        sorter: (a, b) =>
+          new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime(),
+        responsive: ["lg"],
+      },
+      {
+        title: t("Table.STATUS"),
+        dataIndex: "deleted",
+        key: "deleted",
+        visible: hasRole([UserRole.ADMIN, UserRole.EDITOR]),
+        render: (deleted: boolean) => (
+          <Tag color={deleted ? "red" : "green"}>
+            {deleted ? t("Common.PASSIVE") : t("Common.ACTIVE")}
+          </Tag>
+        ),
+        filters: [
+          { text: t("Common.ACTIVE"), value: false },
+          { text: t("Common.PASSIVE"), value: true },
+        ],
+        onFilter: (value, record) => record.deleted === value,
+      },
+      {
+        title: t("Table.ACTIONS"),
+        key: "action",
+        visible: hasRole([UserRole.ADMIN, UserRole.EDITOR]),
+        render: (_: any, record: CompanyType) => (
+          <Space size="middle">
+            <Button
+              type="text"
+              icon={<EditOutlined />}
+              onClick={() => onEdit(record)}
+            >
+              {t("Common.EDIT")}
             </Button>
-          </Popconfirm>
-        </Space>
-      ),
-    },
-  ];
+            <Popconfirm
+              title={t("Companies.DELETE_CONFIRM_TITLE")}
+              description={
+                <span>
+                  <Trans
+                    i18nKey="Companies.DELETE_CONFIRM_DESC"
+                    values={{ name: record.name }}
+                    components={{ bold: <strong /> }}
+                  />
+                </span>
+              }
+              onConfirm={() => onDelete(record)}
+              icon={<DeleteOutlined style={{ color: "red" }} />}
+            >
+              <Button danger type="text">
+                {t("Common.DELETE")}
+              </Button>
+            </Popconfirm>
+          </Space>
+        ),
+      },
+    ];
+
+    return allColumns.filter((col) => col.visible !== false);
+  }, []);
 
   return (
     <Table
