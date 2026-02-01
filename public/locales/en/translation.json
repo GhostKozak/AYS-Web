@@ -70,7 +70,8 @@
     "NO_PLATE": "No Plate",
     "NO_DATA_YET": "No data yet...",
     "NO_DATA_THIS_MONTH": "No data this month",
-    "CHANGES": "Changes"
+    "CHANGES": "Changes",
+    "EXPORT_EXCEL": "Export to Excel"
   },
 
   "Table": {
@@ -201,5 +202,55 @@
 
   "Others": {
     "FAQ": "Frequently Asked Questions"
+  },
+
+  "Excel": {
+    "fileNames": {
+      "TRIPS": "Trip_Report",
+      "COMPANIES": "Company_List",
+      "DRIVERS": "Driver_List",
+      "VEHICLES": "Vehicle_List",
+      "DAILY_REPORT": "Daily_Operation_Report"
+    },
+    "sheetNames": {
+      "TRIPS": "Trips",
+      "COMPANIES": "Companies",
+      "DRIVERS": "Drivers",
+      "VEHICLES": "Vehicles",
+      "DAILY_REPORT": "Daily Report"
+    },
+    "columns": {
+      "COMPANY": "Company",
+      "PLATE": "License Plate",
+      "DRIVER": "Driver",
+      "PHONE": "Phone",
+      "ARRIVAL": "Arrival Time",
+      "DEPARTURE": "Departure Time",
+      "STATUS": "Status",
+      "GPS": "GPS Tracking",
+      "PARKING": "In Temporary Park",
+      "NOTES": "Notes",
+      "CREATED_AT": "Created At",
+      "VEHICLE_TYPE": "Vehicle Type"
+    },
+    "status": {
+      "WAITING": "Waiting",
+      "UNLOADED": "Unloaded",
+      "COMPLETED": "Completed",
+      "CANCELED": "Canceled",
+      "UNKNOWN": "Unknown"
+    },
+    "boolean": {
+      "YES": "Yes",
+      "NO": "No",
+      "EXIST": "Yes",
+      "MISSING": "No"
+    },
+    "vehicleTypes": {
+      "TRUCK": "Truck",
+      "LORRY": "Lorry",
+      "VAN": "Van",
+      "TRAILER": "Trailer"
+    }
   }
 }

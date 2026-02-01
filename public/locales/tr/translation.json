@@ -70,7 +70,8 @@
     "NO_PLATE": "Plaka Yok",
     "NO_DATA_YET": "Henüz veri yok...",
     "NO_DATA_THIS_MONTH": "Bu ay veri yok",
-    "CHANGES": "Değişiklikler"
+    "CHANGES": "Değişiklikler",
+    "EXPORT_EXCEL": "Excel'e Aktar"
   },
 
   "Table": {
@@ -201,5 +202,55 @@
 
   "Other": {
     "FAQ": "Sıkça Sorulan Sorular"
+  },
+
+  "Excel": {
+    "fileNames": {
+      "TRIPS": "Sefer_Raporu",
+      "COMPANIES": "Firma_Listesi",
+      "DRIVERS": "Surucu_Listesi",
+      "VEHICLES": "Arac_Listesi",
+      "DAILY_REPORT": "Gunluk_Operasyon_Raporu"
+    },
+    "sheetNames": {
+      "TRIPS": "Seferler",
+      "COMPANIES": "Firmalar",
+      "DRIVERS": "Sürücüler",
+      "VEHICLES": "Araçlar",
+      "DAILY_REPORT": "Günlük Rapor"
+    },
+    "columns": {
+      "COMPANY": "Firma",
+      "PLATE": "Plaka",
+      "DRIVER": "Sürücü",
+      "PHONE": "Telefon",
+      "ARRIVAL": "Geliş Zamanı",
+      "DEPARTURE": "Gidiş Zamanı",
+      "STATUS": "Durum",
+      "GPS": "GPS Takip",
+      "PARKING": "Geçici Parkta",
+      "NOTES": "Notlar",
+      "CREATED_AT": "Kayıt Tarihi",
+      "VEHICLE_TYPE": "Araç Tipi"
+    },
+    "status": {
+      "WAITING": "Bekliyor",
+      "UNLOADED": "Boşaltıldı",
+      "COMPLETED": "Tamamlandı",
+      "CANCELED": "İptal",
+      "UNKNOWN": "Bilinmiyor"
+    },
+    "boolean": {
+      "YES": "Evet",
+      "NO": "Hayır",
+      "EXIST": "Var",
+      "MISSING": "Yok"
+    },
+    "vehicleTypes": {
+      "TRUCK": "Tır",
+      "LORRY": "Kamyon",
+      "VAN": "Minivan",
+      "TRAILER": "Dorse"
+    }
   }
 }

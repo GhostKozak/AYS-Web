@@ -64,9 +64,17 @@ export const DashboardWidget = React.forwardRef<
               }}
             />
           }
-          bordered={false}
-          style={{ height: "100%", display: "flex", flexDirection: "column" }}
-          bodyStyle={{ flex: 1, padding: "10px", overflow: "hidden" }} // İçerik taşmasın
+          variant="borderless"
+          styles={{
+            body: {
+              height: "100%",
+              display: "flex",
+              flexDirection: "column",
+              flex: 1,
+              padding: "10px",
+              overflow: "hidden",
+            },
+          }}
         >
           {children}
         </Card>

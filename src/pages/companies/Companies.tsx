@@ -3,7 +3,11 @@ import Search from "antd/es/input/Search";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
+import {
+  FileExcelOutlined,
+  PlusOutlined,
+  SearchOutlined,
+} from "@ant-design/icons";
 
 import { useCompanies } from "../../hooks/useCompanies";
 import CompanyModal from "./components/CompanyModal";
@@ -11,6 +15,7 @@ import CompanyTable from "./components/CompanyTable";
 import type { CompanyType } from "../../types";
 import { useIsMobile } from "../../hooks/useIsMobile";
 import CompanyCardList from "./components/CompanyCardList";
+import { exportCompaniesToExcel } from "../../utils/excel.utils";
 
 function Companies() {
   const { t } = useTranslation();
@@ -19,12 +24,16 @@ function Companies() {
   const [searchText, setSearchText] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState<CompanyType | undefined>(
-    undefined
+    undefined,
   );
 
   const { companies, isLoading, createCompany, updateCompany, deleteCompany } =
     useCompanies();
   const isMobile = useIsMobile();
+
+  const handleExport = () => {
+    exportCompaniesToExcel(filteredCompanies);
+  };
 
   const handleDelete = async (record: CompanyType) => {
     try {
@@ -84,6 +93,21 @@ function Companies() {
 
   return (
     <Layout style={{ padding: isMobile ? "0 16px" : "0 50px" }}>
+      <Flex
+        justify="space-between"
+        align="center"
+        style={{ marginTop: 0, marginBottom: 10 }}
+      >
+        <h1>{t("Breadcrumbs.COMPANIES")}</h1>
+        <Button
+          type="primary"
+          icon={<FileExcelOutlined />}
+          style={{ backgroundColor: "#217346" }} // Excel yeşili :)
+          onClick={handleExport}
+        >
+          {t("Common.EXPORT_EXCEL")}
+        </Button>
+      </Flex>
       <Flex gap={isMobile ? 10 : 25} style={{ marginBottom: 20 }}>
         <Search
           placeholder={t("Companies.SEARCH")}

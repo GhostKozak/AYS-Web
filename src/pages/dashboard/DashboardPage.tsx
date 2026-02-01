@@ -1,7 +1,15 @@
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import { useState } from "react";
-import { Badge, Button, Checkbox, Drawer, FloatButton, Typography } from "antd";
+import {
+  Badge,
+  Button,
+  Checkbox,
+  Drawer,
+  Flex,
+  FloatButton,
+  Typography,
+} from "antd";
 import { useTrips } from "../../hooks/useTrips";
 import CompanyDistribution from "./components/CompanyDistribution";
 import MonthlyCompanyDistribution from "./components/MonthlyCompanyDistribution";
@@ -12,8 +20,9 @@ import YearlyActivityMap from "./components/YearlyActivityMap";
 import LiveOperationsList from "./components/LiveOperationsList";
 import { WidthProvider, Responsive } from "react-grid-layout/legacy";
 import { DashboardWidget } from "./components/DashboardWidget";
-import { SettingOutlined } from "@ant-design/icons";
+import { FileExcelOutlined, SettingOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
+import { exportDailyDashboard } from "../../utils/excel.utils";
 
 const { Text } = Typography;
 const ResponsiveGridLayout = WidthProvider(Responsive);
@@ -30,6 +39,10 @@ function DashboardPage() {
     unloaded: true,
   });
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
+  const handleExport = () => {
+    exportDailyDashboard(trips);
+  };
 
   const myLayout = {
     lg: [
@@ -83,7 +96,22 @@ function DashboardPage() {
 
   return (
     <div style={{ padding: "24px" }}>
-      <h1 style={{ marginTop: -30 }}>{t("Dashboard.TITLE")}</h1>
+      <Flex
+        justify="space-between"
+        align="center"
+        style={{ marginTop: -45, marginBottom: 10 }}
+      >
+        <h1 style={{ marginBottom: 0 }}>{t("Dashboard.TITLE")}</h1>
+
+        <Button
+          type="primary"
+          icon={<FileExcelOutlined />}
+          style={{ backgroundColor: "#217346" }} // Excel yeşili :)
+          onClick={handleExport}
+        >
+          {t("Common.EXPORT_EXCEL")}
+        </Button>
+      </Flex>
       <StatsOverview />
       <ResponsiveGridLayout
         className="layout"

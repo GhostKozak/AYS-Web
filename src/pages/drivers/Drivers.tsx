@@ -3,7 +3,11 @@ import Search from "antd/es/input/Search";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
+import {
+  FileExcelOutlined,
+  PlusOutlined,
+  SearchOutlined,
+} from "@ant-design/icons";
 
 import { useCompanies } from "../../hooks/useCompanies";
 import { useDrivers } from "../../hooks/useDrivers";
@@ -12,6 +16,7 @@ import type { DriverType } from "../../types";
 import DriverTable from "./components/DriverTable";
 import { useIsMobile } from "../../hooks/useIsMobile";
 import DriverCardList from "./components/DriverCardList";
+import { exportDriversToExcel } from "../../utils/excel.utils";
 
 function Drivers() {
   const { t } = useTranslation();
@@ -20,13 +25,17 @@ function Drivers() {
   const [searchText, setSearchText] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState<DriverType | undefined>(
-    undefined
+    undefined,
   );
 
   const { drivers, isLoading, createDriver, updateDriver, deleteDriver } =
     useDrivers();
   const { companies } = useCompanies();
   const isMobile = useIsMobile();
+
+  const handleExport = () => {
+    exportDriversToExcel(filteredDrivers);
+  };
 
   const handleDelete = async (record: DriverType) => {
     try {
@@ -108,6 +117,21 @@ function Drivers() {
 
   return (
     <Layout style={{ padding: isMobile ? "0 16px" : "0 50px" }}>
+      <Flex
+        justify="space-between"
+        align="center"
+        style={{ marginTop: 0, marginBottom: 10 }}
+      >
+        <h1>{t("Breadcrumbs.DRIVERS")}</h1>
+        <Button
+          type="primary"
+          icon={<FileExcelOutlined />}
+          style={{ backgroundColor: "#217346" }} // Excel yeşili :)
+          onClick={handleExport}
+        >
+          {t("Common.EXPORT_EXCEL")}
+        </Button>
+      </Flex>
       <Flex gap={isMobile ? 10 : 25} style={{ marginBottom: 20 }}>
         <Search
           placeholder={t("Drivers.SEARCH")}

@@ -73,14 +73,14 @@ const LiveOperationsList = ({ trips }: { trips: TripType[] }) => {
       //     </Text>
       //   </Space>
       // }
-      bordered={false}
-      style={{
-        maxHeight: "350px",
-        overflow: "scroll",
-        // Eğer kartın arka planını özel bir koyu renk yapmak istersen:
-        // backgroundColor: '#1f2937'
+      variant="borderless"
+      styles={{
+        body: {
+          maxHeight: "350px",
+          overflow: "scroll",
+          padding: "0 12px 12px 12px",
+        },
       }}
-      bodyStyle={{ padding: "0 12px 12px 12px" }} // Listeyi kenarlara biraz daha yaklaştırdık
     >
       <List
         itemLayout="horizontal"

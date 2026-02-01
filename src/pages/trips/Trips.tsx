@@ -3,7 +3,11 @@ import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 
-import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
+import {
+  FileExcelOutlined,
+  PlusOutlined,
+  SearchOutlined,
+} from "@ant-design/icons";
 
 import type { TripType } from "../../types";
 import { useIsMobile } from "../../hooks/useIsMobile";
@@ -16,6 +20,7 @@ import TripModal from "./components/TripModal";
 import { useCompanies } from "../../hooks/useCompanies";
 import { useVehicles } from "../../hooks/useVehicles";
 import { useDrivers } from "../../hooks/useDrivers";
+import { exportTripsToExcel } from "../../utils/excel.utils";
 
 function Trips() {
   const { t } = useTranslation();
@@ -33,6 +38,10 @@ function Trips() {
   const { drivers } = useDrivers();
   const { vehicles } = useVehicles();
   const queryClient = useQueryClient();
+
+  const handleExport = () => {
+    exportTripsToExcel(filteredTrips);
+  };
 
   const handleDelete = async (record: TripType) => {
     try {
@@ -128,6 +137,21 @@ function Trips() {
 
   return (
     <Layout style={{ padding: "0 50px" }}>
+      <Flex
+        justify="space-between"
+        align="center"
+        style={{ marginTop: 0, marginBottom: 10 }}
+      >
+        <h1>{t("Breadcrumbs.TRIPS")}</h1>
+        <Button
+          type="primary"
+          icon={<FileExcelOutlined />}
+          style={{ backgroundColor: "#217346" }} // Excel yeşili :)
+          onClick={handleExport}
+        >
+          {t("Common.EXPORT_EXCEL")}
+        </Button>
+      </Flex>
       <Flex gap={isMobile ? 10 : 25} style={{ marginBottom: 20 }}>
         <Search
           placeholder={t("Trips.SEARCH")}
