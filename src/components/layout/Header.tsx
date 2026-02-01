@@ -19,6 +19,7 @@ import {
   LoginOutlined,
   MenuOutlined,
   MoonOutlined,
+  SafetyCertificateOutlined,
   SunOutlined,
   UserOutlined,
 } from "@ant-design/icons";
@@ -201,6 +202,15 @@ function Header() {
       {!isMobile ? (
         <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
           <Button
+            type="dashed"
+            danger
+            icon={<SafetyCertificateOutlined />}
+            onClick={() => navigate(ROUTES.FIELD_OPS)}
+            style={{ marginRight: 10 }}
+          >
+            {t("FieldOps.BUTTON")}
+          </Button>
+          <Button
             ghost
             size="small"
             onClick={toggleLang}
@@ -317,6 +327,15 @@ function Header() {
               isLoggedIn ? userMenuItems.filter((i) => i && i.key !== "0") : []
             }
           />
+          {isLoggedIn && (
+            <div style={{ padding: "20px" }}>
+              <Link to={ROUTES.FIELD_OPS}>
+                <Button type="primary" block icon={<LoginOutlined />}>
+                  {t("FieldOps.BUTTON")}
+                </Button>
+              </Link>
+            </div>
+          )}
           {!isLoggedIn && (
             <div style={{ padding: "20px" }}>
               <Link to={ROUTES.LOGIN}>

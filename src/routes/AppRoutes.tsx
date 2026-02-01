@@ -10,6 +10,7 @@ import NotFoundPage from "../pages/common/NotFoundPage";
 import ErrorPage from "../pages/common/ErrorPage";
 import { ROUTES } from "../constants";
 import FAQ from "../pages/FAQ";
+import FieldDashboard from "../pages/field/FieldDashboard";
 
 function AppRoutes() {
   return createBrowserRouter([
@@ -49,6 +50,10 @@ function AppRoutes() {
         {
           path: ROUTES.FAQ,
           Component: FAQ,
+        },
+        {
+          path: ROUTES.FIELD_OPS,
+          Component: FieldDashboard,
         },
         {
           path: "*",

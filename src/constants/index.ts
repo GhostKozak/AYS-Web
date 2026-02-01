@@ -21,7 +21,8 @@ export const ROUTES = {
   DRIVERS: '/drivers',
   VEHICLES: '/vehicles',
   TRIPS: '/trips',
-  FAQ: '/sss'
+  FAQ: '/sss',
+  FIELD_OPS: '/field-operations'
 } as const;
 
 // HTTP Status Codes

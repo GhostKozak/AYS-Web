@@ -252,5 +252,32 @@
       "VAN": "Van",
       "TRAILER": "Trailer"
     }
+  },
+
+  "FieldOps": {
+    "BUTTON": "Field Mode",
+    "TITLE": "Field Operations",
+    "REFRESH": "Refresh",
+    "URGENT_ACTION": "⚠️ Unloaded Vehicles (Move to Park)",
+    "WAITING_VEHICLES": "⏳ Vehicles in Progress",
+    "COMPLETED_TODAY": "✅ Completed Today",
+    "PLATE": "Plate",
+    "DRIVER": "Driver",
+    "LOCATION": "Location",
+    "STATUS": "Status",
+    "LOC_RAMP": "Ramp / Warehouse Front",
+    "LOC_PARK": "Temporary Parking",
+    "ACTION_MOVE_TO_PARK": "Moved to Empty Park",
+    "NO_VEHICLES": "No vehicles in this status.",
+    "RAMP_VEHICLES": "In Ramp",
+    "PARK_VEHICLES": "In Park",
+    "TAB_URGENT": "Urgent",
+    "TAB_RAMP": "In Field",
+    "TAB_PARK": "Parking",
+    "TAG_RAMP": "In Progress",
+    "TAG_PARK": "Parked",
+    "LABEL_RAMP": "📍 Ramp / Warehouse Front",
+    "LABEL_PARK": "🅿️ Temporary Parking Area",
+    "REFRESH_SUCCESS": "Data refreshed successfully."
   }
 }

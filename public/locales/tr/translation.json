@@ -252,5 +252,32 @@
       "VAN": "Minivan",
       "TRAILER": "Dorse"
     }
+  },
+
+  "FieldOps": {
+    "BUTTON": "Saha Modu",
+    "TITLE": "Saha Operasyon",
+    "REFRESH": "Yenile",
+    "URGENT_ACTION": "⚠️ Boşalan Araçlar (Parka Çekilecek)",
+    "WAITING_VEHICLES": "⏳ İşlemdeki Araçlar",
+    "COMPLETED_TODAY": "✅ Bugün Çıkanlar",
+    "PLATE": "Plaka",
+    "DRIVER": "Sürücü",
+    "LOCATION": "Konum",
+    "STATUS": "Durum",
+    "LOC_RAMP": "Rampa / Antrepo Önü",
+    "LOC_PARK": "Geçici Park Alanı",
+    "ACTION_MOVE_TO_PARK": "Boş Parka Alındı",
+    "NO_VEHICLES": "Bu statüde araç yok.",
+    "RAMP_VEHICLES": "Sahada / Rampada",
+    "PARK_VEHICLES": "Parkta Bekleyenler",
+    "TAB_URGENT": "Acil",
+    "TAB_RAMP": "Sahada",
+    "TAB_PARK": "Parkta",
+    "TAG_RAMP": "İşlemde",
+    "TAG_PARK": "Parkta",
+    "LABEL_RAMP": "📍 Rampa / Antrepo Önü",
+    "LABEL_PARK": "🅿️ Geçici Park Alanında",
+    "REFRESH_SUCCESS": "Veriler başarıyla yenilendi."
   }
 }
