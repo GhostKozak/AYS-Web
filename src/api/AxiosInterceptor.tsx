@@ -42,7 +42,7 @@ export const AxiosInterceptor = () => {
         }
 
         return Promise.reject(error);
-      }
+      },
     );
 
     // Cleanup
