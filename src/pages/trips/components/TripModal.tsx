@@ -135,9 +135,9 @@ const TripModal = ({
         label: t("Trips.UNLOAD_STATUS"),
         key: "unload_status",
         getOldValue: (r) =>
-          r.unload_status ? t(`Common.STATUS_${r.unload_status}`) : "-",
+          r.unload_status ? t(`Trips.STATUS_${r.unload_status}`) : "-",
         getNewValue: (f) =>
-          f.unload_status ? t(`Common.STATUS_${f.unload_status}`) : "-",
+          f.unload_status ? t(`Trips.STATUS_${f.unload_status}`) : "-",
       },
       // Boolean değerler için "-" yerine direk Hayır dönebiliriz çünkü Switch uncheck ise false'dur.
       // Ama null gelme ihtimaline karşı yine de kontrol edelim.
@@ -174,6 +174,57 @@ const TripModal = ({
       },
     ]);
   }, [selectedRecord, currentValues, companies, drivers, vehicles, t]);
+
+  const companyOptions = useMemo(() => {
+    const existing = companies.map((c) => ({ label: c.name, value: c._id }));
+    if (companySearch && !companies.some((c) => c.name === companySearch)) {
+      existing.push({
+        label: `Yeni firma oluştur: ${companySearch}`,
+        value: companySearch,
+      });
+    }
+    return existing;
+  }, [companies, companySearch]);
+
+  const vehicleOptions = useMemo(() => {
+    const existing = vehicles.map((v) => ({
+      label: v.licence_plate,
+      value: v._id,
+    }));
+    if (
+      vehicleSearch &&
+      !vehicles.some((v) => v.licence_plate === vehicleSearch)
+    ) {
+      existing.push({
+        label: `Yeni araç oluştur: ${vehicleSearch}`,
+        value: vehicleSearch,
+      });
+    }
+    return existing;
+  }, [vehicles, vehicleSearch]);
+
+  const driverOptions = useMemo(() => {
+    const existing = drivers.map((d) => ({ label: d.full_name, value: d._id }));
+    if (driverSearch && !drivers.some((d) => d.full_name === driverSearch)) {
+      existing.push({
+        label: `Yeni sürücü oluştur: ${driverSearch}`,
+        value: driverSearch,
+      });
+    }
+    return existing;
+  }, [drivers, driverSearch]);
+
+  const unloadStatusOptions = useMemo(
+    () => [
+      { value: "WAITING", label: t("Trips.STATUS_WAITING") },
+      { value: "UNLOADING", label: t("Trips.STATUS_UNLOADING") },
+      { value: "UNLOADED", label: t("Trips.STATUS_UNLOADED") },
+      { value: "COMPLETED", label: t("Trips.STATUS_COMPLETED") },
+      { value: "CANCELED", label: t("Trips.STATUS_CANCELED") },
+      { value: "UNKNOWN", label: t("Trips.STATUS_UNKNOWN") },
+    ],
+    [t]
+  );
 
   const hasChanges = diffs.length > 0;
 
@@ -335,22 +386,8 @@ const TripModal = ({
                 filterOption={false}
                 onSearch={(val) => setCompanySearch(val)}
                 notFoundContent={null}
-              >
-                {companies.map((company) => (
-                  <Select.Option key={company._id} value={company._id}>
-                    {company.name}
-                  </Select.Option>
-                ))}
-                {companySearch &&
-                  !companies.some((c) => c.name === companySearch) && (
-                    <Select.Option
-                      key={`create-company-${companySearch}`}
-                      value={companySearch}
-                    >
-                      Yeni firma oluştur: {companySearch}
-                    </Select.Option>
-                  )}
-              </Select>
+                options={companyOptions}
+              />
             </Form.Item>
 
             <Form.Item
@@ -364,22 +401,8 @@ const TripModal = ({
                 filterOption={false}
                 onSearch={(val) => setVehicleSearch(val)}
                 notFoundContent={null}
-              >
-                {vehicles.map((vehicle) => (
-                  <Select.Option key={vehicle._id} value={vehicle._id}>
-                    {vehicle.licence_plate}
-                  </Select.Option>
-                ))}
-                {vehicleSearch &&
-                  !vehicles.some((v) => v.licence_plate === vehicleSearch) && (
-                    <Select.Option
-                      key={`create-vehicle-${vehicleSearch}`}
-                      value={vehicleSearch}
-                    >
-                      Yeni araç oluştur: {vehicleSearch}
-                    </Select.Option>
-                  )}
-              </Select>
+                options={vehicleOptions}
+              />
             </Form.Item>
 
             <Form.Item
@@ -394,22 +417,8 @@ const TripModal = ({
                 onSearch={(val) => setDriverSearch(val)}
                 notFoundContent={null}
                 onChange={handleDriverChange}
-              >
-                {drivers.map((driver) => (
-                  <Select.Option key={driver._id} value={driver._id}>
-                    {driver.full_name}
-                  </Select.Option>
-                ))}
-                {driverSearch &&
-                  !drivers.some((d) => d.full_name === driverSearch) && (
-                    <Select.Option
-                      key={`create-driver-${driverSearch}`}
-                      value={driverSearch}
-                    >
-                      Yeni sürücü oluştur: {driverSearch}
-                    </Select.Option>
-                  )}
-              </Select>
+                options={driverOptions}
+              />
             </Form.Item>
 
             {/* Sürücü mevcut değilse (Yeni ekleniyorsa) bu alanları göster */}
@@ -446,7 +455,7 @@ const TripModal = ({
             </Form.Item>
 
             <Form.Item label={t("Trips.UNLOAD_STATUS")} name="unload_status">
-              <Input />
+              <Select placeholder={t("Trips.UNLOAD_STATUS")} options={unloadStatusOptions} />
             </Form.Item>
 
             <Form.Item

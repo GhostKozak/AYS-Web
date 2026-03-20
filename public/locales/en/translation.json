@@ -198,6 +198,7 @@
     "DELETE_SUCCESS": "Trip record deleted.",
     "TOTAL": "total trips",
     "STATUS_WAITING": "Waiting",
+    "STATUS_UNLOADING": "Unloading",
     "STATUS_UNLOADED": "Unloaded",
     "STATUS_IN_PROGRESS": "In Progress",
     "STATUS_COMPLETED": "Completed",
