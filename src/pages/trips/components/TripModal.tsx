@@ -1,5 +1,6 @@
-import { Modal, Form, Input, Button, Select, Switch, Row, Col } from "antd";
+import { Modal, Form, Input, Button, Select, Switch, Row, Col, DatePicker } from "antd";
 import { useEffect, useMemo, useState } from "react";
+import dayjs from "dayjs";
 import { useCompanies } from "../../../hooks/useCompanies";
 import { useDrivers } from "../../../hooks/useDrivers";
 import { useVehicles } from "../../../hooks/useVehicles";
@@ -10,7 +11,7 @@ import {
   type VehicleType,
 } from "../../../types";
 import { useTranslation } from "react-i18next";
-import { calculateDiffs, formatLicencePlate } from "../../../utils";
+import { calculateDiffs, formatLicencePlate } from "../../../utils/index";
 import DiffViewer from "../../common/DiffViewer";
 
 interface TripFormValues {
@@ -72,12 +73,12 @@ const TripModal = ({
         formKey: "arrival_time",
         getOldValue: (r) =>
           r.arrival_time
-            ? new Date(r.arrival_time).toLocaleString("tr-TR")
+            ? dayjs(r.arrival_time).format("DD.MM.YYYY HH:mm:ss")
             : "-",
         // Fix: Değer yoksa "-" döndür, böylece değişiklik yok sayılır
         getNewValue: (f) =>
           f.arrival_time
-            ? new Date(f.arrival_time).toLocaleString("tr-TR")
+            ? dayjs(f.arrival_time).format("DD.MM.YYYY HH:mm:ss")
             : "-",
       },
       {
@@ -86,11 +87,11 @@ const TripModal = ({
         formKey: "departure_time",
         getOldValue: (r) =>
           r.departure_time
-            ? new Date(r.departure_time).toLocaleString("tr-TR")
+            ? dayjs(r.departure_time).format("DD.MM.YYYY HH:mm:ss")
             : "-",
         getNewValue: (f) =>
           f.departure_time
-            ? new Date(f.departure_time).toLocaleString("tr-TR")
+            ? dayjs(f.departure_time).format("DD.MM.YYYY HH:mm:ss")
             : "-",
       },
       {
@@ -182,12 +183,8 @@ const TripModal = ({
         setIsExistingDriver(true);
         const toInputDate = (iso?: string) => {
           if (!iso) return undefined;
-          const d = new Date(iso);
-          if (Number.isNaN(d.getTime())) return undefined;
-          const pad = (n: number) => String(n).padStart(2, "0");
-          return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(
-            d.getDate()
-          )}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+          const d = dayjs(iso);
+          return d.isValid() ? d : undefined;
         };
 
         form.setFieldsValue({
@@ -280,11 +277,11 @@ const TripModal = ({
       });
 
       // Convert datetime-local back to ISO strings before sending
-      const toISO = (val?: string) => {
+      const toISO = (val?: any) => {
         if (!val) return undefined;
-        const d = new Date(val);
-        if (Number.isNaN(d.getTime())) return undefined;
-        return d.toISOString();
+        // DatePicker value is a dayjs object
+        const d = dayjs(val);
+        return d.isValid() ? d.toISOString() : undefined;
       };
       finalValues.departure_time = toISO(finalValues.departure_time);
       finalValues.arrival_time = toISO(finalValues.arrival_time);
@@ -441,11 +438,11 @@ const TripModal = ({
             )}
 
             <Form.Item label={t("Trips.DEPARTURE_TIME")} name="departure_time">
-              <Input type="datetime-local" />
+              <DatePicker style={{ width: '100%' }} showTime format="DD.MM.YYYY HH:mm:ss" />
             </Form.Item>
 
             <Form.Item label={t("Trips.ARRIVAL_TIME")} name="arrival_time">
-              <Input type="datetime-local" />
+              <DatePicker style={{ width: '100%' }} showTime format="DD.MM.YYYY HH:mm:ss" />
             </Form.Item>
 
             <Form.Item label={t("Trips.UNLOAD_STATUS")} name="unload_status">
