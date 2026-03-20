@@ -5,7 +5,7 @@ import type { CreateTripPayload } from "../types";
 export const tripApi = {
   getAll: async () => {
     const response = await apiClient.get(API_ENDPOINTS.TRIPS);
-    return response.data.data;
+    return response.data.data || [];
   },
 
   create: async (payload: CreateTripPayload) => {

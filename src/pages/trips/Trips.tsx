@@ -25,7 +25,7 @@ import { RoleGuard } from "../../components/auth/RoleGuard";
 
 function Trips() {
   const { t } = useTranslation();
-  const { message, notification, modal } = App.useApp();
+  const { notification } = App.useApp();
 
   const [searchText, setSearchText] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);

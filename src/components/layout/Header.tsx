@@ -249,11 +249,13 @@ function Header() {
               </a>
             </Dropdown>
           ) : (
-            <Link to={ROUTES.LOGIN}>
-              <Button type="primary" icon={<LoginOutlined />}>
-                {t("Header.LOGIN")}
-              </Button>
-            </Link>
+            <Button
+              type="primary"
+              icon={<LoginOutlined />}
+              onClick={() => navigate(ROUTES.LOGIN)}
+            >
+              {t("Header.LOGIN")}
+            </Button>
           )}
         </div>
       ) : (
@@ -338,11 +340,17 @@ function Header() {
           )}
           {!isLoggedIn && (
             <div style={{ padding: "20px" }}>
-              <Link to={ROUTES.LOGIN}>
-                <Button type="primary" block icon={<LoginOutlined />}>
-                  {t("Header.LOGIN")}
-                </Button>
-              </Link>
+              <Button
+                type="primary"
+                block
+                icon={<LoginOutlined />}
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  navigate(ROUTES.LOGIN);
+                }}
+              >
+                {t("Header.LOGIN")}
+              </Button>
             </div>
           )}
         </div>

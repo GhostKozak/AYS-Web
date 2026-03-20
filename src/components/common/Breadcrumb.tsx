@@ -25,7 +25,7 @@ function Breadcrumb() {
     },
     ...pathSegments.map((segment, index) => {
       const path = `/${pathSegments.slice(0, index + 1).join("/")}`;
-      const title = getSegmentTitle(segment);
+      const title = getSegmentTitle(segment, t);
 
       // Son segment ise link olmasın
       if (index === pathSegments.length - 1) {
@@ -50,9 +50,7 @@ function Breadcrumb() {
   );
 }
 
-function getSegmentTitle(segment: string): string {
-  const { t } = useTranslation();
-
+function getSegmentTitle(segment: string, t: any): string {
   const titleMap: Record<string, string> = {
     [ROUTES.DASHBOARD.split("/")[1]]: t("Breadcrumbs.DASHBOARD"),
     [ROUTES.LOGIN.split("/")[1]]: t("Breadcrumbs.LOGIN"),

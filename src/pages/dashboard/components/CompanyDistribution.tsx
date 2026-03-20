@@ -2,15 +2,6 @@ import { useCompanyStats } from "../../../hooks/useDashboard";
 import type { TripType } from "../../../types";
 import { ResponsivePie } from "@nivo/pie";
 
-const COLORS = [
-  "#0088FE",
-  "#00C49F",
-  "#FFBB28",
-  "#FF8042",
-  "#AF19FF",
-  "#8884d8",
-];
-
 function CompanyDistribution({ trips }: { trips: TripType[] }) {
   const data = useCompanyStats(trips);
 

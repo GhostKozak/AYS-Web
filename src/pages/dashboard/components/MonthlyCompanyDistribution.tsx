@@ -1,23 +1,6 @@
-import {
-  PieChart,
-  Pie,
-  Cell,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from "recharts";
 import { useMonthCompanyStats } from "../../../hooks/useDashboard";
 import type { TripType } from "../../../types";
 import { ResponsivePie } from "@nivo/pie";
-
-const COLORS = [
-  "#0088FE",
-  "#00C49F",
-  "#FFBB28",
-  "#FF8042",
-  "#AF19FF",
-  "#8884d8",
-];
 
 function MonthlyCompanyDistribution({ trips }: { trips: TripType[] }) {
   // Veriyi hook sayesinde hesapla
