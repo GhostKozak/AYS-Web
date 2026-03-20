@@ -281,8 +281,10 @@ function Header() {
         placement="right"
         onClose={() => setIsMobileMenuOpen(false)}
         open={isMobileMenuOpen}
-        width={280}
-        styles={{ body: { padding: 0 } }}
+        styles={{ 
+          body: { padding: 0 },
+          wrapper: { width: 280 }
+        }}
       >
         {isLoggedIn && (
           <div

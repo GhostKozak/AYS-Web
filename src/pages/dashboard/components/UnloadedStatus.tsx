@@ -1,33 +1,56 @@
-import { useVehicleUnloadStats } from "../../../hooks/useDashboard";
-import type { TripType } from "../../../types";
+import { useStatusDistribution } from "../../../hooks/useReports";
 import { ResponsivePie } from "@nivo/pie";
+import { Skeleton } from "antd";
+import { useTranslation } from "react-i18next";
 
-function UnloadedStatus({ trips }: { trips: TripType[] }) {
-  const data = useVehicleUnloadStats(trips);
+const STATUS_COLORS: Record<string, string> = {
+  WAITING: "#faad14", // Sarı
+  UNLOADING: "#1890ff", // Mavi (Yeni ekledim, backend dokümanında var)
+  UNLOADED: "#52c41a", // Yeşil
+  CANCELED: "#ff4d4f", // Kırmızı
+  UNKNOWN: "#d9d9d9", // Gri
+};
+
+function UnloadedStatus() {
+  const { t } = useTranslation();
+  const { data: rawData, isLoading } = useStatusDistribution("today");
+
+  const data = rawData ? [
+    ...Object.entries(rawData.statuses || {}).map(([key, value]) => ({
+      id: t(`Trips.STATUS_${key}`),
+      label: t(`Trips.STATUS_${key}`),
+      value: value as number,
+      color: STATUS_COLORS[key] || STATUS_COLORS.UNKNOWN
+    })),
+    // İptal edilenler ayrı bir alandaysa ekleyelim
+    ...(rawData.canceled ? [{
+      id: t("Trips.STATUS_CANCELED"),
+      label: t("Trips.STATUS_CANCELED"),
+      value: rawData.canceled,
+      color: STATUS_COLORS.CANCELED
+    }] : [])
+  ] : [];
+
+  if (isLoading) return <Skeleton active paragraph={{ rows: 8 }} />;
 
   return (
     <div style={{ width: "100%", height: 300, marginBlock: 25 }}>
       <ResponsivePie
         data={data}
         margin={{ top: 40, right: 80, bottom: 80, left: 80 }}
-        innerRadius={0.6} // Ortasını delerek Donut yapar (0.5 - 0.8 arası iyidir)
-        padAngle={0.7} // Dilimler arası boşluk (Modern görünüm için şart)
-        cornerRadius={3} // Dilim kenarlarını yuvarlar
-        activeOuterRadiusOffset={8} // Üzerine gelince büyüme efekti
+        innerRadius={0.6}
+        padAngle={0.7}
+        cornerRadius={3}
+        activeOuterRadiusOffset={8}
         colors={{ datum: "data.color" }}
         borderWidth={1}
         borderColor={{ from: "color", modifiers: [["darker", 0.2]] }}
-        // Ortadaki yazıları kapatıp (çünkü çok sıkışık oluyor),
-        // sadece kenara çizgi çekerek gösterelim:
         arcLinkLabelsSkipAngle={10}
-        arcLinkLabelsTextColor="#ffffff" // Dark mode için beyaz yazı
+        arcLinkLabelsTextColor="#ffffff"
         arcLinkLabelsThickness={2}
         arcLinkLabelsColor={{ from: "color" }}
-        // Dilimlerin içindeki sayıları gizlemek istersen false yap
         arcLabelsSkipAngle={10}
         arcLabelsTextColor={{ from: "color", modifiers: [["darker", 2]] }}
-        // Ortaya "Toplam" veya yüzde yazdırmak için bir katman eklenebilir
-        // Ancak en basit haliyle Nivo'nun "Legends" özelliğini kullanabilirsin
         legends={[
           {
             anchor: "bottom",

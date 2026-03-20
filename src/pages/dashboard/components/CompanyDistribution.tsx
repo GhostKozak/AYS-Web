@@ -1,33 +1,36 @@
-import { useCompanyStats } from "../../../hooks/useDashboard";
-import type { TripType } from "../../../types";
+import { useTopCompanies } from "../../../hooks/useReports";
 import { ResponsivePie } from "@nivo/pie";
+import { Skeleton } from "antd";
 
-function CompanyDistribution({ trips }: { trips: TripType[] }) {
-  const data = useCompanyStats(trips);
+function CompanyDistribution() {
+  const { data: rawData, isLoading } = useTopCompanies("all");
+
+  const data = (rawData || []).map((item: any) => ({
+    id: item.companyName,
+    label: item.companyName,
+    value: item.tripCount,
+  }));
+
+  if (isLoading) return <Skeleton active paragraph={{ rows: 8 }} />;
 
   return (
     <div style={{ width: "100%", height: 300, marginBlock: 25 }}>
       <ResponsivePie
         data={data}
         margin={{ top: 40, right: 80, bottom: 80, left: 80 }}
-        innerRadius={0.5} // Ortasını delerek Donut yapar (0.5 - 0.8 arası iyidir)
-        padAngle={3} // Dilimler arası boşluk (Modern görünüm için şart)
-        cornerRadius={3} // Dilim kenarlarını yuvarlar
-        activeOuterRadiusOffset={8} // Üzerine gelince büyüme efekti
-        colors={{ scheme: "dark2" }} // Verideki renkleri kullan
+        innerRadius={0.5}
+        padAngle={3}
+        cornerRadius={3}
+        activeOuterRadiusOffset={8}
+        colors={{ scheme: "dark2" }}
         borderWidth={1}
         borderColor={{ from: "color", modifiers: [["darker", 0.2]] }}
-        // Ortadaki yazıları kapatıp (çünkü çok sıkışık oluyor),
-        // sadece kenara çizgi çekerek gösterelim:
         arcLinkLabelsSkipAngle={10}
-        arcLinkLabelsTextColor="#ffffff" // Dark mode için beyaz yazı
+        arcLinkLabelsTextColor="#ffffff"
         arcLinkLabelsThickness={2}
         arcLinkLabelsColor={{ from: "color" }}
-        // Dilimlerin içindeki sayıları gizlemek istersen false yap
         arcLabelsSkipAngle={10}
         arcLabelsTextColor={{ from: "color", modifiers: [["darker", 2]] }}
-        // Ortaya "Toplam" veya yüzde yazdırmak için bir katman eklenebilir
-        // Ancak en basit haliyle Nivo'nun "Legends" özelliğini kullanabilirsin
         legends={[
           {
             anchor: "bottom",

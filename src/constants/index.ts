@@ -10,7 +10,17 @@ export const API_ENDPOINTS = {
   DRIVERS: '/drivers',
   DRIVERS_SEARCH: '/drivers/search',
   VEHICLES: '/vehicles',
-  TRIPS: '/trips'
+  TRIPS: '/trips',
+  REPORTS: {
+    TOP_COMPANIES: '/reports/top-companies',
+    UNLOAD_WAITING: '/reports/unload-waiting',
+    STATUS_DISTRIBUTION: '/reports/status-distribution',
+    AVERAGE_TURNAROUND: '/reports/average-turnaround',
+    TREND: '/reports/trend',
+    DASHBOARD_SUMMARY: '/reports/dashboard-summary',
+    EXPORT_EXCEL: '/reports/export/excel',
+    EXPORT_PDF: '/reports/export/pdf'
+  }
 } as const;
 
 // Route Paths

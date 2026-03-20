@@ -6,10 +6,16 @@ import {
   AppstoreOutlined,
 } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
+import { useDashboardSummary } from "../../../hooks/useReports";
 
 function StatsOverview() {
   const { t } = useTranslation();
-  const isLoading = false;
+  const { data, isLoading } = useDashboardSummary();
+
+  const stats = data?.today || {
+    totalTrips: 0,
+    waitingToUnload: 0,
+  };
 
   return (
     <Row gutter={[16, 16]}>
@@ -17,8 +23,31 @@ function StatsOverview() {
         <Card>
           <Skeleton loading={isLoading} active paragraph={{ rows: 1 }}>
             <Statistic
+              title={t("Stats.TOTAL_TRIPS_TODAY")}
+              value={stats.totalTrips}
+              prefix={<AppstoreOutlined />}
+            />
+          </Skeleton>
+        </Card>
+      </Col>
+      <Col xs={24} sm={12} md={6}>
+        <Card>
+          <Skeleton loading={isLoading} active paragraph={{ rows: 1 }}>
+            <Statistic
+              title={t("Stats.WAITING_TO_UNLOAD")}
+              value={stats.waitingToUnload}
+              prefix={<CarOutlined />}
+              styles={{ content: { color: stats.waitingToUnload > 0 ? "#faad14" : "inherit" } }}
+            />
+          </Skeleton>
+        </Card>
+      </Col>
+      <Col xs={24} sm={12} md={6}>
+        <Card>
+          <Skeleton loading={isLoading} active paragraph={{ rows: 1 }}>
+            <Statistic
               title={t("Stats.TOTAL_COMPANY")}
-              value={12}
+              value={data?.totalCompanies || 0}
               prefix={<TeamOutlined />}
             />
           </Skeleton>
@@ -29,30 +58,8 @@ function StatsOverview() {
           <Skeleton loading={isLoading} active paragraph={{ rows: 1 }}>
             <Statistic
               title={t("Stats.TOTAL_DRIVER")}
-              value={48}
+              value={data?.totalDrivers || 0}
               prefix={<UserOutlined />}
-            />
-          </Skeleton>
-        </Card>
-      </Col>
-      <Col xs={24} sm={12} md={6}>
-        <Card>
-          <Skeleton loading={isLoading} active paragraph={{ rows: 1 }}>
-            <Statistic
-              title={t("Stats.TOTAL_VEHICLE")}
-              value={156}
-              prefix={<CarOutlined />}
-            />
-          </Skeleton>
-        </Card>
-      </Col>
-      <Col xs={24} sm={12} md={6}>
-        <Card>
-          <Skeleton loading={isLoading} active paragraph={{ rows: 1 }}>
-            <Statistic
-              title={t("Stats.ACTIVE_TRIP")}
-              value={8}
-              prefix={<AppstoreOutlined />}
             />
           </Skeleton>
         </Card>

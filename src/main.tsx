@@ -12,7 +12,7 @@ const queryClient = new QueryClient();
 
 createRoot(document.getElementById("root")!).render(
   <AppConfigProvider>
-    <AntdApp>
+    <AntdApp notification={{ top: 70 }} message={{ top: 70 }}>
       <QueryClientProvider client={queryClient}>
         <RouterProvider router={AppRoutes()} />
         <ReactQueryDevtools

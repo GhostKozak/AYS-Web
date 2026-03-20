@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Card, List, Avatar, Tag, Typography, Space, theme } from "antd";
+import { Card, Flex, Avatar, Tag, Typography, Space, theme } from "antd";
 import { TruckOutlined, ClockCircleOutlined } from "@ant-design/icons";
 import type { TripType } from "../../../types";
 import { useTranslation } from "react-i18next";
@@ -82,28 +82,31 @@ const LiveOperationsList = ({ trips }: { trips: TripType[] }) => {
         },
       }}
     >
-      <List
-        itemLayout="horizontal"
-        dataSource={latestTrips}
-        locale={{ emptyText: t("Common.NO_DATA_YET") }}
-        renderItem={(trip) => {
-          const timeString = trip.arrival_time
-            ? new Date(trip.arrival_time).toLocaleTimeString("tr-TR", {
-                hour: "2-digit",
-                minute: "2-digit",
-              })
-            : "-";
+      <Flex vertical gap={0}>
+        {latestTrips.length === 0 ? (
+          <div style={{ padding: "40px", textAlign: "center", color: token.colorTextTertiary }}>
+            {t("Common.NO_DATA_YET")}
+          </div>
+        ) : (
+          latestTrips.map((trip) => {
+            const timeString = trip.arrival_time
+              ? new Date(trip.arrival_time).toLocaleTimeString("tr-TR", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })
+              : "-";
 
-          return (
-            <List.Item
-              style={{
-                borderBottom: `1px solid ${token.colorBorderSecondary}`,
-                padding: "12px 8px",
-              }}
-            >
-              <List.Item.Meta
-                // Kamyon İkonu (Avatar içinde)
-                avatar={
+            return (
+              <Flex
+                key={trip._id}
+                justify="space-between"
+                align="center"
+                style={{
+                  borderBottom: `1px solid ${token.colorBorderSecondary}`,
+                  padding: "12px 8px",
+                }}
+              >
+                <Flex gap="middle" align="center">
                   <Avatar
                     shape="square"
                     icon={<TruckOutlined />}
@@ -112,48 +115,42 @@ const LiveOperationsList = ({ trips }: { trips: TripType[] }) => {
                       color: token.colorPrimary,
                     }}
                   />
-                }
-                // Plaka Bilgisi (Başlık)
-                title={
-                  <Text strong style={{ fontSize: 14 }}>
-                    {trip.vehicle?.licence_plate || t("Common.NO_PLATE")}
-                  </Text>
-                }
-                // Firma Bilgisi (Alt Başlık)
-                description={
-                  <Text type="secondary" style={{ fontSize: 12 }}>
-                    {trip.company?.name || t("Common.UNKNOWN_COMPANY")}
-                  </Text>
-                }
-              />
+                  <div>
+                    <div style={{ fontWeight: "bold", fontSize: 14, color: token.colorText }}>
+                      {trip.vehicle?.licence_plate || t("Common.NO_PLATE")}
+                    </div>
+                    <div style={{ fontSize: 12, color: token.colorTextSecondary }}>
+                      {trip.company?.name || t("Common.UNKNOWN_COMPANY")}
+                    </div>
+                  </div>
+                </Flex>
 
-              {/* Listenin Sağ Tarafı (Durum ve Saat) */}
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "flex-end",
-                  gap: 4,
-                }}
-              >
-                {getStatusTag(trip.unload_status, t)}
-
-                <Space size={4}>
-                  <ClockCircleOutlined
-                    style={{ fontSize: 10, color: token.colorTextTertiary }}
-                  />
-                  <Text
-                    type="secondary"
-                    style={{ fontSize: 11, fontFamily: "monospace" }}
-                  >
-                    {timeString}
-                  </Text>
-                </Space>
-              </div>
-            </List.Item>
-          );
-        }}
-      />
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "flex-end",
+                    gap: 4,
+                  }}
+                >
+                  {getStatusTag(trip.unload_status, t)}
+                  <Space size={4}>
+                    <ClockCircleOutlined
+                      style={{ fontSize: 10, color: token.colorTextTertiary }}
+                    />
+                    <Text
+                      type="secondary"
+                      style={{ fontSize: 11, fontFamily: "monospace" }}
+                    >
+                      {timeString}
+                    </Text>
+                  </Space>
+                </div>
+              </Flex>
+            );
+          })
+        )}
+      </Flex>
     </Card>
   );
 };

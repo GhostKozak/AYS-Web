@@ -9,8 +9,9 @@ import {
   Flex,
   FloatButton,
   Typography,
+  App,
+  Space,
 } from "antd";
-import { useTrips } from "../../hooks/useTrips";
 import CompanyDistribution from "./components/CompanyDistribution";
 import MonthlyCompanyDistribution from "./components/MonthlyCompanyDistribution";
 import StatsOverview from "./components/StatsOverview";
@@ -20,16 +21,20 @@ import YearlyActivityMap from "./components/YearlyActivityMap";
 import LiveOperationsList from "./components/LiveOperationsList";
 import { WidthProvider, Responsive } from "react-grid-layout/legacy";
 import { DashboardWidget } from "./components/DashboardWidget";
-import { FileExcelOutlined, SettingOutlined } from "@ant-design/icons";
+import { FileExcelOutlined, FilePdfOutlined, SettingOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
-import { exportDailyDashboard } from "../../utils/excel.utils";
+import { reportApi } from "../../api/reportApi";
+import { useTrips } from "../../hooks/useTrips";
 
 const { Text } = Typography;
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
 function DashboardPage() {
   const { t } = useTranslation();
-  const { trips } = useTrips();
+  const { message } = App.useApp();
+  const { trips } = useTrips(); // Live list için hala gerekebilir veya summary'den alınabilir
+  const [isExporting, setIsExporting] = useState(false);
+
   const [visibleWidgets, setVisibleWidgets] = useState({
     weekly: true,
     live: true,
@@ -40,8 +45,33 @@ function DashboardPage() {
   });
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
-  const handleExport = () => {
-    exportDailyDashboard(trips);
+  const handleExport = async (type: 'excel' | 'pdf') => {
+    setIsExporting(true);
+    try {
+      const data = type === 'excel' 
+        ? await reportApi.exportExcel('today')
+        : await reportApi.exportPdf('today');
+      
+      const blob = new Blob([data], { 
+        type: type === 'excel' 
+          ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+          : 'application/pdf' 
+      });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      const dateStr = new Date().toISOString().split('T')[0];
+      link.setAttribute('download', `Rapor_${dateStr}.${type === 'excel' ? 'xlsx' : 'pdf'}`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      message.success(t("Common.EXPORT_SUCCESS"));
+    } catch (error) {
+      console.error(error);
+      message.error(t("Common.EXPORT_ERROR"));
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   const myLayout = {
@@ -103,14 +133,26 @@ function DashboardPage() {
       >
         <h1 style={{ marginBottom: 0 }}>{t("Dashboard.TITLE")}</h1>
 
-        <Button
-          type="primary"
-          icon={<FileExcelOutlined />}
-          style={{ backgroundColor: "#217346" }} // Excel yeşili :)
-          onClick={handleExport}
-        >
-          {t("Common.EXPORT_EXCEL")}
-        </Button>
+        <Space>
+          <Button
+            type="primary"
+            icon={<FileExcelOutlined />}
+            style={{ backgroundColor: "#217346" }}
+            onClick={() => handleExport('excel')}
+            loading={isExporting}
+          >
+            {t("Common.EXPORT_EXCEL")}
+          </Button>
+          <Button
+            type="primary"
+            danger
+            icon={<FilePdfOutlined />}
+            onClick={() => handleExport('pdf')}
+            loading={isExporting}
+          >
+            {t("Common.EXPORT_PDF")}
+          </Button>
+        </Space>
       </Flex>
       <StatsOverview />
       <ResponsiveGridLayout
@@ -129,7 +171,7 @@ function DashboardPage() {
               title={t("Dashboard.TOP_COMPANIES")}
               onClose={() => toggleWidget("company", false)}
             >
-              <CompanyDistribution trips={trips} />
+              <CompanyDistribution />
             </DashboardWidget>
           </div>
         )}
@@ -140,7 +182,7 @@ function DashboardPage() {
               title={t("Dashboard.MONTHLY_COMPANIES")}
               onClose={() => toggleWidget("monthlyCompany", false)}
             >
-              <MonthlyCompanyDistribution trips={trips} />
+              <MonthlyCompanyDistribution />
             </DashboardWidget>
           </div>
         )}
@@ -151,7 +193,7 @@ function DashboardPage() {
               title={t("Dashboard.TODAY_UNLOAD_STATUS")}
               onClose={() => toggleWidget("unloaded", false)}
             >
-              <UnloadedStatus trips={trips} />
+              <UnloadedStatus />
             </DashboardWidget>
           </div>
         )}
@@ -180,7 +222,7 @@ function DashboardPage() {
               title={t("Dashboard.WEEKLY_ACTIVITY")}
               onClose={() => toggleWidget("weekly", false)}
             >
-              <WeeklyActivityChart trips={trips} />
+              <WeeklyActivityChart />
             </DashboardWidget>
           </div>
         )}
@@ -191,7 +233,7 @@ function DashboardPage() {
               title={t("Dashboard.YEARLY_ACTIVITY")}
               onClose={() => toggleWidget("yearly", false)}
             >
-              <YearlyActivityMap trips={trips} />
+              <YearlyActivityMap />
             </DashboardWidget>
           </div>
         )}

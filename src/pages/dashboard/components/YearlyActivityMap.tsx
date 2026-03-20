@@ -1,52 +1,51 @@
-// components/YearlyActivityMap.tsx
 import { ResponsiveCalendar } from "@nivo/calendar";
-import { useCalendarStats } from "../../../hooks/useDashboard";
-import type { TripType } from "../../../types";
+import { useReportTrend } from "../../../hooks/useReports";
+import { Skeleton } from "antd";
 
-// Bu Yılın Başlangıç ve Bitiş Tarihleri
 const currentYear = new Date().getFullYear();
 const fromDate = `${currentYear}-01-01`;
 const toDate = `${currentYear}-12-31`;
 
-const YearlyActivityMap = ({ trips }: { trips: TripType[] }) => {
-  const data = useCalendarStats(trips);
+const YearlyActivityMap = () => {
+  const { data: rawData, isLoading } = useReportTrend("year");
+
+  const data = (rawData || []).map((item: any) => ({
+    day: item.timestamp,
+    value: item.count,
+  }));
+
+  if (isLoading) return <Skeleton active paragraph={{ rows: 6 }} />;
 
   return (
-    // Calendar genelde geniş olduğu için yükseklik 200-250px yeterlidir
     <div style={{ height: 220, width: "100%", marginBlock: 30 }}>
       <ResponsiveCalendar
         data={data}
         from={fromDate}
         to={toDate}
-        emptyColor="#1f2937" // Boş günler (Senin kart arka plan renginle aynı olmalı)
-        // RENK PALETİ: Koyu Yeşilden -> Parlak Neon Yeşile
+        emptyColor="#1f2937"
         colors={["#064e3b", "#065f46", "#047857", "#10b981"]}
         margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
         yearSpacing={40}
-        // Ay İsimleri ve Sınırları
-        monthBorderColor="#000000" // Arka plan siyahsa sınır görünmesin diye
+        monthBorderColor="#000000"
         monthLegendOffset={10}
-        // Gün Kutucukları
         dayBorderWidth={2}
-        dayBorderColor="#000000" // Kutucukların arası ayrılsın (Siyah çizgi)
-        daySpacing={0} // Border kullandığımız için spacing 0 olabilir
-        // Dark Mode Teması
+        dayBorderColor="#000000"
+        daySpacing={0}
         theme={{
           text: {
-            fill: "#9ca3af", // Ay ve Gün isimleri (Gri)
+            fill: "#9ca3af",
             fontSize: 12,
           },
           tooltip: {
             container: {
-              background: "#111827", // Tooltip arka planı (Simsiyah)
-              color: "#10b981", // Tooltip yazı rengi (Yeşil)
+              background: "#111827",
+              color: "#10b981",
               fontSize: "13px",
               borderRadius: "4px",
               boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.5)",
             },
           },
         }}
-        // Tooltip İçeriği (Türkçe Tarih Göstermek İçin)
         tooltip={({ day, value, color }) => (
           <div style={{ padding: 12, color, backgroundColor: "#111827" }}>
             <strong>

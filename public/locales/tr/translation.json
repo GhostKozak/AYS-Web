@@ -32,7 +32,9 @@
     "TOTAL_COMPANY": "Toplam Firma",
     "TOTAL_DRIVER": "Toplam Sürücü",
     "TOTAL_VEHICLE": "Toplam Araç",
-    "ACTIVE_TRIP": "Aktif Sefer"
+    "ACTIVE_TRIP": "Aktif Sefer",
+    "TOTAL_TRIPS_TODAY": "Bugün Toplam Sefer",
+    "WAITING_TO_UNLOAD": "Boşaltma Bekleyen"
   },
 
   "Login": {
@@ -71,7 +73,10 @@
     "NO_DATA_YET": "Henüz veri yok...",
     "NO_DATA_THIS_MONTH": "Bu ay veri yok",
     "CHANGES": "Değişiklikler",
-    "EXPORT_EXCEL": "Excel'e Aktar"
+    "EXPORT_EXCEL": "Excel'e Aktar",
+    "EXPORT_PDF": "PDF'e Aktar",
+    "EXPORT_SUCCESS": "Dosya başarıyla indirildi.",
+    "EXPORT_ERROR": "Dosya indirilirken bir hata oluştu."
   },
 
   "Table": {

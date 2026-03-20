@@ -32,7 +32,9 @@
     "TOTAL_COMPANY": "Total Companies",
     "TOTAL_DRIVER": "Total Drivers",
     "TOTAL_VEHICLE": "Total Vehicles",
-    "ACTIVE_TRIP": "Active Trips"
+    "ACTIVE_TRIP": "Active Trips",
+    "TOTAL_TRIPS_TODAY": "Total Trips Today",
+    "WAITING_TO_UNLOAD": "Waiting to Unload"
   },
 
   "Login": {
@@ -71,7 +73,10 @@
     "NO_DATA_YET": "No data yet...",
     "NO_DATA_THIS_MONTH": "No data this month",
     "CHANGES": "Changes",
-    "EXPORT_EXCEL": "Export to Excel"
+    "EXPORT_EXCEL": "Export to Excel",
+    "EXPORT_PDF": "Export to PDF",
+    "EXPORT_SUCCESS": "File downloaded successfully.",
+    "EXPORT_ERROR": "Error downloading file."
   },
 
   "Table": {
