@@ -138,7 +138,31 @@ export default function TripTable({
         title: t("Trips.UNLOAD_STATUS"),
         dataIndex: "unload_status",
         key: "unload_status",
-        render: (val: string) => (val ? t(`Trips.STATUS_${val}`) : "-"),
+        render: (val: string) => {
+          if (!val) return "-";
+          
+          const colorMap: Record<string, string> = {
+            WAITING: "warning",
+            UNLOADING: "processing",
+            UNLOADED: "success",
+            COMPLETED: "success",
+            CANCELED: "error",
+          };
+
+          return (
+            <Tag color={colorMap[val] || "default"}>
+              {t(`Trips.STATUS_${val}`)}
+            </Tag>
+          );
+        },
+        filters: [
+          { text: t("Trips.STATUS_WAITING"), value: "WAITING" },
+          { text: t("Trips.STATUS_UNLOADING"), value: "UNLOADING" },
+          { text: t("Trips.STATUS_UNLOADED"), value: "UNLOADED" },
+          { text: t("Trips.STATUS_COMPLETED"), value: "COMPLETED" },
+          { text: t("Trips.STATUS_CANCELED"), value: "CANCELED" },
+        ],
+        onFilter: (value, record) => record.unload_status === value,
       },
       {
         title: t("Trips.GPS_TRACKING"),
