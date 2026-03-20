@@ -1,21 +1,63 @@
-import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
+import { saveAs } from 'file-saver';
 import i18next from 'i18next';
 import type { TripType, CompanyType, DriverType, VehicleType } from '../types';
 
 // Ortak Kaydetme Fonksiyonu
-const saveAsExcel = (data: any[], fileNameKey: string, sheetName: string, colWidths: any[]) => {
-  const worksheet = XLSX.utils.json_to_sheet(data);
-  worksheet['!cols'] = colWidths;
-  
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
-  
+const saveAsExcel = async (data: any[], fileNameKey: string, sheetName: string, colWidths: { width: number }[]) => {
+  const workbook = new ExcelJS.Workbook();
+  const worksheet = workbook.addWorksheet(sheetName);
+
+  // Başlıkları ekle
+  if (data.length > 0) {
+    const columns = Object.keys(data[0]).map((key, index) => ({
+      header: key,
+      key: key,
+      width: colWidths[index]?.width || 20
+    }));
+    worksheet.columns = columns;
+
+    // Verileri ekle
+    worksheet.addRows(data);
+
+    // Genel Stil Ayarları (Font: Calibri, 11pt)
+    worksheet.getRows(1, worksheet.rowCount)?.forEach(row => {
+      row.font = { name: 'Calibri', size: 11 };
+      row.alignment = { vertical: 'middle', horizontal: 'left' };
+    });
+
+    // Başlık (Header) Stili
+    const headerRow = worksheet.getRow(1);
+    headerRow.height = 25;
+    headerRow.font = { name: 'Calibri', size: 12, bold: true, color: { argb: 'FFFFFFFF' } };
+    headerRow.fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FF1F4E78' } // Koyu Mavi (Premium Excel Görünümü)
+    };
+    headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
+
+    // Kenarlıklar ekle
+    worksheet.eachRow((row) => {
+      row.eachCell((cell) => {
+        cell.border = {
+          top: { style: 'thin', color: { argb: 'FFD9D9D9' } },
+          left: { style: 'thin', color: { argb: 'FFD9D9D9' } },
+          bottom: { style: 'thin', color: { argb: 'FFD9D9D9' } },
+          right: { style: 'thin', color: { argb: 'FFD9D9D9' } }
+        };
+      });
+    });
+  }
+
   // Dosya Adı Çevirisi
   const baseName = i18next.t(`Excel.fileNames.${fileNameKey}`);
   const dateStr = new Date().toLocaleDateString('tr-TR').replace(/\./g, '_');
   const fullFileName = `${baseName}_${dateStr}.xlsx`;
 
-  XLSX.writeFile(workbook, fullFileName);
+  // Yaz ve Kaydet
+  const buffer = await workbook.xlsx.writeBuffer();
+  saveAs(new Blob([buffer]), fullFileName);
 };
 
 // 1. SEFERLER
@@ -34,7 +76,7 @@ export const exportTripsToExcel = (trips: TripType[]) => {
   }));
   
   saveAsExcel(data, 'TRIPS', i18next.t('Excel.sheetNames.TRIPS'), [
-    { wch: 20 }, { wch: 15 }, { wch: 20 }, { wch: 15 }, { wch: 20 }, { wch: 20 }, { wch: 15 }, { wch: 12 }, { wch: 12 }, { wch: 30 }
+    { width: 25 }, { width: 15 }, { width: 25 }, { width: 15 }, { width: 25 }, { width: 25 }, { width: 15 }, { width: 12 }, { width: 12 }, { width: 40 }
   ]);
 };
 
@@ -45,7 +87,7 @@ export const exportCompaniesToExcel = (companies: CompanyType[]) => {
     [i18next.t('Excel.columns.CREATED_AT')]: new Date(c.createdAt).toLocaleDateString('tr-TR')
   }));
 
-  saveAsExcel(data, 'COMPANIES', i18next.t('Excel.sheetNames.COMPANIES'), [{ wch: 40 }, { wch: 20 }]);
+  saveAsExcel(data, 'COMPANIES', i18next.t('Excel.sheetNames.COMPANIES'), [{ width: 45 }, { width: 20 }]);
 };
 
 // 3. SÜRÜCÜLER
@@ -58,7 +100,7 @@ export const exportDriversToExcel = (drivers: DriverType[]) => {
   }));
 
   saveAsExcel(data, 'DRIVERS', i18next.t('Excel.sheetNames.DRIVERS'), [
-    { wch: 25 }, { wch: 15 }, { wch: 30 }, { wch: 15 }
+    { width: 30 }, { width: 20 }, { width: 35 }, { width: 20 }
   ]);
 };
 
@@ -71,7 +113,7 @@ export const exportVehiclesToExcel = (vehicles: VehicleType[]) => {
   }));
 
   saveAsExcel(data, 'VEHICLES', i18next.t('Excel.sheetNames.VEHICLES'), [
-    { wch: 15 }, { wch: 15 }, { wch: 15 }
+    { width: 20 }, { width: 20 }, { width: 20 }
   ]);
 };
 
@@ -95,6 +137,6 @@ export const exportDailyDashboard = (trips: TripType[]) => {
   }));
 
   saveAsExcel(data, 'DAILY_REPORT', i18next.t('Excel.sheetNames.DAILY_REPORT'), [
-    { wch: 15 }, { wch: 25 }, { wch: 20 }, { wch: 15 }, { wch: 15 }, { wch: 12 }, { wch: 30 }
+    { width: 20 }, { width: 30 }, { width: 25 }, { width: 20 }, { width: 20 }, { width: 15 }, { width: 40 }
   ]);
 };
