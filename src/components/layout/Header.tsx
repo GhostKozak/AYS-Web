@@ -68,13 +68,13 @@ function Header() {
   const getRoleColor = (role?: string) => {
     switch (role) {
       case "admin":
-        return "#87d068";
+        return "green";
       case "editor":
-        return "#2db7f5";
+        return "blue";
       case "viewer":
-        return "#108ee9";
+        return "orange";
       default:
-        return undefined;
+        return "default";
     }
   };
 
@@ -267,7 +267,7 @@ function Header() {
                 />
                 <span>{userObject?.firstName}</span>
                 <Tag color={getRoleColor(userObject?.role)}>
-                  {userObject?.role?.toUpperCase()}
+                  <strong>{userObject?.role?.toUpperCase()}</strong>
                 </Tag>
               </a>
             </Dropdown>
@@ -298,70 +298,70 @@ function Header() {
           />
         </Space>
       )}
- 
-       <Drawer
-         title={t("Header.MENU")}
-         placement="right"
-         onClose={() => setIsMobileMenuOpen(false)}
-         open={isMobileMenuOpen}
-         styles={{ 
-           body: { padding: 0 },
-           wrapper: { width: 280 }
-         }}
-       >
-         {authenticated && userObject && (
-           <div
-             style={{
-               padding: "20px",
-               background: token.colorBgContainerDisabled,
-               marginBottom: "10px",
-             }}
-           >
-             <Flex gap="small" align="center">
-               <Avatar size="large" icon={<UserOutlined />} />
-               <div>
-                 <div style={{ fontWeight: "bold" }}>
-                   {userObject.firstName} {userObject.lastName}
-                 </div>
-                  <Tag color={getRoleColor(userObject.role)}>
-                    {userObject.role.toUpperCase()}
-                  </Tag>
-               </div>
-             </Flex>
-           </div>
-         )}
- 
-         <Menu
-           mode="inline"
-           selectedKeys={[location.pathname.split("/")[1] || "dashboard"]}
-           items={menuItems}
-           style={{ borderRight: "none" }}
-         />
- 
-         <div
-           style={{
-             borderTop: `1px solid ${token.colorBorder}`,
-             marginTop: "10px",
-             paddingTop: "10px",
-           }}
-         >
-           <Menu
-             mode="inline"
-             selectable={false}
-             items={
-               authenticated ? userMenuItems.filter((i) => i && i.key !== "0") : []
-             }
-           />
-           {authenticated && (
-             <div style={{ padding: "20px" }}>
-               <Link to={ROUTES.FIELD_OPS}>
-                 <Button type="primary" block icon={<LoginOutlined />}>
-                   {t("FieldOps.BUTTON")}
-                 </Button>
-               </Link>
-             </div>
-           )}
-           {!authenticated && (
+
+      <Drawer
+        title={t("Header.MENU")}
+        placement="right"
+        onClose={() => setIsMobileMenuOpen(false)}
+        open={isMobileMenuOpen}
+        styles={{
+          body: { padding: 0 },
+          wrapper: { width: 280 }
+        }}
+      >
+        {authenticated && userObject && (
+          <div
+            style={{
+              padding: "20px",
+              background: token.colorBgContainerDisabled,
+              marginBottom: "10px",
+            }}
+          >
+            <Flex gap="small" align="center">
+              <Avatar size="large" icon={<UserOutlined />} />
+              <div>
+                <div style={{ fontWeight: "bold" }}>
+                  {userObject.firstName} {userObject.lastName}
+                </div>
+                <Tag color={getRoleColor(userObject.role)}>
+                  <strong>{userObject.role.toUpperCase()}</strong>
+                </Tag>
+              </div>
+            </Flex>
+          </div>
+        )}
+
+        <Menu
+          mode="inline"
+          selectedKeys={[location.pathname.split("/")[1] || "dashboard"]}
+          items={menuItems}
+          style={{ borderRight: "none" }}
+        />
+
+        <div
+          style={{
+            borderTop: `1px solid ${token.colorBorder}`,
+            marginTop: "10px",
+            paddingTop: "10px",
+          }}
+        >
+          <Menu
+            mode="inline"
+            selectable={false}
+            items={
+              authenticated ? userMenuItems.filter((i) => i && i.key !== "0") : []
+            }
+          />
+          {authenticated && (
+            <div style={{ padding: "20px" }}>
+              <Link to={ROUTES.FIELD_OPS}>
+                <Button type="primary" block icon={<LoginOutlined />}>
+                  {t("FieldOps.BUTTON")}
+                </Button>
+              </Link>
+            </div>
+          )}
+          {!authenticated && (
             <div style={{ padding: "20px" }}>
               <Button
                 type="primary"
@@ -389,7 +389,7 @@ function Header() {
               form.resetFields();
               setIsModalOpen(false);
             })
-            .catch(() => {});
+            .catch(() => { });
         }}
         onCancel={handleCancel}
         okText={t("Common.SEND")}
