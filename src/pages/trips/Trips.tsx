@@ -2,6 +2,8 @@ import { App, Button, Flex, Layout } from "antd";
 import { useState, useMemo } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import { useSearchParams } from "react-router";
+import { usePageTitle } from "../../hooks/usePageTitle";
 
 import {
   FileExcelOutlined,
@@ -27,7 +29,13 @@ function Trips() {
   const { t } = useTranslation();
   const { notification } = App.useApp();
 
-  const [searchText, setSearchText] = useState("");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const searchText = searchParams.get("q") ?? "";
+  const setSearchText = (val: string) =>
+    setSearchParams(val ? { q: val } : {}, { replace: true });
+
+  usePageTitle(t("Breadcrumbs.TRIPS"));
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState<TripType | undefined>(
     undefined,

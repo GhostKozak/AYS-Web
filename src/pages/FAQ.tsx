@@ -1,9 +1,13 @@
 import { Collapse, Layout, type CollapseProps } from "antd";
-import { t } from "i18next";
+import { useTranslation } from "react-i18next";
+import { usePageTitle } from "../hooks/usePageTitle";
 
 const { Content } = Layout;
 
 function FAQ() {
+  const { t } = useTranslation();
+  usePageTitle(t("Other.FAQ"));
+
   const text = `
   A dog is a type of domesticated animal.
   Known for its loyalty and faithfulness,

@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef, useMemo } from "react";
+import { usePageTitle } from "../../hooks/usePageTitle";
 import { useTrips } from "../../hooks/useTrips";
 import {
   Badge,
@@ -27,6 +28,7 @@ const { Title, Text } = Typography;
 
 function FieldDashboard() {
   const { t } = useTranslation();
+  usePageTitle(t("FieldOps.TITLE"));
   const { trips, isLoading } = useTrips();
   const [activeTab, setActiveTab] = useState<"URGENT" | "RAMP" | "PARK">(
     "URGENT",

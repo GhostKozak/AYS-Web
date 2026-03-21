@@ -1,6 +1,8 @@
 import { App, Button, Flex, Layout } from "antd";
 import Search from "antd/es/input/Search";
 import { useState } from "react";
+import { useSearchParams } from "react-router";
+import { usePageTitle } from "../../hooks/usePageTitle";
 import { useTranslation } from "react-i18next";
 
 import {
@@ -23,7 +25,12 @@ function Drivers() {
   const { t } = useTranslation();
   const { notification } = App.useApp();
 
-  const [searchText, setSearchText] = useState("");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const searchText = searchParams.get("q") ?? "";
+  const setSearchText = (val: string) =>
+    setSearchParams(val ? { q: val } : {}, { replace: true });
+
+  usePageTitle(t("Breadcrumbs.DRIVERS"));
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState<DriverType | undefined>(
     undefined,

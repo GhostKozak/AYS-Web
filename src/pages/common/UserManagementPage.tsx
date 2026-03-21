@@ -6,6 +6,7 @@ import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useState } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import dayjs from "dayjs";
+import { usePageTitle } from "../../hooks/usePageTitle";
 import type { User, CreateUserPayload } from "../../types";
 import { USER_ROLES } from "../../types";
 import { getUser } from "../../utils/auth.utils";
@@ -14,6 +15,7 @@ const { Title } = Typography;
 
 function UserManagementPage() {
   const { t } = useTranslation();
+  usePageTitle(t("Breadcrumbs.USERS"));
   const queryClient = useQueryClient();
   const { updateCurrentUser } = useAuth();
   const { message, modal, notification } = App.useApp();

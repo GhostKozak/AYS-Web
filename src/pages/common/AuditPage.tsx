@@ -1,9 +1,10 @@
-import { useState } from "react";
 import { Table, Tag, Typography, Space, Input } from "antd";
 import { useQuery } from "@tanstack/react-query";
 import { auditApi } from "../../api/auditApi";
 import { useTranslation } from "react-i18next";
+import { useSearchParams } from "react-router";
 import dayjs from "dayjs";
+import { usePageTitle } from "../../hooks/usePageTitle";
 
 import type { AuditType } from "../../types";
 
@@ -11,7 +12,27 @@ const { Title } = Typography;
 
 function AuditPage() {
   const { t } = useTranslation();
-  const [filters, setFilters] = useState<{ entity?: string; entityId?: string }>({});
+  usePageTitle(t("Breadcrumbs.AUDIT"));
+  
+  const [searchParams, setSearchParams] = useSearchParams();
+  
+  const filters = {
+    entity: searchParams.get("entity") || undefined,
+    entityId: searchParams.get("entityId") || undefined,
+  };
+
+  const setFilters = (newFilters: { entity?: string; entityId?: string }) => {
+    const next = new URLSearchParams(searchParams);
+    if (newFilters.entity !== undefined) {
+      if (newFilters.entity) next.set("entity", newFilters.entity);
+      else next.delete("entity");
+    }
+    if (newFilters.entityId !== undefined) {
+      if (newFilters.entityId) next.set("entityId", newFilters.entityId);
+      else next.delete("entityId");
+    }
+    setSearchParams(next, { replace: true });
+  };
 
   const { data, isLoading } = useQuery<AuditType[]>({
     queryKey: ["audit", filters],
@@ -83,13 +104,15 @@ function AuditPage() {
       <Space style={{ marginBottom: 16 }} size="middle">
         <Input 
           placeholder={t("Audit.ENTITY")} 
-          onChange={(e) => setFilters(prev => ({ ...prev, entity: e.target.value }))}
+          value={filters.entity}
+          onChange={(e) => setFilters({ entity: e.target.value })}
           style={{ width: 200 }}
           allowClear
         />
         <Input 
           placeholder={t("Audit.ENTITY_ID")} 
-          onChange={(e) => setFilters(prev => ({ ...prev, entityId: e.target.value }))}
+          value={filters.entityId}
+          onChange={(e) => setFilters({ entityId: e.target.value })}
           style={{ width: 200 }}
           allowClear
         />
