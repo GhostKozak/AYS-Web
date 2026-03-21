@@ -93,7 +93,10 @@
     "SUCCESS": "Başarılı",
     "ERROR": "Hata",
     "INFO": "Bilgi",
-    "WARNING": "Uyarı"
+    "WARNING": "Uyarı",
+    "LOADING": "Yükleniyor...",
+    "ACTIONS": "İşlemler",
+    "RELOAD": "Yenile"
   },
 
   "Table": {

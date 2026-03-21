@@ -35,9 +35,9 @@ function FAQ() {
   ];
 
   return (
-    <Layout>
-      <Content style={{ padding: isMobile ? "0 16px" : "0 48px" }}>
-        <h1>{t("Other.FAQ")}</h1>
+    <Layout style={{ padding: isMobile ? "0 12px" : "0 20px" }}>
+      <Content>
+        <h1 style={{ margin: 0 }}>{t("Other.FAQ")}</h1>
         <p>
           Lorem ipsum dolor sit amet consectetur adipisicing elit. Recusandae
           ipsam veniam cupiditate voluptate saepe libero placeat voluptatum, id

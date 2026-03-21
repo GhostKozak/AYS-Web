@@ -93,7 +93,10 @@
     "SUCCESS": "Success",
     "ERROR": "Error",
     "INFO": "Information",
-    "WARNING": "Warning"
+    "WARNING": "Warning",
+    "LOADING": "Loading...",
+    "ACTIONS": "Actions",
+    "RELOAD": "Reload"
   },
 
   "Table": {

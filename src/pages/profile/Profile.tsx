@@ -51,7 +51,7 @@ export default function Profile() {
         firstName: values.firstName,
         lastName: values.lastName,
       });
-      
+
       // Update local auth state via hook which now handles storage + query cache sync
       updateCurrentUser({
         firstName: values.firstName,
@@ -94,7 +94,7 @@ export default function Profile() {
   };
 
   return (
-    <Layout style={{ padding: isMobile ? "0 16px" : "0 50px" }}>
+    <Layout style={{ padding: isMobile ? "0 12px" : "0 20px" }}>
       <Title level={2} style={{ marginTop: 0, marginBottom: 20 }}>
         {t("Header.ACCOUNT_SETTINGS", "Hesap Ayarları")}
       </Title>
