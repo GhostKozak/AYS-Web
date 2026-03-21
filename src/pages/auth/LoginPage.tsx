@@ -1,6 +1,6 @@
 import { Form, Input, Button, Card, App } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { authApi } from "../../api/authApi";
 import { ROUTES } from "../../constants";
@@ -12,9 +12,12 @@ import type { LoginPayload } from "../../types";
 function LoginPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
   const queryClient = useQueryClient();
   const { message } = App.useApp();
   const [loading, setLoading] = useState(false);
+
+  const from = location.state?.from?.pathname || ROUTES.DASHBOARD;
 
   const onFinish = async (values: LoginPayload) => {
     setLoading(true);
@@ -22,9 +25,6 @@ function LoginPage() {
       const data = await authApi.login(values);
       setToken(data.access_token);
       
-      // Adapt Backend User to Frontend User if needed
-      // Currently backend returns {id, email, firstName, lastName, role}
-      // Frontend User type expects {_id, email, firstName, lastName, role, ...}
       const frontendUser = {
         ...data.user,
         _id: data.user.id,
@@ -33,7 +33,7 @@ function LoginPage() {
       setUser(frontendUser as any);
       queryClient.invalidateQueries({ queryKey: ["currentUser"] });
       message.success(t("Login.SUCCESS"));
-      navigate(ROUTES.DASHBOARD);
+      navigate(from, { replace: true });
     } catch (error: any) {
       console.error("Login error:", error);
       const errorMessage = error.response?.data?.message || t("Login.ERROR");

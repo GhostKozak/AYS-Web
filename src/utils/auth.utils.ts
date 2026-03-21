@@ -2,7 +2,7 @@ import { STORAGE_KEYS } from "../constants";
 import type { UserRole, User } from "../types";
 
 export const getUser = (): User | null => {
-  const userString = localStorage.getItem(STORAGE_KEYS.USER);
+  const userString = sessionStorage.getItem(STORAGE_KEYS.USER);
   if (!userString) return null;
   
   try {
@@ -14,20 +14,20 @@ export const getUser = (): User | null => {
 };
 
 export const setUser = (user: User): void => {
-  localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
+  sessionStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
 };
 
 export const getToken = (): string | null => {
-  return localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
+  return sessionStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
 };
 
 export const setToken = (token: string): void => {
-  localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, token);
+  sessionStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, token);
 };
 
 export const clearAuth = (): void => {
-  localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
-  localStorage.removeItem(STORAGE_KEYS.USER);
+  sessionStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
+  sessionStorage.removeItem(STORAGE_KEYS.USER);
 };
 
 export const isLoggedIn = (): boolean => {

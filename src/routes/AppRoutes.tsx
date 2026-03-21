@@ -13,6 +13,7 @@ import FAQ from "../pages/FAQ";
 import FieldDashboard from "../pages/field/FieldDashboard";
 import AuditPage from "../pages/common/AuditPage";
 import UserManagementPage from "../pages/common/UserManagementPage";
+import { AuthGuard } from "../components/auth/AuthGuard";
 import { RoleGuard } from "../components/auth/RoleGuard";
 import { UserRole } from "../types";
 
@@ -25,7 +26,11 @@ function AppRoutes() {
     },
     {
       path: "/",
-      Component: App,
+      element: (
+        <AuthGuard>
+          <App />
+        </AuthGuard>
+      ),
       errorElement: <ErrorPage />,
       children: [
         {

@@ -11,6 +11,13 @@ function App() {
 
   useEffect(() => {
     checkTokenValidity(navigate);
+
+    // Her 1 dakikada bir kontrol et
+    const interval = setInterval(() => {
+      checkTokenValidity(navigate);
+    }, 60000);
+
+    return () => clearInterval(interval);
   }, [navigate]);
 
   return (
