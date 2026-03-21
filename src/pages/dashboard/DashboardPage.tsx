@@ -91,7 +91,7 @@ function DashboardPage() {
   };
 
   return (
-    <div style={{ padding: isMobile ? "16px" : "24px", paddingTop: isMobile ? "0px" : "24px" }}>
+    <div style={{ padding: isMobile ? "0 12px" : "0 20px" }}>
       <Flex
         justify="space-between"
         align="center"
@@ -99,7 +99,7 @@ function DashboardPage() {
         gap="middle"
         style={{ marginBottom: isMobile ? 10 : 20 }}
       >
-        <h1 style={{ margin: isMobile ? 0 : undefined, minWidth: 'fit-content' }}>{t("Dashboard.TITLE")}</h1>
+        <h1 style={{ margin: 0, minWidth: 'fit-content' }}>{t("Dashboard.TITLE")}</h1>
 
         <Space>
           <Button

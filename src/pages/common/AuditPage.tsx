@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Table, Tag, Typography, Space, Input, Button, Modal } from "antd";
+import { Table, Tag, Typography, Space, Input, Button, Modal, Layout, Flex } from "antd";
 import { useQuery } from "@tanstack/react-query";
 import { auditApi } from "../../api/auditApi";
 import { useTranslation } from "react-i18next";
@@ -17,7 +17,7 @@ function AuditPage() {
   const { t } = useTranslation();
   usePageTitle(t("Breadcrumbs.AUDIT"));
   const isMobile = useIsMobile();
-  
+
   const [searchParams, setSearchParams] = useSearchParams();
   const [selectedAudit, setSelectedAudit] = useState<AuditType | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -26,7 +26,7 @@ function AuditPage() {
     setSelectedAudit(record);
     setIsModalOpen(true);
   };
-  
+
   const filters = {
     entity: searchParams.get("entity") || undefined,
     entityId: searchParams.get("entityId") || undefined,
@@ -67,7 +67,7 @@ function AuditPage() {
           const first = u.firstName || (u as any).first_name || "";
           const last = u.lastName || (u as any).last_name || "";
           const full = (u as any).full_name || "";
-          
+
           const displayName = `${first} ${last}`.trim() || full || u.email;
           if (displayName) return displayName;
         }
@@ -109,19 +109,25 @@ function AuditPage() {
   ];
 
   return (
-    <div style={{ padding: isMobile ? 16 : 24 }}>
-      <Title level={isMobile ? 3 : 2}>{t("Audit.TITLE")}</Title>
-      
+    <Layout style={{ padding: isMobile ? "0 12px" : "0 20px" }}>
+      <Flex
+        justify="space-between"
+        align="center"
+        style={{ marginTop: 0, marginBottom: 10 }}
+      >
+        <h1 style={{ margin: 0 }}>{t("Audit.TITLE")}</h1>
+      </Flex>
+
       <Space style={{ marginBottom: 16 }} size="middle" wrap>
-        <Input 
-          placeholder={t("Audit.ENTITY")} 
+        <Input
+          placeholder={t("Audit.ENTITY")}
           value={filters.entity}
           onChange={(e) => setFilters({ entity: e.target.value })}
           style={{ width: 200 }}
           allowClear
         />
-        <Input 
-          placeholder={t("Audit.ENTITY_ID")} 
+        <Input
+          placeholder={t("Audit.ENTITY_ID")}
           value={filters.entityId}
           onChange={(e) => setFilters({ entityId: e.target.value })}
           style={{ width: 200 }}
@@ -129,15 +135,15 @@ function AuditPage() {
         />
       </Space>
 
-      <Table 
-        columns={columns} 
-        dataSource={data} 
-        loading={isLoading} 
+      <Table
+        columns={columns}
+        dataSource={data}
+        loading={isLoading}
         rowKey="_id"
         pagination={{ pageSize: 20 }}
         scroll={{ x: "max-content" }}
       />
-      
+
       <Modal
         title={t("Audit.DETAILS")}
         open={isModalOpen}
@@ -150,15 +156,15 @@ function AuditPage() {
         width={800}
       >
         {selectedAudit && (
-          <AuditDetailViewer 
-            action={selectedAudit.action} 
+          <AuditDetailViewer
+            action={selectedAudit.action}
             details={selectedAudit.details}
             oldValue={selectedAudit.oldValue}
-            newValue={selectedAudit.newValue} 
+            newValue={selectedAudit.newValue}
           />
         )}
       </Modal>
-    </div>
+    </Layout>
   );
 }
 

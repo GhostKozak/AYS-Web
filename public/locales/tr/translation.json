@@ -358,5 +358,12 @@
     "LABEL_RAMP": "📍 Rampa / Antrepo Önü",
     "LABEL_PARK": "🅿️ Geçici Park Alanında",
     "REFRESH_SUCCESS": "Veriler başarıyla yenilendi."
+  },
+
+  "Periods": {
+    "TODAY": "Bugün",
+    "THIS_MONTH": "Bu Ay",
+    "THIS_YEAR": "Bu Yıl",
+    "ALL_TIME": "Tüm Zamanlar"
   }
 }

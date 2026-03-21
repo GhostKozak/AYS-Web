@@ -70,9 +70,9 @@ function Companies() {
       const results = await Promise.allSettled(
         selectedRowKeys.map((id) => deleteCompany(id.toString()))
       );
-      
+
       const successCount = results.filter(r => r.status === 'fulfilled').length;
-      
+
       notification.success({
         title: t("Common.SUCCESS"),
         description: t("Common.BULK_DELETE_SUCCESS", { count: successCount }),
@@ -130,13 +130,13 @@ function Companies() {
   });
 
   return (
-    <Layout style={{ padding: isMobile ? "0 12px" : "0 50px" }}>
+    <Layout style={{ padding: isMobile ? "0 12px" : "0 20px" }}>
       <Flex
         justify="space-between"
         align="center"
         style={{ marginTop: 0, marginBottom: 10 }}
       >
-        <h1 style={{ margin: isMobile ? 0 : undefined }}>{t("Breadcrumbs.COMPANIES")}</h1>
+        <h1 style={{ margin: 0 }}>{t("Breadcrumbs.COMPANIES")}</h1>
         <RoleGuard allowedRoles={[USER_ROLES.ADMIN]}>
           <Button
             type="primary"

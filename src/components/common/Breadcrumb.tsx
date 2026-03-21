@@ -48,7 +48,7 @@ function Breadcrumb() {
     <AntBreadcrumb
       style={{
         margin: isMobile ? "8px 0" : "16px 0",
-        padding: isMobile ? "0 16px" : "0 50px",
+        padding: isMobile ? "0 12px" : "0 20px",
       }}
       items={breadcrumbItems}
     />

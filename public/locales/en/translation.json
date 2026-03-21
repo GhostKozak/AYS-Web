@@ -355,5 +355,12 @@
     "LABEL_RAMP": "📍 Ramp / Warehouse Front",
     "LABEL_PARK": "🅿️ Temporary Parking Area",
     "REFRESH_SUCCESS": "Data refreshed successfully."
+  },
+
+  "Periods": {
+    "TODAY": "Today",
+    "THIS_MONTH": "This Month",
+    "THIS_YEAR": "This Year",
+    "ALL_TIME": "All Time"
   }
 }

@@ -1,4 +1,4 @@
-import { Table, Button, Space, Typography, Tag, Modal, Form, Input, Select, Switch, App } from "antd";
+import { Table, Button, Space, Typography, Tag, Modal, Form, Input, Select, Switch, App, Layout } from "antd";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { userApi } from "../../api/userApi";
 import { useTranslation } from "react-i18next";
@@ -48,7 +48,7 @@ function UserManagementPage() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<CreateUserPayload> }) => 
+    mutationFn: ({ id, data }: { id: string; data: Partial<CreateUserPayload> }) =>
       userApi.update(id, data),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
@@ -145,10 +145,10 @@ function UserManagementPage() {
       render: (date: string) => date ? dayjs(date).format("DD.MM.YYYY HH:mm") : "-",
     },
     {
-       title: "⚠️",
-       dataIndex: "failedLoginAttempts",
-       key: "failedLoginAttempts",
-       render: (val: number) => val > 0 ? <Tag color="warning">{val}</Tag> : "-",
+      title: "⚠️",
+      dataIndex: "failedLoginAttempts",
+      key: "failedLoginAttempts",
+      render: (val: number) => val > 0 ? <Tag color="warning">{val}</Tag> : "-",
     },
     {
       title: t("Common.ACTIONS"),
@@ -156,15 +156,15 @@ function UserManagementPage() {
       render: (_: any, record: User) => (
         <Space size="middle">
           <Button icon={<EditOutlined />} onClick={() => handleEdit(record)} />
-          <Button 
-            icon={<DeleteOutlined />} 
-            danger 
+          <Button
+            icon={<DeleteOutlined />}
+            danger
             onClick={() => {
               modal.confirm({
                 title: t("Common.ARE_YOU_SURE"),
                 onOk: () => deleteMutation.mutate(record._id),
               });
-            }} 
+            }}
           />
         </Space>
       ),
@@ -172,25 +172,25 @@ function UserManagementPage() {
   ];
 
   return (
-    <div style={{ padding: isMobile ? 16 : 24 }}>
-      <div style={{ 
-        display: "flex", 
-        justifyContent: "space-between", 
-        alignItems: "center", 
+    <Layout style={{ padding: isMobile ? "0 12px" : "0 20px" }}>
+      <div style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
         marginBottom: isMobile ? 12 : 16,
         flexWrap: "wrap",
         gap: 8
       }}>
-        <Title level={isMobile ? 3 : 2} style={{ marginBottom: 0 }}>{t("Users.TITLE")}</Title>
+        <h1 style={{ margin: 0 }}>{t("Users.TITLE")}</h1>
         <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
           {t("Users.ADD_USER")}
         </Button>
       </div>
-      <Table 
-        columns={columns} 
-        dataSource={data} 
-        loading={isLoading} 
-        rowKey="_id" 
+      <Table
+        columns={columns}
+        dataSource={data}
+        loading={isLoading}
+        rowKey="_id"
         scroll={{ x: "max-content" }}
       />
 
@@ -236,7 +236,7 @@ function UserManagementPage() {
             <Input />
           </Form.Item>
           <Form.Item name="role" label={t("Users.ROLE")} rules={[{ required: true }]}>
-            <Select 
+            <Select
               options={[
                 { value: USER_ROLES.ADMIN, label: 'ADMIN' },
                 { value: USER_ROLES.EDITOR, label: 'EDITOR' },
@@ -252,7 +252,7 @@ function UserManagementPage() {
           )}
         </Form>
       </Modal>
-    </div>
+    </Layout>
   );
 }
 
