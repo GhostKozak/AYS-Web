@@ -9,7 +9,7 @@ const WeeklyActivityChart = () => {
 
   // Son 7 günü filtreleyelim veya hepsini gösterelim (Backend "month" için hepsini dönebilir)
   // Nivo Bar için datayı hazırlayalım
-  const data = (rawData || []).map((item: any) => ({
+  const data = (rawData || []).map((item) => ({
     day: item.timestamp,
     count: item.count,
   })).slice(-7); // Sadece son 7 gün

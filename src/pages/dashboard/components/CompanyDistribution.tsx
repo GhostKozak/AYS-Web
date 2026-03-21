@@ -5,7 +5,7 @@ import { Skeleton } from "antd";
 function CompanyDistribution() {
   const { data: rawData, isLoading } = useTopCompanies("all");
 
-  const data = (rawData || []).map((item: any) => ({
+  const data = (rawData || []).map((item) => ({
     id: item.companyName,
     label: item.companyName,
     value: item.tripCount,

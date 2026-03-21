@@ -9,12 +9,14 @@ const toDate = `${currentYear}-12-31`;
 const YearlyActivityMap = () => {
   const { data: rawData, isLoading } = useReportTrend("year");
 
-  const data = (rawData || []).map((item: any) => ({
+  const data = (rawData || []).map((item) => ({
     day: item.timestamp,
     value: item.count,
   }));
 
   if (isLoading) return <Skeleton active paragraph={{ rows: 6 }} />;
+
+  const currentLocale = "tr-TR"; // Sabit kalabilir ya da i18n'den alınabilir (önceki gibi)
 
   return (
     <div style={{ height: 220, width: "100%", marginBlock: 30 }}>
@@ -49,7 +51,7 @@ const YearlyActivityMap = () => {
         tooltip={({ day, value, color }) => (
           <div style={{ padding: 12, color, backgroundColor: "#111827" }}>
             <strong>
-              {new Date(day).toLocaleDateString("tr-TR", {
+              {new Date(day).toLocaleDateString(currentLocale, {
                 day: "numeric",
                 month: "long",
                 weekday: "long",

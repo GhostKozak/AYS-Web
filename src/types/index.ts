@@ -94,8 +94,8 @@ export interface CreateCompanyPayload {
 
 export type DiffChange = {
   key: string;
-  oldValue: any;
-  newValue: any;
+  oldValue: unknown;
+  newValue: unknown;
 };
 
 export type DiffConfigItem<T, F> = {
@@ -111,8 +111,8 @@ export type DiffConfigItem<T, F> = {
 
   // 3. YÖNTEM: Özel Dönüştürücüler (ID -> İsim gibi durumlar için)
   // Veriyi okurken işlemek isterseniz bunları kullanırsınız
-  getOldValue?: (record: T) => any;
-  getNewValue?: (formValues: F) => any;
+  getOldValue?: (record: T) => unknown;
+  getNewValue?: (formValues: F) => unknown;
 };
 
 export type DailyStat = {

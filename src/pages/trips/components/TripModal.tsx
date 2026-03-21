@@ -277,21 +277,23 @@ const TripModal = ({
     }
   };
 
-  const extractId = (res: any) => {
+  const extractId = (res: { _id?: string; id?: string; data?: { _id?: string; id?: string; data?: { _id?: string } } } | string | undefined): string | undefined => {
+    if (typeof res === "string") return res;
+    if (!res) return undefined;
     return (
-      res?._id || res?.data?._id || res?.data || res?.data?.data?._id || res?.id
+      res._id || res.id || res.data?._id || res.data?.id || res.data?.data?._id
     );
   };
 
   const handleFinish = async (values: TripFormValues) => {
     setSubmitting(true);
     try {
-      const finalValues = { ...values } as any;
+      const finalValues: TripFormValues & { company?: string; vehicle?: string; driver?: string } = { ...values };
 
       // Company
       const companyExists = companies.some((c) => c._id === values.company);
       if (!companyExists && values.company) {
-        const res = await createCompany({ name: values.company } as any);
+        const res = await createCompany({ name: values.company });
         const newId = extractId(res);
         if (newId) finalValues.company = newId;
       }
@@ -301,9 +303,9 @@ const TripModal = ({
       if (!vehicleExists && values.vehicle) {
         const payload = {
           licence_plate: values.vehicle,
-          vehicle_type: "TRUCK",
+          vehicle_type: "TRUCK" as const,
         };
-        const res = await createVehicle(payload as any);
+        const res = await createVehicle(payload);
         const newId = extractId(res);
         if (newId) finalValues.vehicle = newId;
       }
@@ -314,10 +316,11 @@ const TripModal = ({
         const payload = {
           full_name: values.driver_full_name,
           phone_number: values.driver_phone_number,
-          company: finalValues.company,
+          company: finalValues.company || values.company,
         };
-        const res = await createDriver(payload as any);
-        finalValues.driver = extractId(res);
+        const res = await createDriver(payload);
+        const newId = extractId(res);
+        if (newId) finalValues.driver = newId;
       }
 
       // Update form to reflect newly-created ids so UI shows selected values
@@ -328,16 +331,20 @@ const TripModal = ({
       });
 
       // Convert datetime-local back to ISO strings before sending
-      const toISO = (val?: any) => {
+      const toISO = (val?: dayjs.Dayjs | string) => {
         if (!val) return undefined;
         // DatePicker value is a dayjs object
         const d = dayjs(val);
         return d.isValid() ? d.toISOString() : undefined;
       };
-      finalValues.departure_time = toISO(finalValues.departure_time);
-      finalValues.arrival_time = toISO(finalValues.arrival_time);
+      
+      const submissionData = {
+        ...finalValues,
+        departure_time: toISO(finalValues.departure_time),
+        arrival_time: toISO(finalValues.arrival_time),
+      };
 
-      await onFinish(finalValues);
+      await onFinish(submissionData as TripFormValues);
 
       // Notify parent to refresh lists if provided
       try {

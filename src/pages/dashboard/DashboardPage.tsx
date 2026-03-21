@@ -108,7 +108,7 @@ function DashboardPage() {
             const currentList =
               newLayouts[breakpoint as keyof typeof newLayouts] || [];
             newLayouts[breakpoint as keyof typeof newLayouts] = [
-              ...currentList.filter((item: any) => item.i !== key), // Eskisini sil
+              ...currentList.filter((item) => item.i !== key), // Eskisini sil
               originalItem, // Orijinali ekle
             ];
           }
