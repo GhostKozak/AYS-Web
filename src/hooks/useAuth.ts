@@ -11,8 +11,8 @@ export const useAuth = () => {
   const { data: user } = useQuery<User | null>({
     queryKey: ["currentUser"],
     queryFn: () => getUser(),
-    staleTime: 0, 
-    initialData: getUser(), 
+    staleTime: Infinity,
+    initialData: () => getUser(),
   });
 
   const updateCurrentUser = (updatedUser: Partial<User>) => {

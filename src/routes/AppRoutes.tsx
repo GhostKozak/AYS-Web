@@ -1,21 +1,25 @@
 import { createBrowserRouter } from "react-router";
+import { lazy, Suspense } from "react";
 import App from "../App";
-import DashboardPage from "../pages/dashboard/DashboardPage";
 import LoginPage from "../pages/auth/LoginPage";
-import Companies from "../pages/companies/Companies";
-import Drivers from "../pages/drivers/Drivers";
-import Vehicles from "../pages/vehicles/Vehicles";
-import Trips from "../pages/trips/Trips";
-import NotFoundPage from "../pages/common/NotFoundPage";
-import ErrorPage from "../pages/common/ErrorPage";
 import { ROUTES } from "../constants";
-import FAQ from "../pages/FAQ";
-import FieldDashboard from "../pages/field/FieldDashboard";
-import AuditPage from "../pages/common/AuditPage";
-import UserManagementPage from "../pages/common/UserManagementPage";
 import { AuthGuard } from "../components/auth/AuthGuard";
 import { RoleGuard } from "../components/auth/RoleGuard";
 import { USER_ROLES } from "../types";
+import { PageLoader } from "../components/common/PageLoader";
+import ErrorPage from "../pages/common/ErrorPage";
+
+// Lazy-loaded pages — her biri ayrı JS chunk olarak yüklenir
+const DashboardPage = lazy(() => import("../pages/dashboard/DashboardPage"));
+const Companies = lazy(() => import("../pages/companies/Companies"));
+const Drivers = lazy(() => import("../pages/drivers/Drivers"));
+const Vehicles = lazy(() => import("../pages/vehicles/Vehicles"));
+const Trips = lazy(() => import("../pages/trips/Trips"));
+const FAQ = lazy(() => import("../pages/FAQ"));
+const FieldDashboard = lazy(() => import("../pages/field/FieldDashboard"));
+const AuditPage = lazy(() => import("../pages/common/AuditPage"));
+const UserManagementPage = lazy(() => import("../pages/common/UserManagementPage"));
+const NotFoundPage = lazy(() => import("../pages/common/NotFoundPage"));
 
 function AppRoutes() {
   return createBrowserRouter([
@@ -35,41 +39,75 @@ function AppRoutes() {
       children: [
         {
           index: true,
-          Component: DashboardPage,
+          element: (
+            <Suspense fallback={<PageLoader />}>
+              <DashboardPage />
+            </Suspense>
+          ),
         },
         {
           path: ROUTES.DASHBOARD,
-          Component: DashboardPage,
+          element: (
+            <Suspense fallback={<PageLoader />}>
+              <DashboardPage />
+            </Suspense>
+          ),
         },
         {
           path: ROUTES.COMPANIES,
-          Component: Companies,
+          element: (
+            <Suspense fallback={<PageLoader />}>
+              <Companies />
+            </Suspense>
+          ),
         },
         {
           path: ROUTES.DRIVERS,
-          Component: Drivers,
+          element: (
+            <Suspense fallback={<PageLoader />}>
+              <Drivers />
+            </Suspense>
+          ),
         },
         {
           path: ROUTES.VEHICLES,
-          Component: Vehicles,
+          element: (
+            <Suspense fallback={<PageLoader />}>
+              <Vehicles />
+            </Suspense>
+          ),
         },
         {
           path: ROUTES.TRIPS,
-          Component: Trips,
+          element: (
+            <Suspense fallback={<PageLoader />}>
+              <Trips />
+            </Suspense>
+          ),
         },
         {
           path: ROUTES.FAQ,
-          Component: FAQ,
+          element: (
+            <Suspense fallback={<PageLoader />}>
+              <FAQ />
+            </Suspense>
+          ),
         },
         {
           path: ROUTES.FIELD_OPS,
-          Component: FieldDashboard,
+          element: (
+            <Suspense fallback={<PageLoader />}>
+              <FieldDashboard />
+            </Suspense>
+          ),
         },
         {
           path: ROUTES.AUDIT,
           element: (
             <RoleGuard allowedRoles={[USER_ROLES.ADMIN]}>
-              <AuditPage />
+              <Suspense fallback={<PageLoader />}>
+                <AuditPage />
+              </Suspense>
             </RoleGuard>
           ),
         },
@@ -77,13 +115,19 @@ function AppRoutes() {
           path: ROUTES.USERS,
           element: (
             <RoleGuard allowedRoles={[USER_ROLES.ADMIN]}>
-              <UserManagementPage />
+              <Suspense fallback={<PageLoader />}>
+                <UserManagementPage />
+              </Suspense>
             </RoleGuard>
           ),
         },
         {
           path: "*",
-          Component: NotFoundPage,
+          element: (
+            <Suspense fallback={<PageLoader />}>
+              <NotFoundPage />
+            </Suspense>
+          ),
         },
       ],
     },
@@ -91,3 +135,4 @@ function AppRoutes() {
 }
 
 export default AppRoutes;
+
