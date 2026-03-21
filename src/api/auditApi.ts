@@ -3,7 +3,7 @@ import { API_ENDPOINTS } from "../constants";
 
 export const auditApi = {
   getAll: async (params?: { entity?: string; entityId?: string }) => {
-    const response = await apiClient.get(API_ENDPOINTS.AUDIT, { params });
+    const response = await apiClient.get(API_ENDPOINTS.AUDIT, { params: { ...params, limit: 10000 } });
     return response.data.data ?? response.data;
   }
 };

@@ -4,7 +4,7 @@ import type { CreateCompanyPayload } from "../types";
 
 export const companyApi = {
   getAll: async () => {
-    const response = await apiClient.get(API_ENDPOINTS.COMPANIES);
+    const response = await apiClient.get(API_ENDPOINTS.COMPANIES, { params: { limit: 10000 } });
     return response.data.data ?? response.data;
   },
 
