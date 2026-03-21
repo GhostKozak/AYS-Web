@@ -1,10 +1,12 @@
-import { Table, Tag, Typography, Space, Input } from "antd";
+import { useState } from "react";
+import { Table, Tag, Typography, Space, Input, Button, Modal } from "antd";
 import { useQuery } from "@tanstack/react-query";
 import { auditApi } from "../../api/auditApi";
 import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router";
 import dayjs from "dayjs";
 import { usePageTitle } from "../../hooks/usePageTitle";
+import AuditDetailViewer from "./components/AuditDetailViewer";
 
 import type { AuditType } from "../../types";
 
@@ -15,6 +17,13 @@ function AuditPage() {
   usePageTitle(t("Breadcrumbs.AUDIT"));
   
   const [searchParams, setSearchParams] = useSearchParams();
+  const [selectedAudit, setSelectedAudit] = useState<AuditType | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleViewDetails = (record: AuditType) => {
+    setSelectedAudit(record);
+    setIsModalOpen(true);
+  };
   
   const filters = {
     entity: searchParams.get("entity") || undefined,
@@ -89,10 +98,10 @@ function AuditPage() {
       title: t("Audit.DETAILS"),
       dataIndex: "details",
       key: "details",
-      render: (details: any) => (
-        <pre style={{ fontSize: 10, maxWidth: 300, overflow: 'auto' }}>
-          {JSON.stringify(details, null, 2)}
-        </pre>
+      render: (_: any, record: AuditType) => (
+        <Button size="small" type="dashed" onClick={() => handleViewDetails(record)}>
+          {t("Audit.VIEW_DETAILS", "Detayları Gör")}
+        </Button>
       ),
     },
   ];
@@ -125,6 +134,27 @@ function AuditPage() {
         rowKey="_id"
         pagination={{ pageSize: 20 }}
       />
+      
+      <Modal
+        title={t("Audit.DETAILS")}
+        open={isModalOpen}
+        onCancel={() => setIsModalOpen(false)}
+        footer={[
+          <Button key="close" onClick={() => setIsModalOpen(false)}>
+            {t("Common.CLOSE")}
+          </Button>
+        ]}
+        width={800}
+      >
+        {selectedAudit && (
+          <AuditDetailViewer 
+            action={selectedAudit.action} 
+            details={selectedAudit.details}
+            oldValue={selectedAudit.oldValue}
+            newValue={selectedAudit.newValue} 
+          />
+        )}
+      </Modal>
     </div>
   );
 }

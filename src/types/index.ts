@@ -180,6 +180,8 @@ export interface AuditType {
   action: string;
   entity: string;
   entityId?: string;
-  details: any;
+  details?: any; // legacy
+  oldValue?: any;
+  newValue?: any;
   createdAt: string;
 }

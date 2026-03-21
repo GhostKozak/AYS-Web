@@ -134,7 +134,11 @@
     "ACTION": "İşlem",
     "ENTITY": "Varlık",
     "ENTITY_ID": "Varlık ID",
-    "DETAILS": "Detaylar"
+    "DETAILS": "Detaylar",
+    "VIEW_DETAILS": "Detayları Gör",
+    "BEFORE": "Önceki",
+    "AFTER": "Sonraki",
+    "CHANGES": "Değişiklikler"
   },
 
   "Users": {

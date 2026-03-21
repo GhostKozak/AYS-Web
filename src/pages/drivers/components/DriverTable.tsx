@@ -33,7 +33,7 @@ export default function DriverTable({
         (driver) => driver.phone_number,
         formatPhoneNumber,
       ),
-      company: getUniqueOptions(drivers, (driver) => driver.company.name),
+      company: getUniqueOptions(drivers, (driver) => driver.company?.name),
     };
   }, [drivers]);
 
@@ -65,7 +65,7 @@ export default function DriverTable({
         dataIndex: ["company", "name"],
         key: "company",
         filters: filters.company,
-        onFilter: (value, record) => record.company.name === value,
+        onFilter: (value, record) => record.company?.name === value,
         filterSearch: true,
       },
       {

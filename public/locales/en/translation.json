@@ -134,7 +134,11 @@
     "ACTION": "Action",
     "ENTITY": "Entity",
     "ENTITY_ID": "Entity ID",
-    "DETAILS": "Details"
+    "DETAILS": "Details",
+    "VIEW_DETAILS": "View Details",
+    "BEFORE": "Before",
+    "AFTER": "After",
+    "CHANGES": "Changes"
   },
 
   "Users": {
