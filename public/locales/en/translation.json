@@ -106,7 +106,8 @@
     "SERVER_ERROR": "Server Error",
     "SERVER_ERROR_DESC": "A server error occurred. Please try again later.",
     "NETWORK_ERROR": "Connection Error",
-    "NETWORK_ERROR_DESC": "Please check your internet connection."
+    "NETWORK_ERROR_DESC": "Please check your internet connection.",
+    "CONNECTION_RESTORED": "Internet connection restored."
   },
 
   "Validation": {

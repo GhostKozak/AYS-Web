@@ -106,7 +106,8 @@
     "SERVER_ERROR": "Sunucu Hatası",
     "SERVER_ERROR_DESC": "Sunucuda bir hata oluştu. Lütfen daha sonra tekrar deneyiniz.",
     "NETWORK_ERROR": "Bağlantı Hatası",
-    "NETWORK_ERROR_DESC": "İnternet bağlantınızı kontrol ediniz."
+    "NETWORK_ERROR_DESC": "İnternet bağlantınızı kontrol ediniz.",
+    "CONNECTION_RESTORED": "İnternet bağlantısı sağlandı."
   },
 
   "Validation": {

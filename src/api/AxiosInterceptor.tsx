@@ -120,7 +120,7 @@ export const AxiosInterceptor = () => {
           ) : (
             <>
               <CheckCircleOutlined />
-              {t("Common.SUCCESS")}
+              {t("Errors.CONNECTION_RESTORED")}
             </>
           )}
         </div>
