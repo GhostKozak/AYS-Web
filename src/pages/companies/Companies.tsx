@@ -20,6 +20,7 @@ import { useIsMobile } from "../../hooks/useIsMobile";
 import CompanyCardList from "./components/CompanyCardList";
 import { exportCompaniesToExcel } from "../../utils/excel.utils";
 import { RoleGuard } from "../../components/auth/RoleGuard";
+import { hasRole } from "../../utils/auth.utils";
 
 function Companies() {
   const { t } = useTranslation();
@@ -41,6 +42,7 @@ function Companies() {
   const { companies, isLoading, createCompany, updateCompany, deleteCompany } =
     useCompanies();
   const isMobile = useIsMobile();
+  const isAdmin = hasRole([USER_ROLES.ADMIN]);
 
   const handleExport = () => {
     exportCompaniesToExcel(filteredCompanies);
@@ -163,7 +165,7 @@ function Companies() {
         />
         <RoleGuard allowedRoles={[USER_ROLES.ADMIN, USER_ROLES.EDITOR]}>
           <Space>
-            {selectedRowKeys.length > 0 && (
+            {selectedRowKeys.length > 0 && isAdmin && (
               <Popconfirm
                 title={t("Common.BULK_DELETE_CONFIRM_TITLE")}
                 description={t("Common.BULK_DELETE_CONFIRM_DESC", { count: selectedRowKeys.length })}
@@ -196,10 +198,10 @@ function Companies() {
           isLoading={isLoading}
           onDelete={handleDelete}
           onEdit={handleEdit}
-          rowSelection={{
+          rowSelection={isAdmin ? {
             selectedRowKeys,
             onChange: setSelectedRowKeys,
-          }}
+          } : undefined}
         />
       )}
       <CompanyModal

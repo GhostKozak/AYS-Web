@@ -25,6 +25,7 @@ import { useVehicles } from "../../hooks/useVehicles";
 import { useDrivers } from "../../hooks/useDrivers";
 import { exportTripsToExcel } from "../../utils/excel.utils";
 import { RoleGuard } from "../../components/auth/RoleGuard";
+import { hasRole } from "../../utils/auth.utils";
 
 function Trips() {
   const { t } = useTranslation();
@@ -50,6 +51,7 @@ function Trips() {
   const { drivers } = useDrivers();
   const { vehicles } = useVehicles();
   const queryClient = useQueryClient();
+  const isAdmin = hasRole([USER_ROLES.ADMIN]);
 
   const handleExport = () => {
     exportTripsToExcel(filteredTrips);
@@ -211,7 +213,7 @@ function Trips() {
         />
         <RoleGuard allowedRoles={[USER_ROLES.ADMIN, USER_ROLES.EDITOR]}>
           <Space>
-            {selectedRowKeys.length > 0 && (
+            {selectedRowKeys.length > 0 && isAdmin && (
               <Popconfirm
                 title={t("Common.BULK_DELETE_CONFIRM_TITLE")}
                 description={t("Common.BULK_DELETE_CONFIRM_DESC", { count: selectedRowKeys.length })}
@@ -244,10 +246,10 @@ function Trips() {
           isLoading={isLoading}
           onDelete={handleDelete}
           onEdit={handleEdit}
-          rowSelection={{
+          rowSelection={isAdmin ? {
             selectedRowKeys,
             onChange: setSelectedRowKeys,
-          }}
+          } : undefined}
         />
       )}
       <TripModal

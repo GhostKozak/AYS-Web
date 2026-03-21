@@ -21,6 +21,7 @@ import { useIsMobile } from "../../hooks/useIsMobile";
 import DriverCardList from "./components/DriverCardList";
 import { exportDriversToExcel } from "../../utils/excel.utils";
 import { RoleGuard } from "../../components/auth/RoleGuard";
+import { hasRole } from "../../utils/auth.utils";
 
 function Drivers() {
   const { t } = useTranslation();
@@ -43,6 +44,7 @@ function Drivers() {
     useDrivers();
   const { companies } = useCompanies();
   const isMobile = useIsMobile();
+  const isAdmin = hasRole([USER_ROLES.ADMIN]);
 
   const handleExport = () => {
     exportDriversToExcel(filteredDrivers);
@@ -183,7 +185,7 @@ function Drivers() {
         />
         <RoleGuard allowedRoles={[USER_ROLES.ADMIN, USER_ROLES.EDITOR]}>
           <Space>
-            {selectedRowKeys.length > 0 && (
+            {selectedRowKeys.length > 0 && isAdmin && (
               <Popconfirm
                 title={t("Common.BULK_DELETE_CONFIRM_TITLE")}
                 description={t("Common.BULK_DELETE_CONFIRM_DESC", { count: selectedRowKeys.length })}
@@ -216,10 +218,10 @@ function Drivers() {
           isLoading={isLoading}
           onEdit={handleEdit}
           onDelete={handleDelete}
-          rowSelection={{
+          rowSelection={isAdmin ? {
             selectedRowKeys,
             onChange: setSelectedRowKeys,
-          }}
+          } : undefined}
         />
       )}
       <DriverModal

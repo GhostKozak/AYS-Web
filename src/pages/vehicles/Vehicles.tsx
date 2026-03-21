@@ -18,6 +18,7 @@ import { useIsMobile } from "../../hooks/useIsMobile";
 import VehicleCardList from "./components/VehicleCardList";
 import { exportVehiclesToExcel } from "../../utils/excel.utils";
 import { RoleGuard } from "../../components/auth/RoleGuard";
+import { hasRole } from "../../utils/auth.utils";
 
 function Vehicles() {
   const { t } = useTranslation();
@@ -40,6 +41,7 @@ function Vehicles() {
   const { vehicles, isLoading, createVehicle, updateVehicle, deleteVehicle } =
     useVehicles();
   const isMobile = useIsMobile();
+  const isAdmin = hasRole([USER_ROLES.ADMIN]);
 
   const handleExport = () => {
     exportVehiclesToExcel(filteredVehicles);
@@ -178,7 +180,7 @@ function Vehicles() {
         />
         <RoleGuard allowedRoles={[USER_ROLES.ADMIN, USER_ROLES.EDITOR]}>
           <Space>
-            {selectedRowKeys.length > 0 && (
+            {selectedRowKeys.length > 0 && isAdmin && (
               <Popconfirm
                 title={t("Common.BULK_DELETE_CONFIRM_TITLE")}
                 description={t("Common.BULK_DELETE_CONFIRM_DESC", { count: selectedRowKeys.length })}
@@ -211,10 +213,10 @@ function Vehicles() {
           isLoading={isLoading}
           onEdit={handleEdit}
           onDelete={handleDelete}
-          rowSelection={{
+          rowSelection={isAdmin ? {
             selectedRowKeys,
             onChange: setSelectedRowKeys,
-          }}
+          } : undefined}
         />
       )}
 
