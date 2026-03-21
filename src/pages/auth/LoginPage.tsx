@@ -2,28 +2,31 @@ import { Form, Input, Button, Card, message } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router";
 import apiClient from "../../api/apiClient";
-import { API_ENDPOINTS, ROUTES, STORAGE_KEYS } from "../../constants";
+import { API_ENDPOINTS, ROUTES } from "../../constants";
 import { useTranslation } from "react-i18next";
+
+import { useState } from "react";
+import { setToken, setUser } from "../../utils/auth.utils";
 
 function LoginPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   const onFinish = async (values: any) => {
+    setLoading(true);
     try {
       const response = await apiClient.post(API_ENDPOINTS.AUTH.LOGIN, values);
-      localStorage.setItem(
-        STORAGE_KEYS.ACCESS_TOKEN,
-        response.data.access_token,
-      );
-      localStorage.setItem(
-        STORAGE_KEYS.USER,
-        JSON.stringify(response.data.user),
-      );
+      setToken(response.data.access_token);
+      setUser(response.data.user);
       message.success(t("Login.SUCCESS"));
       navigate(ROUTES.DASHBOARD);
-    } catch (error) {
-      message.error(t("Login.ERROR"));
+    } catch (error: any) {
+      console.error("Login error:", error);
+      const errorMessage = error.response?.data?.message || t("Login.ERROR");
+      message.error(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -57,7 +60,7 @@ function LoginPage() {
             />
           </Form.Item>
           <Form.Item>
-            <Button type="primary" htmlType="submit" style={{ width: "100%" }}>
+            <Button type="primary" htmlType="submit" style={{ width: "100%" }} loading={loading}>
               {t("Login.BUTTON")}
             </Button>
           </Form.Item>

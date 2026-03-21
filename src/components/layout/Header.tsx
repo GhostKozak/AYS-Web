@@ -14,7 +14,7 @@ import {
   theme,
 } from "antd";
 import { Link, useLocation, useNavigate } from "react-router";
-import { CONFIG, ROUTES, STORAGE_KEYS } from "../../constants";
+import { CONFIG, ROUTES } from "../../constants";
 import {
   LoginOutlined,
   MenuOutlined,
@@ -28,6 +28,8 @@ import { useAppConfig } from "../../utils/AppConfigProvider";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useIsMobile } from "../../hooks/useIsMobile";
+
+import { clearAuth, getUser, isLoggedIn } from "../../utils/auth.utils";
 
 function Header() {
   const { t, i18n } = useTranslation();
@@ -50,20 +52,17 @@ function Header() {
   const showModal = () => setIsModalOpen(true);
   const handleCancel = () => setIsModalOpen(false);
 
-  const userString = localStorage.getItem(STORAGE_KEYS.USER);
-  const userObject = userString ? JSON.parse(userString) : null;
-  const isLoggedIn = !!userObject;
-  const currentLang = localStorage.getItem(STORAGE_KEYS.LANGUAGE) || "tr";
+  const userObject = getUser();
+  const authenticated = isLoggedIn();
+  const currentLang = i18n.language || "tr";
 
   const handleLogout = () => {
-    localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
-    localStorage.removeItem(STORAGE_KEYS.USER);
+    clearAuth();
     navigate(ROUTES.LOGIN);
   };
 
   const toggleLang = () => {
     const newLang = currentLang === "tr" ? "en" : "tr";
-    localStorage.setItem(STORAGE_KEYS.LANGUAGE, newLang);
     i18n.changeLanguage(newLang);
   };
 
@@ -218,7 +217,7 @@ function Header() {
           >
             {currentLang.toUpperCase()}
           </Button>
-          {isLoggedIn ? (
+          {authenticated ? (
             <Dropdown
               menu={{ items: userMenuItems }}
               trigger={["click"]}
@@ -240,11 +239,11 @@ function Header() {
                   icon={<UserOutlined />}
                   style={{ backgroundColor: token.colorPrimary }}
                 />
-                <span>{userObject.firstName}</span>
+                <span>{userObject?.firstName}</span>
                 <Tag
-                  color={userObject.role === "admin" ? "#87d068" : "#2db7f5"}
+                  color={userObject?.role === "admin" ? "#87d068" : "#2db7f5"}
                 >
-                  {userObject.role}
+                  {userObject?.role}
                 </Tag>
               </a>
             </Dropdown>
@@ -275,72 +274,72 @@ function Header() {
           />
         </Space>
       )}
-
-      <Drawer
-        title={t("Header.MENU")}
-        placement="right"
-        onClose={() => setIsMobileMenuOpen(false)}
-        open={isMobileMenuOpen}
-        styles={{ 
-          body: { padding: 0 },
-          wrapper: { width: 280 }
-        }}
-      >
-        {isLoggedIn && (
-          <div
-            style={{
-              padding: "20px",
-              background: token.colorBgContainerDisabled,
-              marginBottom: "10px",
-            }}
-          >
-            <Flex gap="small" align="center">
-              <Avatar size="large" icon={<UserOutlined />} />
-              <div>
-                <div style={{ fontWeight: "bold" }}>
-                  {userObject.firstName} {userObject.lastName}
-                </div>
-                <Tag
-                  color={userObject.role === "admin" ? "#87d068" : "#2db7f5"}
-                >
-                  {userObject.role}
-                </Tag>
-              </div>
-            </Flex>
-          </div>
-        )}
-
-        <Menu
-          mode="inline"
-          selectedKeys={[location.pathname.split("/")[1] || "dashboard"]}
-          items={menuItems}
-          style={{ borderRight: "none" }}
-        />
-
-        <div
-          style={{
-            borderTop: `1px solid ${token.colorBorder}`,
-            marginTop: "10px",
-            paddingTop: "10px",
-          }}
-        >
-          <Menu
-            mode="inline"
-            selectable={false}
-            items={
-              isLoggedIn ? userMenuItems.filter((i) => i && i.key !== "0") : []
-            }
-          />
-          {isLoggedIn && (
-            <div style={{ padding: "20px" }}>
-              <Link to={ROUTES.FIELD_OPS}>
-                <Button type="primary" block icon={<LoginOutlined />}>
-                  {t("FieldOps.BUTTON")}
-                </Button>
-              </Link>
-            </div>
-          )}
-          {!isLoggedIn && (
+ 
+       <Drawer
+         title={t("Header.MENU")}
+         placement="right"
+         onClose={() => setIsMobileMenuOpen(false)}
+         open={isMobileMenuOpen}
+         styles={{ 
+           body: { padding: 0 },
+           wrapper: { width: 280 }
+         }}
+       >
+         {authenticated && userObject && (
+           <div
+             style={{
+               padding: "20px",
+               background: token.colorBgContainerDisabled,
+               marginBottom: "10px",
+             }}
+           >
+             <Flex gap="small" align="center">
+               <Avatar size="large" icon={<UserOutlined />} />
+               <div>
+                 <div style={{ fontWeight: "bold" }}>
+                   {userObject.firstName} {userObject.lastName}
+                 </div>
+                 <Tag
+                   color={userObject.role === "admin" ? "#87d068" : "#2db7f5"}
+                 >
+                   {userObject.role}
+                 </Tag>
+               </div>
+             </Flex>
+           </div>
+         )}
+ 
+         <Menu
+           mode="inline"
+           selectedKeys={[location.pathname.split("/")[1] || "dashboard"]}
+           items={menuItems}
+           style={{ borderRight: "none" }}
+         />
+ 
+         <div
+           style={{
+             borderTop: `1px solid ${token.colorBorder}`,
+             marginTop: "10px",
+             paddingTop: "10px",
+           }}
+         >
+           <Menu
+             mode="inline"
+             selectable={false}
+             items={
+               authenticated ? userMenuItems.filter((i) => i && i.key !== "0") : []
+             }
+           />
+           {authenticated && (
+             <div style={{ padding: "20px" }}>
+               <Link to={ROUTES.FIELD_OPS}>
+                 <Button type="primary" block icon={<LoginOutlined />}>
+                   {t("FieldOps.BUTTON")}
+                 </Button>
+               </Link>
+             </div>
+           )}
+           {!authenticated && (
             <div style={{ padding: "20px" }}>
               <Button
                 type="primary"

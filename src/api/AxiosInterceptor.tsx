@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { App } from "antd";
 import { useNavigate } from "react-router";
 import apiClient from "./apiClient";
-import { ROUTES, STORAGE_KEYS } from "../constants";
+import { ROUTES } from "../constants";
 import { CheckCircleOutlined, DisconnectOutlined } from "@ant-design/icons";
+import { clearAuth } from "../utils/auth.utils";
 
 export const AxiosInterceptor = () => {
   const { message, notification } = App.useApp();
@@ -52,8 +53,7 @@ export const AxiosInterceptor = () => {
 
           if (status === 401) {
             message.warning("Oturum süreniz doldu, lütfen tekrar giriş yapın.");
-            localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
-            localStorage.removeItem(STORAGE_KEYS.USER);
+            clearAuth();
             navigate(ROUTES.LOGIN);
           } else if (status === 403) {
             notification.error({

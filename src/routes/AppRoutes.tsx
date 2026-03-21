@@ -15,6 +15,11 @@ import FieldDashboard from "../pages/field/FieldDashboard";
 function AppRoutes() {
   return createBrowserRouter([
     {
+      path: ROUTES.LOGIN,
+      Component: LoginPage,
+      errorElement: <ErrorPage />,
+    },
+    {
       path: "/",
       Component: App,
       errorElement: <ErrorPage />,
@@ -26,10 +31,6 @@ function AppRoutes() {
         {
           path: ROUTES.DASHBOARD,
           Component: DashboardPage,
-        },
-        {
-          path: ROUTES.LOGIN,
-          Component: LoginPage,
         },
         {
           path: ROUTES.COMPANIES,
@@ -59,18 +60,6 @@ function AppRoutes() {
           path: "*",
           Component: NotFoundPage,
         },
-        // Example RoleGuard Route
-        // {
-        //   path: ROUTES.COMPANIES,
-        //   element: (
-        //     <RoleGuard
-        //       allowedRoles={[UserRole.ADMIN, UserRole.EDITOR]}
-        //       fallback={<Navigate to={ROUTES.DASHBOARD} replace />}
-        //     >
-        //       <Companies />
-        //     </RoleGuard>
-        //   ),
-        // },
       ],
     },
   ]);

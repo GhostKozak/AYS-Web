@@ -1,6 +1,7 @@
 import type { NavigateFunction } from "react-router";
-import { ROUTES, STORAGE_KEYS } from "../constants";
+import { ROUTES } from "../constants";
 import type { DiffChange, DiffConfigItem } from "../types";
+import { clearAuth, getToken } from "./auth.utils";
 
 export const formatPhoneNumber = (phone_number: string): string => {
   const cleanNumber = String(phone_number).replace(/\D/g, "");
@@ -35,35 +36,28 @@ export const formatLicencePlate = (plate: string): string => {
 };
 
 export const checkTokenValidity = (navigate: NavigateFunction) => {
-  const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
+  const token = getToken();
 
-  if (!token) return; // Token yoksa zaten sorun yok, Header boş gelecek
+  if (!token) return;
 
   try {
-    // JWT Token'ın içindeki "expiration" (son kullanma) tarihini okuyoruz
-    // Token yapısı: header.payload.signature (noktalarla ayrılır)
     const payloadBase64 = token.split(".")[1];
-
     if (!payloadBase64) throw new Error("Invalid token");
 
-    // Base64 decode işlemi
-    const decodedJson = atob(payloadBase64);
+    // Base64URL to Base64 (replace - with +, _ with /)
+    const base64 = payloadBase64.replace(/-/g, "+").replace(/_/g, "/");
+    const decodedJson = atob(base64);
     const payload = JSON.parse(decodedJson);
 
-    // Süre kontrolü (payload.exp saniye cinsindendir, 1000 ile çarpıp milisaniye yaparız)
     const isExpired = payload.exp * 1000 < Date.now();
 
     if (isExpired) {
-      // Süresi dolmuşsa temizle ve at
-      localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
-      localStorage.removeItem(STORAGE_KEYS.USER);
+      clearAuth();
       navigate(ROUTES.LOGIN);
     }
   } catch (error) {
-    // Token bozuksa da temizle
-    console.error("Token kontrol hatası:", error);
-    localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
-    localStorage.removeItem(STORAGE_KEYS.USER);
+    console.error("Token check error:", error);
+    clearAuth();
     navigate(ROUTES.LOGIN);
   }
 };

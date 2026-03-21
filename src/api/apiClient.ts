@@ -1,5 +1,6 @@
 import axios from 'axios';
-import { STORAGE_KEYS, CONFIG } from '../constants';
+import { CONFIG } from '../constants';
+import { getToken } from '../utils/auth.utils';
 
 const apiClient = axios.create({
   baseURL: CONFIG.API_BASE_URL,
@@ -10,7 +11,7 @@ const apiClient = axios.create({
 
 // Token'ı her isteğe eklemek için interceptor
 apiClient.interceptors.request.use((config) => {
-  const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
+  const token = getToken();
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
