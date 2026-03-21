@@ -4,6 +4,7 @@ import { getToken } from '../utils/auth.utils';
 
 const apiClient = axios.create({
   baseURL: CONFIG.API_BASE_URL,
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
   },

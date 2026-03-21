@@ -83,6 +83,14 @@ export const AxiosInterceptor = () => {
           setIsOffline(true);
         }
 
+        // Güvenlik: Hassas verileri loglardan temizle
+        const sanitizedError = {
+          message: error.message,
+          code: error.code,
+          status: error.response?.status,
+        };
+        console.error("API Error:", sanitizedError);
+
         return Promise.reject(error);
       }
     );

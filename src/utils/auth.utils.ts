@@ -21,8 +21,23 @@ export const getToken = (): string | null => {
   return localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
 };
 
-export const setToken = (token: string): void => {
-  localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, token);
+export const getRoleFromToken = (token: string | null): UserRole | null => {
+  if (!token) return null;
+  try {
+    const payloadBase64 = token.split(".")[1];
+    if (!payloadBase64) return null;
+    const base64 = payloadBase64.replace(/-/g, "+").replace(/_/g, "/");
+    const payload = JSON.parse(atob(base64));
+    return payload.role || null;
+  } catch (error) {
+    console.error("Failed to decode token role:", error);
+    return null;
+  }
+};
+
+export const setToken = (_token: string): void => {
+  // Artik token localStorage'da saklanmıyor (HttpOnly Cookie kullanılıyor)
+  // console.debug("Token received, but not stored in localStorage for security.");
 };
 
 export const clearAuth = (): void => {
@@ -35,6 +50,11 @@ export const isLoggedIn = (): boolean => {
 };
 
 export const hasRole = (allowedRoles: UserRole[]): boolean => {
+  const token = getToken();
+  const roleFromToken = getRoleFromToken(token);
   const user = getUser();
-  return !!user && allowedRoles.includes(user.role);
+  
+  // Güvenlik: Öncelikli olarak token içindeki role bilgisini kullan (tamper-proof)
+  const effectiveRole = roleFromToken || user?.role;
+  return !!effectiveRole && allowedRoles.includes(effectiveRole as UserRole);
 };

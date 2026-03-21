@@ -6,7 +6,7 @@ import { authApi } from "../../api/authApi";
 import { ROUTES } from "../../constants";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
-import { setToken, setUser } from "../../utils/auth.utils";
+import { setUser } from "../../utils/auth.utils";
 import type { LoginPayload } from "../../types";
 
 function LoginPage() {
@@ -23,7 +23,7 @@ function LoginPage() {
     setLoading(true);
     try {
       const data = await authApi.login(values);
-      setToken(data.access_token);
+      // setToken(data.access_token); // Artik HttpOnly Cookie kullanılıyor
       
       const frontendUser = {
         ...data.user,

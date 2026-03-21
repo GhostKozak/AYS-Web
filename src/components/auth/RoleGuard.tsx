@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import type { UserRole } from "../../types";
 import { useAuth } from "../../hooks/useAuth";
+import { hasRole } from "../../utils/auth.utils";
 
 interface RoleGuardProps {
   children: ReactNode;
@@ -15,7 +16,7 @@ export const RoleGuard = ({
 }: RoleGuardProps) => {
   const { user } = useAuth();
 
-  if (!user || !allowedRoles.includes(user.role)) {
+  if (!user || !hasRole(allowedRoles)) {
     return <>{fallback}</>;
   }
 

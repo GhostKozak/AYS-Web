@@ -1,5 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getUser, setUser as setStoredUser, clearAuth as clearStoredAuth } from "../utils/auth.utils";
+import { userApi } from "../api/userApi";
 import type { User } from "../types";
 import { useNavigate } from "react-router";
 import { ROUTES } from "../constants";
@@ -10,9 +11,21 @@ export const useAuth = () => {
 
   const { data: user, refetch } = useQuery<User | null>({
     queryKey: ["currentUser"],
-    queryFn: () => getUser(),
-    staleTime: 1000 * 60 * 5, // 5 minutes instead of Infinity
+    queryFn: async () => {
+      try {
+        // Güvenlik: Cookie tabanlı oturumu kontrol et
+        const userData = await userApi.getMe();
+        setStoredUser(userData);
+        return userData;
+      } catch (error) {
+        // Oturum geçersizse temizle
+        clearStoredAuth();
+        return null;
+      }
+    },
+    staleTime: 1000 * 60 * 5,
     initialData: () => getUser(),
+    retry: false,
   });
 
   const updateCurrentUser = (updatedUser: Partial<User>) => {
