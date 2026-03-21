@@ -47,9 +47,9 @@ export const useCrud = <T, CreatePayload>(
   const updateMutation = useMutation({
     mutationFn: ({
       id,
-      ...data
+      ...payload
     }: { id: string } & Partial<CreatePayload>) =>
-      api.update(id, data as Partial<CreatePayload>),
+      api.update(id, payload as Partial<CreatePayload>),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey });
     },

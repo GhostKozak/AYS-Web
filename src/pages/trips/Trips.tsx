@@ -142,7 +142,7 @@ function Trips() {
   }, [trips, searchText]);
 
   return (
-    <Layout style={{ padding: "0 50px" }}>
+    <Layout style={{ padding: isMobile ? "0 16px" : "0 50px" }}>
       <Flex
         justify="space-between"
         align="center"

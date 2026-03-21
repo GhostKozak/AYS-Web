@@ -60,7 +60,6 @@ const VehicleModal = ({
   useEffect(() => {
     if (isOpen) {
       if (selectedRecord) {
-        console.table(selectedRecord);
         form.setFieldsValue({
           licence_plate: selectedRecord.licence_plate,
           vehicle_type: selectedRecord.vehicle_type,

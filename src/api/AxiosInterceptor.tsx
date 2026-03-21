@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { App } from "antd";
 import { useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
@@ -36,12 +36,21 @@ export const AxiosInterceptor = () => {
     };
   }, []);
 
+  const tRef = useRef(t);
+  const navigateRef = useRef(navigate);
+  const isOfflineRef = useRef(isOffline);
+
+  useEffect(() => {
+    tRef.current = t;
+    navigateRef.current = navigate;
+    isOfflineRef.current = isOffline;
+  }, [t, navigate, isOffline]);
+
   useEffect(() => {
     // Response Interceptor
     const interceptor = apiClient.interceptors.response.use(
       (response) => {
-        // Herhangi bir başarılı istek gelirse çevrimiçi olduğumuzu varsayabiliriz
-        if (isOffline) {
+        if (isOfflineRef.current) {
           setIsOffline(false);
           setShowOnline(true);
           setTimeout(() => setShowOnline(false), 3000);
@@ -49,30 +58,28 @@ export const AxiosInterceptor = () => {
         return response;
       },
       (error) => {
-        // Global Hata Yönetimi
         if (error.response) {
           const { status } = error.response;
 
           if (status === 401) {
-            message.warning(t("Errors.PLEASE_LOGIN_AGAIN"));
+            message.warning(tRef.current("Errors.PLEASE_LOGIN_AGAIN"));
             clearAuth();
-            navigate(ROUTES.LOGIN);
+            navigateRef.current(ROUTES.LOGIN);
           } else if (status === 403) {
             notification.error({
               key: "403-forbidden",
-              title: t("Common.ERROR"),
-              description: t("Errors.UNAUTHORIZED_DESC"),
+              title: tRef.current("Common.ERROR"),
+              description: tRef.current("Errors.UNAUTHORIZED_DESC"),
             });
           } else if (status >= 500) {
             notification.error({
               key: "500-server-error",
-              title: t("Common.ERROR"),
+              title: tRef.current("Common.ERROR"),
               description:
-                error.response?.data?.message || t("Errors.SERVER_ERROR_DESC"),
+                error.response?.data?.message || tRef.current("Errors.SERVER_ERROR_DESC"),
             });
           }
         } else if (error.code === "ERR_NETWORK") {
-          // Çok fazla mesaj çıkmaması için sadece state'i güncelliyoruz
           setIsOffline(true);
         }
 
@@ -80,11 +87,10 @@ export const AxiosInterceptor = () => {
       }
     );
 
-    // Cleanup
     return () => {
       apiClient.interceptors.response.eject(interceptor);
     };
-  }, [message, notification, navigate, isOffline, t]);
+  }, [message, notification]); // message and notification are stable from App.useApp()
 
   return (
     <>
