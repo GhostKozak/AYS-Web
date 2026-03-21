@@ -198,7 +198,7 @@ const TripModal = ({
     const existing = companies.map((c) => ({ label: c.name, value: c._id }));
     if (companySearch && !companies.some((c) => c.name === companySearch)) {
       existing.push({
-        label: `Yeni firma oluştur: ${companySearch}`,
+        label: t("Trips.CREATE_NEW_COMPANY", { name: companySearch }),
         value: companySearch,
       });
     }
@@ -215,7 +215,7 @@ const TripModal = ({
       !vehicles.some((v) => v.licence_plate === vehicleSearch)
     ) {
       existing.push({
-        label: `Yeni araç oluştur: ${vehicleSearch}`,
+        label: t("Trips.CREATE_NEW_VEHICLE", { plate: vehicleSearch }),
         value: vehicleSearch,
       });
     }
@@ -226,7 +226,7 @@ const TripModal = ({
     const existing = drivers.map((d) => ({ label: d.full_name, value: d._id }));
     if (driverSearch && !drivers.some((d) => d.full_name === driverSearch)) {
       existing.push({
-        label: `Yeni sürücü oluştur: ${driverSearch}`,
+        label: t("Trips.CREATE_NEW_DRIVER", { name: driverSearch }),
         value: driverSearch,
       });
     }

@@ -92,7 +92,7 @@ export default function VehicleCardList({
               <Space orientation="vertical" style={{ width: "100%" }}>
                 <Flex justify="space-between">
                   <Text type="secondary">{t("Vehicles.VEHICLE_TYPE")}:</Text>
-                  <Text>{item.vehicle_type}</Text>
+                  <Text>{t(`Vehicles.TYPE_${item.vehicle_type}`)}</Text>
                 </Flex>
                 <Divider size="small" style={{ margin: "8px 0" }} />
                 <Flex justify="space-between">

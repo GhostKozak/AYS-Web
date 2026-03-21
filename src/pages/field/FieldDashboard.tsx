@@ -261,7 +261,7 @@ function FieldDashboard() {
 
       {/* LİSTELEME ALANI */}
       {isLoading ? (
-        <div style={{ textAlign: "center", padding: 50 }}>Yükleniyor...</div>
+        <div style={{ textAlign: "center", padding: 50 }}>{t("Common.LOADING")}...</div>
       ) : (
         <>
           {activeTab === "URGENT" && (

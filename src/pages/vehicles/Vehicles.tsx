@@ -9,7 +9,7 @@ import {
   SearchOutlined,
 } from "@ant-design/icons";
 import { useVehicles } from "../../hooks/useVehicles";
-import { UserRole, type VehicleType, type VehicleTypeEnum } from "../../types";
+import { USER_ROLES, type VehicleType, type VehicleTypeEnum } from "../../types";
 import VehicleTable from "./components/VehicleTable";
 import { useIsMobile } from "../../hooks/useIsMobile";
 import VehicleCardList from "./components/VehicleCardList";
@@ -81,7 +81,7 @@ function Vehicles() {
       }
       setIsModalOpen(false);
     } catch (error: any) {
-      if (error.response?.status === 400) {
+      if (error.response?.status && [400, 409, 422].includes(error.response.status)) {
         notification.error({
           title: t("Common.ERROR"),
           description: error.response?.data?.message || t("Errors.OPERATION_FAILED"),
@@ -115,7 +115,7 @@ function Vehicles() {
         style={{ marginTop: 0, marginBottom: 10 }}
       >
         <h1>{t("Breadcrumbs.VEHICLES")}</h1>
-        <RoleGuard allowedRoles={[UserRole.ADMIN]}>
+        <RoleGuard allowedRoles={[USER_ROLES.ADMIN]}>
           <Button
             type="primary"
             icon={<FileExcelOutlined />}
@@ -141,7 +141,7 @@ function Vehicles() {
           onSearch={setSearchText}
           onChange={(e) => setSearchText(e.target.value)}
         />
-        <RoleGuard allowedRoles={[UserRole.ADMIN, UserRole.EDITOR]}>
+        <RoleGuard allowedRoles={[USER_ROLES.ADMIN, USER_ROLES.EDITOR]}>
           <Button color="cyan" variant="solid" size="large" onClick={handleAdd}>
             <PlusOutlined />{" "}
             {isMobile ? t("Common.ADD") : t("Vehicles.ADD_BUTTON")}

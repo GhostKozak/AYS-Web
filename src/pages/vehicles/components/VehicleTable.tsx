@@ -1,6 +1,6 @@
 import { Table, Tag, Popconfirm, Button, Space } from "antd";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
-import { UserRole, type VehicleType } from "../../../types";
+import { USER_ROLES, type VehicleType } from "../../../types";
 import { Trans, useTranslation } from "react-i18next";
 import { formatLicencePlate, getUniqueOptions } from "../../../utils";
 import { useMemo } from "react";
@@ -61,7 +61,7 @@ export default function VehicleTable({
         title: t("Table.CREATED_AT"),
         dataIndex: "createdAt",
         key: "createdAt",
-        visible: hasRole([UserRole.ADMIN, UserRole.EDITOR]),
+        visible: hasRole([USER_ROLES.ADMIN, USER_ROLES.EDITOR]),
         render: (date: string) => new Date(date).toLocaleString("tr-TR"),
         sorter: (a, b) =>
           new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
@@ -80,7 +80,7 @@ export default function VehicleTable({
         title: t("Table.STATUS"),
         key: "deleted",
         dataIndex: "deleted",
-        visible: hasRole([UserRole.ADMIN, UserRole.EDITOR]),
+        visible: hasRole([USER_ROLES.ADMIN, USER_ROLES.EDITOR]),
         render: (deleted: boolean) => (
           <Tag color={deleted ? "red" : "green"}>
             {deleted ? t("Common.PASSIVE") : t("Common.ACTIVE")}
@@ -95,7 +95,7 @@ export default function VehicleTable({
       {
         title: t("Table.ACTIONS"),
         key: "action",
-        visible: hasRole([UserRole.ADMIN, UserRole.EDITOR]),
+        visible: hasRole([USER_ROLES.ADMIN, USER_ROLES.EDITOR]),
         render: (_: any, record: VehicleType) => (
           <Space>
             <Button

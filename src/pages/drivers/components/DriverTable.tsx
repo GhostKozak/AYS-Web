@@ -1,6 +1,6 @@
 import { Table, Tag, Popconfirm, Button, Space } from "antd";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
-import { UserRole, type DriverType } from "../../../types";
+import { USER_ROLES, type DriverType } from "../../../types";
 import { Trans, useTranslation } from "react-i18next";
 import { formatPhoneNumber, getUniqueOptions } from "../../../utils";
 import { useMemo } from "react";
@@ -69,7 +69,7 @@ export default function DriverTable({
         title: t("Table.CREATED_AT"),
         dataIndex: "createdAt",
         key: "createdAt",
-        visible: hasRole([UserRole.ADMIN, UserRole.EDITOR]),
+        visible: hasRole([USER_ROLES.ADMIN, USER_ROLES.EDITOR]),
         render: (date: string) => new Date(date).toLocaleString("tr-TR"),
         sorter: (a, b) =>
           new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
@@ -88,7 +88,7 @@ export default function DriverTable({
         title: t("Table.STATUS"),
         dataIndex: "deleted",
         key: "deleted",
-        visible: hasRole([UserRole.ADMIN, UserRole.EDITOR]),
+        visible: hasRole([USER_ROLES.ADMIN, USER_ROLES.EDITOR]),
         render: (deleted: boolean) => (
           <Tag color={deleted ? "red" : "green"}>
             {deleted ? t("Common.PASSIVE") : t("Common.ACTIVE")}
@@ -103,7 +103,7 @@ export default function DriverTable({
       {
         title: t("Table.ACTIONS"),
         key: "action",
-        visible: hasRole([UserRole.ADMIN, UserRole.EDITOR]),
+        visible: hasRole([USER_ROLES.ADMIN, USER_ROLES.EDITOR]),
         render: (_: any, record: DriverType) => (
           <Space>
             <Button

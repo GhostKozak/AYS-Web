@@ -1,7 +1,6 @@
 import { Modal, Form, Input, Button, Select, Row, Col } from "antd";
 import { useEffect, useMemo } from "react";
 import {
-  VehicleLabels,
   VehicleValues,
   type VehicleType,
   type VehicleTypeEnum,
@@ -53,8 +52,8 @@ const VehicleModal = ({
   const hasChanges = diffs.length > 0;
 
   const vehicleOptions = VehicleValues.map((value) => ({
-    label: VehicleLabels[value],
-    value: value,
+    label: t(`Vehicles.TYPE_${value}`),
+    value,
   }));
 
   useEffect(() => {

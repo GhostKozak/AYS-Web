@@ -12,7 +12,7 @@ import {
 import { useCompanies } from "../../hooks/useCompanies";
 import { useDrivers } from "../../hooks/useDrivers";
 import DriverModal from "./components/DriverModal";
-import { UserRole, type DriverType } from "../../types";
+import { USER_ROLES, type DriverType } from "../../types";
 import DriverTable from "./components/DriverTable";
 import { useIsMobile } from "../../hooks/useIsMobile";
 import DriverCardList from "./components/DriverCardList";
@@ -83,7 +83,7 @@ function Drivers() {
       if (selectedRecord) {
         await updateDriver({ id: selectedRecord._id, ...payload });
         notification.info({
-          title: t("Common.INFO"),
+          title: t("Audit.DETAILS"),
           description: t("Drivers.UPDATE_SUCCESS", { name: values.full_name }),
         });
       } else {
@@ -95,7 +95,7 @@ function Drivers() {
       }
       setIsModalOpen(false);
     } catch (error: any) {
-      if (error.response?.status === 400) {
+      if (error.response?.status && [400, 409, 422].includes(error.response.status)) {
         notification.error({
           title: t("Common.ERROR"),
           description: error.response?.data?.message || t("Errors.OPERATION_FAILED"),
@@ -120,7 +120,7 @@ function Drivers() {
         style={{ marginTop: 0, marginBottom: 10 }}
       >
         <h1>{t("Breadcrumbs.DRIVERS")}</h1>
-        <RoleGuard allowedRoles={[UserRole.ADMIN]}>
+        <RoleGuard allowedRoles={[USER_ROLES.ADMIN]}>
           <Button
             type="primary"
             icon={<FileExcelOutlined />}
@@ -146,7 +146,7 @@ function Drivers() {
           onSearch={handleSearch}
           onChange={(e) => handleSearch(e.target.value)}
         />
-        <RoleGuard allowedRoles={[UserRole.ADMIN, UserRole.EDITOR]}>
+        <RoleGuard allowedRoles={[USER_ROLES.ADMIN, USER_ROLES.EDITOR]}>
           <Button color="cyan" variant="solid" size="large" onClick={handleAdd}>
             <PlusOutlined />{" "}
             {isMobile ? t("Common.ADD") : t("Drivers.ADD_BUTTON")}

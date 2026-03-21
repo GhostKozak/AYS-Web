@@ -37,12 +37,8 @@ export const VehicleValues: VehicleTypeEnum[] = [
   'TRAILER',
 ];
 
-export const VehicleLabels: Record<VehicleTypeEnum, string> = {
-  TRUCK: 'Tır',
-  LORRY: 'Lorry Kamyonet',
-  VAN: 'Minivan',
-  TRAILER: 'Dorse',
-};
+
+export type TripStatus = 'WAITING' | 'UNLOADING' | 'UNLOADED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELED';
 
 export interface TripType {
   _id: string;
@@ -51,7 +47,7 @@ export interface TripType {
   vehicle: Pick<VehicleType, '_id' | 'licence_plate'>;
   departure_time: string;
   arrival_time: string;
-  unload_status: string;
+  unload_status: TripStatus;
   has_gps_tracking: boolean;
   is_in_temporary_parking_lot: boolean;
   is_in_parking_lot: boolean;
@@ -156,7 +152,7 @@ export interface LoginResponse {
   };
 }
 
-export const UserRole = {
+export const USER_ROLES = {
   ADMIN: 'admin',
   EDITOR: 'editor',
   VIEWER: 'viewer',

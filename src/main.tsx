@@ -9,12 +9,13 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { App as AntdApp } from "antd";
 
 const queryClient = new QueryClient();
+const router = AppRoutes();
 
 createRoot(document.getElementById("root")!).render(
   <AppConfigProvider>
     <AntdApp notification={{ top: 70 }} message={{ top: 70 }}>
       <QueryClientProvider client={queryClient}>
-        <RouterProvider router={AppRoutes()} />
+        <RouterProvider router={router} />
         <ReactQueryDevtools
           initialIsOpen={false}
           buttonPosition="bottom-left"

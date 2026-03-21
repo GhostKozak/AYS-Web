@@ -24,7 +24,6 @@ import { DashboardWidget } from "./components/DashboardWidget";
 import { FileExcelOutlined, FilePdfOutlined, SettingOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import { reportApi } from "../../api/reportApi";
-import { useTrips } from "../../hooks/useTrips";
 
 const { Text } = Typography;
 const ResponsiveGridLayout = WidthProvider(Responsive);
@@ -32,7 +31,6 @@ const ResponsiveGridLayout = WidthProvider(Responsive);
 function DashboardPage() {
   const { t } = useTranslation();
   const { message } = App.useApp();
-  const { trips } = useTrips(); // Live list için hala gerekebilir veya summary'den alınabilir
   const [isExporting, setIsExporting] = useState(false);
 
   const [visibleWidgets, setVisibleWidgets] = useState({
@@ -211,7 +209,7 @@ function DashboardPage() {
               }
               onClose={() => toggleWidget("live", false)}
             >
-              <LiveOperationsList trips={trips} />
+              <LiveOperationsList />
             </DashboardWidget>
           </div>
         )}

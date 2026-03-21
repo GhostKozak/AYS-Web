@@ -1,6 +1,6 @@
 import { Table, Tag, Popconfirm, Button, Space, Tooltip } from "antd";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
-import { UserRole, type TripType } from "../../../types";
+import { USER_ROLES, type TripType } from "../../../types";
 import { Trans, useTranslation } from "react-i18next";
 import {
   formatLicencePlate,
@@ -240,7 +240,7 @@ export default function TripTable({
         key: "action",
         fixed: "right",
         width: 200,
-        visible: hasRole([UserRole.ADMIN, UserRole.EDITOR]),
+        visible: hasRole([USER_ROLES.ADMIN, USER_ROLES.EDITOR]),
         render: (_: any, record: TripType) => (
           <Space>
             <Button

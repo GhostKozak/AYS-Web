@@ -208,10 +208,10 @@
     "UPDATE_SUCCESS": "{{plate}} plakalı araç başarıyla güncellendi.",
     "DELETE_SUCCESS": "{{plate}} plakalı araç silindi.",
     "TOTAL": "adet araç",
-    "TYPE_TRUCK": "TIR",
-    "TYPE_VAN": "MİNİVAN",
-    "TYPE_LORRY": "KAMYONET",
-    "TYPE_TRAILER": "DORSE"
+    "TYPE_TRUCK": "Tır",
+    "TYPE_VAN": "Minivan",
+    "TYPE_LORRY": "Kamyonet",
+    "TYPE_TRAILER": "Dorse"
   },
 
   "Trips": {
@@ -247,7 +247,10 @@
     "STATUS_IN_PROGRESS": "Devam Ediyor",
     "STATUS_COMPLETED": "Tamamlandı",
     "STATUS_CANCELED": "İptal Edildi",
-    "STATUS_UNKNOWN": "Belirsiz"
+    "STATUS_UNKNOWN": "Belirsiz",
+    "CREATE_NEW_COMPANY": "Yeni firma oluştur: {{name}}",
+    "CREATE_NEW_VEHICLE": "Yeni araç oluştur: {{plate}}",
+    "CREATE_NEW_DRIVER": "Yeni sürücü oluştur: {{name}}"
   },
 
   "Other": {

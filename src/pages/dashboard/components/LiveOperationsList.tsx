@@ -1,8 +1,9 @@
 import { useMemo } from "react";
 import { Card, Flex, Avatar, Tag, Typography, Space, theme } from "antd";
 import { TruckOutlined, ClockCircleOutlined } from "@ant-design/icons";
-import type { TripType } from "../../../types";
 import { useTranslation } from "react-i18next";
+import { useTrips } from "../../../hooks/useTrips";
+import { formatLicencePlate } from "../../../utils";
 
 const { Text } = Typography;
 const { useToken } = theme;
@@ -17,40 +18,39 @@ const getStatusTag = (status: string, t: (key: string) => string) => {
         <Tag color="warning" style={{ margin: 0 }}>
           {label}
         </Tag>
-      ); // Sarı/Turuncu
+      ); 
     case "COMPLETED":
       return (
         <Tag color="success" style={{ margin: 0 }}>
           {label}
         </Tag>
-      ); // Yeşil
+      ); 
     case "UNLOADED":
       return (
         <Tag color="cyan" style={{ margin: 0 }}>
           {label}
         </Tag>
-      ); // Camgöbeği
+      ); 
     case "CANCELED":
       return (
         <Tag color="error" style={{ margin: 0 }}>
           {label}
         </Tag>
-      ); // Kırmızı
+      ); 
     default:
       return (
         <Tag color="default" style={{ margin: 0 }}>
           {label}
         </Tag>
-      ); // Gri
+      ); 
   }
 };
 
-const LiveOperationsList = ({ trips }: { trips: TripType[] }) => {
-  // Ant Design theme tokens (for dark mode compatibility)
+export default function LiveOperationsList() {
+  const { trips, isLoading } = useTrips();
   const { token } = useToken();
   const { t } = useTranslation();
 
-  // Veriyi sıralama ve son 6 taneyi alma mantığı (Aynı)
   const latestTrips = useMemo(() => {
     if (!trips) return [];
     return [...trips]
@@ -64,15 +64,6 @@ const LiveOperationsList = ({ trips }: { trips: TripType[] }) => {
 
   return (
     <Card
-      // title={
-      //   <Space>
-      //     {/* Yanıp sönen yeşil nokta efekti için AntD Badge */}
-      //     <Badge status="processing" color="green" />
-      //     <Text strong style={{ fontSize: 16 }}>
-      //       Son Hareketler
-      //     </Text>
-      //   </Space>
-      // }
       variant="borderless"
       styles={{
         body: {
@@ -83,7 +74,11 @@ const LiveOperationsList = ({ trips }: { trips: TripType[] }) => {
       }}
     >
       <Flex vertical gap={0}>
-        {latestTrips.length === 0 ? (
+        {isLoading ? (
+          <div style={{ padding: "40px", textAlign: "center" }}>
+            <Text type="secondary">{t("Common.LOADING")}...</Text>
+          </div>
+        ) : latestTrips.length === 0 ? (
           <div style={{ padding: "40px", textAlign: "center", color: token.colorTextTertiary }}>
             {t("Common.NO_DATA_YET")}
           </div>
@@ -117,7 +112,9 @@ const LiveOperationsList = ({ trips }: { trips: TripType[] }) => {
                   />
                   <div>
                     <div style={{ fontWeight: "bold", fontSize: 14, color: token.colorText }}>
-                      {trip.vehicle?.licence_plate || t("Common.NO_PLATE")}
+                      {trip.vehicle?.licence_plate 
+                        ? formatLicencePlate(trip.vehicle.licence_plate) 
+                        : t("Common.NO_PLATE")}
                     </div>
                     <div style={{ fontSize: 12, color: token.colorTextSecondary }}>
                       {trip.company?.name || t("Common.UNKNOWN_COMPANY")}
@@ -153,6 +150,4 @@ const LiveOperationsList = ({ trips }: { trips: TripType[] }) => {
       </Flex>
     </Card>
   );
-};
-
-export default LiveOperationsList;
+}

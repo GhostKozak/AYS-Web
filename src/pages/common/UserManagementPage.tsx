@@ -7,7 +7,7 @@ import { useState } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import dayjs from "dayjs";
 import type { User, CreateUserPayload } from "../../types";
-import { UserRole as UserRoleConst } from "../../types";
+import { USER_ROLES } from "../../types";
 import { getUser } from "../../utils/auth.utils";
 
 const { Title } = Typography;
@@ -16,7 +16,7 @@ function UserManagementPage() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const { updateCurrentUser } = useAuth();
-  const { message, modal } = App.useApp();
+  const { message, modal, notification } = App.useApp();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [form] = Form.useForm();
@@ -33,6 +33,14 @@ function UserManagementPage() {
       message.success(t("Users.CREATE_SUCCESS"));
       setIsModalOpen(false);
     },
+    onError: (error: any) => {
+      if (error.response?.status && [400, 409, 422].includes(error.response.status)) {
+        notification.error({
+          message: t("Common.ERROR"),
+          description: error.response?.data?.message || t("Errors.OPERATION_FAILED"),
+        });
+      }
+    },
   });
 
   const updateMutation = useMutation({
@@ -48,6 +56,14 @@ function UserManagementPage() {
       message.success(t("Users.UPDATE_SUCCESS"));
       setIsModalOpen(false);
     },
+    onError: (error: any) => {
+      if (error.response?.status && [400, 409, 422].includes(error.response.status)) {
+        notification.error({
+          message: t("Common.ERROR"),
+          description: error.response?.data?.message || t("Errors.OPERATION_FAILED"),
+        });
+      }
+    },
   });
 
   const deleteMutation = useMutation({
@@ -55,6 +71,14 @@ function UserManagementPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
       message.success(t("Users.DELETE_SUCCESS"));
+    },
+    onError: (error: any) => {
+      if (error.response?.status && [400, 409, 422].includes(error.response.status)) {
+        notification.error({
+          message: t("Common.ERROR"),
+          description: error.response?.data?.message || t("Errors.OPERATION_FAILED"),
+        });
+      }
     },
   });
 
@@ -202,10 +226,10 @@ function UserManagementPage() {
           <Form.Item name="role" label={t("Users.ROLE")} rules={[{ required: true }]}>
             <Select 
               options={[
-                { value: UserRoleConst.ADMIN, label: 'ADMIN' },
-                { value: UserRoleConst.EDITOR, label: 'EDITOR' },
-                { value: UserRoleConst.VIEWER, label: 'VIEWER' },
-                { value: UserRoleConst.USER, label: 'USER' },
+                { value: USER_ROLES.ADMIN, label: 'ADMIN' },
+                { value: USER_ROLES.EDITOR, label: 'EDITOR' },
+                { value: USER_ROLES.VIEWER, label: 'VIEWER' },
+                { value: USER_ROLES.USER, label: 'USER' },
               ]}
             />
           </Form.Item>

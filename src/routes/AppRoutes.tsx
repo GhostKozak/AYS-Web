@@ -15,7 +15,7 @@ import AuditPage from "../pages/common/AuditPage";
 import UserManagementPage from "../pages/common/UserManagementPage";
 import { AuthGuard } from "../components/auth/AuthGuard";
 import { RoleGuard } from "../components/auth/RoleGuard";
-import { UserRole } from "../types";
+import { USER_ROLES } from "../types";
 
 function AppRoutes() {
   return createBrowserRouter([
@@ -68,7 +68,7 @@ function AppRoutes() {
         {
           path: ROUTES.AUDIT,
           element: (
-            <RoleGuard allowedRoles={[UserRole.ADMIN]}>
+            <RoleGuard allowedRoles={[USER_ROLES.ADMIN]}>
               <AuditPage />
             </RoleGuard>
           ),
@@ -76,7 +76,7 @@ function AppRoutes() {
         {
           path: ROUTES.USERS,
           element: (
-            <RoleGuard allowedRoles={[UserRole.ADMIN]}>
+            <RoleGuard allowedRoles={[USER_ROLES.ADMIN]}>
               <UserManagementPage />
             </RoleGuard>
           ),
