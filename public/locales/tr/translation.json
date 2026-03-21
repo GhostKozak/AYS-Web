@@ -52,6 +52,7 @@
 
   "Common": {
     "ADD": "Ekle",
+    "SEND": "Gönder",
     "EDIT": "Düzenle",
     "DELETE": "Sil",
     "SEARCH": "Ara",
@@ -69,6 +70,7 @@
     "SEARCH_IN_FILTERS": "Filtrelerde ara",
     "CLEAR_FILTERS": "Filtreleri Temizle",
     "APP_SUBTITLE": "Araç Yönetim Sistemi",
+    "APP_ABBREVIATION": "AYS",
     "UNKNOWN_COMPANY": "Bilinmeyen Firma",
     "OTHERS": "Diğerleri",
     "NO_PLATE": "Plaka Yok",

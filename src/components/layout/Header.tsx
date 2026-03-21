@@ -193,7 +193,8 @@ function Header() {
           marginRight: "20px",
         }}
       >
-        {CONFIG.APP.NAME + " " + t("Common.APP_SUBTITLE")}
+        {CONFIG.APP.NAME}
+        {" " + (isMobile ? t("Common.APP_ABBREVIATION") : t("Common.APP_SUBTITLE"))}
         {CONFIG.DEBUG && (
           <span
             style={{

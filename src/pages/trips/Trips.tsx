@@ -178,13 +178,13 @@ function Trips() {
   }, [trips, searchText]);
 
   return (
-    <Layout style={{ padding: isMobile ? "0 16px" : "0 50px" }}>
+    <Layout style={{ padding: isMobile ? "0 12px" : "0 50px" }}>
       <Flex
         justify="space-between"
         align="center"
         style={{ marginTop: 0, marginBottom: 10 }}
       >
-        <h1>{t("Breadcrumbs.TRIPS")}</h1>
+        <h1 style={{ margin: isMobile ? 0 : undefined }}>{t("Breadcrumbs.TRIPS")}</h1>
         <RoleGuard allowedRoles={[USER_ROLES.ADMIN]}>
           <Button
             type="primary"

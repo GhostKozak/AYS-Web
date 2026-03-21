@@ -94,7 +94,7 @@ export default function DriverCardList({
                 </Flex>
                 <Flex justify="space-between">
                   <Text type="secondary">{t("Drivers.COMPANY_NAME")}:</Text>
-                  <Text>{item.company.name}</Text>
+                  <Text>{item.company?.name || t("Common.UNKNOWN_COMPANY")}</Text>
                 </Flex>
                 <Divider size="small" style={{ margin: "8px 0" }} />
                 <Flex justify="space-between">

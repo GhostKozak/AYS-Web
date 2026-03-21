@@ -52,6 +52,7 @@
 
   "Common": {
     "ADD": "Add",
+    "SEND": "Send",
     "EDIT": "Edit",
     "DELETE": "Delete",
     "SEARCH": "Search",
@@ -69,6 +70,7 @@
     "SEARCH_IN_FILTERS": "Search in filters",
     "CLEAR_FILTERS": "Clear filters",
     "APP_SUBTITLE": "Vehicle Management System",
+    "APP_ABBREVIATION": "AYS",
     "UNKNOWN_COMPANY": "Unknown Company",
     "OTHERS": "Others",
     "NO_PLATE": "No Plate",
@@ -274,7 +276,7 @@
     "STATUS_UNKNOWN": "Unknown"
   },
 
-  "Others": {
+  "Other": {
     "FAQ": "Frequently Asked Questions"
   },
 

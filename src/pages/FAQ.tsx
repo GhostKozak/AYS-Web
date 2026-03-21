@@ -1,12 +1,14 @@
 import { Collapse, Layout, type CollapseProps } from "antd";
 import { useTranslation } from "react-i18next";
 import { usePageTitle } from "../hooks/usePageTitle";
+import { useIsMobile } from "../hooks/useIsMobile";
 
 const { Content } = Layout;
 
 function FAQ() {
   const { t } = useTranslation();
   usePageTitle(t("Other.FAQ"));
+  const isMobile = useIsMobile();
 
   const text = `
   A dog is a type of domesticated animal.
@@ -34,7 +36,7 @@ function FAQ() {
 
   return (
     <Layout>
-      <Content style={{ padding: "0 48px" }}>
+      <Content style={{ padding: isMobile ? "0 16px" : "0 48px" }}>
         <h1>{t("Other.FAQ")}</h1>
         <p>
           Lorem ipsum dolor sit amet consectetur adipisicing elit. Recusandae

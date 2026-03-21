@@ -3,6 +3,7 @@ import "react-resizable/css/styles.css";
 import { useState } from "react";
 import { useDashboardLayout } from "../../hooks/useDashboardLayout";
 import { usePageTitle } from "../../hooks/usePageTitle";
+import { useIsMobile } from "../../hooks/useIsMobile";
 import {
   Badge,
   Button,
@@ -40,6 +41,7 @@ function DashboardPage() {
 
   const { layouts, visibleWidgets, onLayoutChange, toggleWidget, resetLayout } =
     useDashboardLayout();
+  const isMobile = useIsMobile();
 
   usePageTitle(t("Dashboard.TITLE"));
 
@@ -52,19 +54,19 @@ function DashboardPage() {
         const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
         setExportProgress(percentCompleted);
       } else {
-        setExportProgress((prev) => Math.min(prev + 10, 90)); 
+        setExportProgress((prev) => Math.min(prev + 10, 90));
       }
     };
 
     try {
-      const data = type === 'excel' 
+      const data = type === 'excel'
         ? await reportApi.exportExcel('today', onProgress)
         : await reportApi.exportPdf('today', onProgress);
-      
-      const blob = new Blob([data], { 
-        type: type === 'excel' 
-          ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
-          : 'application/pdf' 
+
+      const blob = new Blob([data], {
+        type: type === 'excel'
+          ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+          : 'application/pdf'
       });
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -74,7 +76,7 @@ function DashboardPage() {
       document.body.appendChild(link);
       link.click();
       link.remove();
-      
+
       setExportProgress(100);
       setExportStatus('success');
     } catch (error) {
@@ -89,13 +91,15 @@ function DashboardPage() {
   };
 
   return (
-    <div style={{ padding: "24px" }}>
+    <div style={{ padding: isMobile ? "16px" : "24px", paddingTop: isMobile ? "0px" : "24px" }}>
       <Flex
         justify="space-between"
         align="center"
-        style={{ marginTop: -45, marginBottom: 10 }}
+        wrap="wrap"
+        gap="middle"
+        style={{ marginBottom: isMobile ? 10 : 20 }}
       >
-        <h1 style={{ marginBottom: 0 }}>{t("Dashboard.TITLE")}</h1>
+        <h1 style={{ margin: isMobile ? 0 : undefined, minWidth: 'fit-content' }}>{t("Dashboard.TITLE")}</h1>
 
         <Space>
           <Button

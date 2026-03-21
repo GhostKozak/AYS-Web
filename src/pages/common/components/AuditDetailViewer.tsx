@@ -133,8 +133,8 @@ export default function AuditDetailViewer({ action, details, oldValue, newValue 
             <Switch checked={showOnlyChanges} onChange={setShowOnlyChanges} />
           </Space>
         </div>
-        <Row gutter={16}>
-        <Col span={12}>
+        <Row gutter={[16, 16]}>
+        <Col xs={24} md={12}>
           <Card title={<Text type="danger">{t("Audit.BEFORE", "Önceki")}</Text>} size="small" style={{ borderColor: '#ffa39e', wordBreak: 'break-all' }}>
             <div style={{ overflowX: 'auto' }}>
               {typeof displayBefore === 'object' && displayBefore !== null ? (
@@ -145,7 +145,7 @@ export default function AuditDetailViewer({ action, details, oldValue, newValue 
             </div>
           </Card>
         </Col>
-        <Col span={12}>
+        <Col xs={24} md={12}>
           <Card title={<Text type="success">{t("Audit.AFTER", "Sonraki")}</Text>} size="small" style={{ borderColor: '#b7eb8f', wordBreak: 'break-all' }}>
             <div style={{ overflowX: 'auto' }}>
               {typeof displayAfter === 'object' && displayAfter !== null ? (

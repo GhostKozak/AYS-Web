@@ -7,6 +7,7 @@ import { useSearchParams } from "react-router";
 import dayjs from "dayjs";
 import { usePageTitle } from "../../hooks/usePageTitle";
 import AuditDetailViewer from "./components/AuditDetailViewer";
+import { useIsMobile } from "../../hooks/useIsMobile";
 
 import type { AuditType } from "../../types";
 
@@ -15,6 +16,7 @@ const { Title } = Typography;
 function AuditPage() {
   const { t } = useTranslation();
   usePageTitle(t("Breadcrumbs.AUDIT"));
+  const isMobile = useIsMobile();
   
   const [searchParams, setSearchParams] = useSearchParams();
   const [selectedAudit, setSelectedAudit] = useState<AuditType | null>(null);
@@ -107,10 +109,10 @@ function AuditPage() {
   ];
 
   return (
-    <div style={{ padding: 24 }}>
-      <Title level={2}>{t("Audit.TITLE")}</Title>
+    <div style={{ padding: isMobile ? 16 : 24 }}>
+      <Title level={isMobile ? 3 : 2}>{t("Audit.TITLE")}</Title>
       
-      <Space style={{ marginBottom: 16 }} size="middle">
+      <Space style={{ marginBottom: 16 }} size="middle" wrap>
         <Input 
           placeholder={t("Audit.ENTITY")} 
           value={filters.entity}
@@ -133,6 +135,7 @@ function AuditPage() {
         loading={isLoading} 
         rowKey="_id"
         pagination={{ pageSize: 20 }}
+        scroll={{ x: "max-content" }}
       />
       
       <Modal

@@ -10,6 +10,7 @@ import { usePageTitle } from "../../hooks/usePageTitle";
 import type { User, CreateUserPayload } from "../../types";
 import { USER_ROLES } from "../../types";
 import { getUser } from "../../utils/auth.utils";
+import { useIsMobile } from "../../hooks/useIsMobile";
 
 const { Title } = Typography;
 
@@ -22,6 +23,7 @@ function UserManagementPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [form] = Form.useForm();
+  const isMobile = useIsMobile();
 
   const { data, isLoading } = useQuery<User[]>({
     queryKey: ["users"],
@@ -170,9 +172,16 @@ function UserManagementPage() {
   ];
 
   return (
-    <div style={{ padding: 24 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-        <Title level={2}>{t("Users.TITLE")}</Title>
+    <div style={{ padding: isMobile ? 16 : 24 }}>
+      <div style={{ 
+        display: "flex", 
+        justifyContent: "space-between", 
+        alignItems: "center", 
+        marginBottom: isMobile ? 12 : 16,
+        flexWrap: "wrap",
+        gap: 8
+      }}>
+        <Title level={isMobile ? 3 : 2} style={{ marginBottom: 0 }}>{t("Users.TITLE")}</Title>
         <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
           {t("Users.ADD_USER")}
         </Button>
@@ -182,6 +191,7 @@ function UserManagementPage() {
         dataSource={data} 
         loading={isLoading} 
         rowKey="_id" 
+        scroll={{ x: "max-content" }}
       />
 
       <Modal

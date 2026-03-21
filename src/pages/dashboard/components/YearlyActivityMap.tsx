@@ -1,6 +1,8 @@
 import { ResponsiveCalendar } from "@nivo/calendar";
 import { useReportTrend } from "../../../hooks/useReports";
-import { Skeleton } from "antd";
+import { Skeleton, theme } from "antd";
+import { useTranslation } from "react-i18next";
+import { useIsMobile } from "../../../hooks/useIsMobile";
 
 const currentYear = new Date().getFullYear();
 const fromDate = `${currentYear}-01-01`;
@@ -8,6 +10,9 @@ const toDate = `${currentYear}-12-31`;
 
 const YearlyActivityMap = () => {
   const { data: rawData, isLoading } = useReportTrend("year");
+  const { token } = theme.useToken();
+  const { t, i18n } = useTranslation();
+  const isMobile = useIsMobile();
 
   const data = (rawData || []).map((item) => ({
     day: item.timestamp,
@@ -16,52 +21,62 @@ const YearlyActivityMap = () => {
 
   if (isLoading) return <Skeleton active paragraph={{ rows: 6 }} />;
 
-  const currentLocale = "tr-TR"; // Sabit kalabilir ya da i18n'den alınabilir (önceki gibi)
-
   return (
-    <div style={{ height: "100%", width: "100%", minHeight: 180 }}>
-      <ResponsiveCalendar
-        data={data}
-        from={fromDate}
-        to={toDate}
-        emptyColor="#1f2937"
-        colors={["#064e3b", "#065f46", "#047857", "#10b981"]}
-        margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
-        yearSpacing={40}
-        monthBorderColor="#000000"
-        monthLegendOffset={10}
-        dayBorderWidth={2}
-        dayBorderColor="#000000"
-        daySpacing={0}
-        theme={{
-          text: {
-            fill: "#9ca3af",
-            fontSize: 12,
-          },
-          tooltip: {
-            container: {
-              background: "#111827",
-              color: "#10b981",
-              fontSize: "13px",
-              borderRadius: "4px",
-              boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.5)",
+    <div style={{ height: "100%", width: "100%", overflowX: "auto", overflowY: "hidden" }}>
+      <div style={{ minWidth: isMobile ? 800 : "100%", height: isMobile ? 250 : "100%", minHeight: 200 }}>
+        <ResponsiveCalendar
+          data={data}
+          from={fromDate}
+          to={toDate}
+          emptyColor={token.colorFillAlter}
+          colors={[token.colorPrimaryBorder, token.colorPrimaryHover, token.colorPrimary, token.colorPrimaryActive]}
+          margin={{ top: 20, right: 20, bottom: 20, left: 40 }}
+          yearSpacing={40}
+          monthBorderColor={token.colorBgContainer}
+          monthLegendOffset={10}
+          dayBorderWidth={2}
+          dayBorderColor={token.colorBgContainer}
+          daySpacing={0}
+          theme={{
+            text: {
+              fill: token.colorTextSecondary,
+              fontSize: 12,
             },
-          },
-        }}
-        tooltip={({ day, value, color }) => (
-          <div style={{ padding: 12, color, backgroundColor: "#111827" }}>
-            <strong>
-              {new Date(day).toLocaleDateString(currentLocale, {
-                day: "numeric",
-                month: "long",
-                weekday: "long",
-              })}
-            </strong>
-            <br />
-            <span>Sefer Sayısı: {value}</span>
-          </div>
-        )}
-      />
+            tooltip: {
+              container: {
+                background: token.colorBgElevated,
+                color: token.colorText,
+                fontSize: "13px",
+                borderRadius: token.borderRadius,
+                boxShadow: token.boxShadow,
+                border: `1px solid ${token.colorBorder}`,
+              },
+            },
+          }}
+          tooltip={({ day, value, color }) => {
+            const dateObj = new Date(day);
+            const dateStr = !isNaN(dateObj.getTime()) 
+              ? dateObj.toLocaleDateString(i18n.language || "tr-TR", { day: "numeric", month: "long", weekday: "long" })
+              : day;
+            return (
+              <div style={{ 
+                padding: "8px 12px", 
+                backgroundColor: token.colorBgElevated, 
+                color: token.colorText, 
+                borderRadius: token.borderRadius,
+                boxShadow: token.boxShadowSecondary
+              }}>
+                <strong>{dateStr}</strong>
+                <br />
+                <span style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 4 }}>
+                  <span style={{ width: 10, height: 10, backgroundColor: color, borderRadius: "50%" }}></span>
+                  {value} {t("Breadcrumbs.TRIPS").toLowerCase()}
+                </span>
+              </div>
+            );
+          }}
+        />
+      </div>
     </div>
   );
 };

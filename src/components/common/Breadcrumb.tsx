@@ -3,10 +3,12 @@ import { useLocation, Link } from "react-router";
 import { HomeOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import { ROUTES } from "../../constants";
+import { useIsMobile } from "../../hooks/useIsMobile";
 
 function Breadcrumb() {
   const { t } = useTranslation();
   const location = useLocation();
+  const isMobile = useIsMobile();
 
   // URL path'ini parçalara ayır
   const pathSegments = location.pathname
@@ -44,7 +46,10 @@ function Breadcrumb() {
 
   return (
     <AntBreadcrumb
-      style={{ margin: "16px 0", padding: "0 50px" }}
+      style={{
+        margin: isMobile ? "8px 0" : "16px 0",
+        padding: isMobile ? "0 16px" : "0 50px",
+      }}
       items={breadcrumbItems}
     />
   );
