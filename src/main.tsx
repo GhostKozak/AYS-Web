@@ -24,12 +24,13 @@ createRoot(document.getElementById("root")!).render(
   </AppConfigProvider>
 );
 
-//* for the React Query Devtools extension.
-//TODO: Delete before productions
 declare global {
   interface Window {
     __TANSTACK_QUERY_CLIENT__: import("@tanstack/query-core").QueryClient;
   }
 }
 
-window.__TANSTACK_QUERY_CLIENT__ = queryClient;
+// React Query Devtools global client for development
+if (import.meta.env.DEV) {
+  window.__TANSTACK_QUERY_CLIENT__ = queryClient;
+}

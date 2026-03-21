@@ -8,6 +8,7 @@ export const useCompanies = () => {
     CreateCompanyPayload
   >(companyApi, {
     queryKey: ["companies"],
+    staleTime: 1000 * 60 * 10, // 10 dakika
   });
 
   return {

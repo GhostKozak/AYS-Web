@@ -8,6 +8,7 @@ export const useVehicles = () => {
     CreateVehiclePayload
   >(vehicleApi, {
     queryKey: ["vehicles"],
+    staleTime: 1000 * 60 * 10, // 10 dakika
   });
 
   return {

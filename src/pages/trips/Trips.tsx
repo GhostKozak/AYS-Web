@@ -1,5 +1,5 @@
 import { App, Button, Flex, Layout } from "antd";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 
@@ -121,20 +121,19 @@ function Trips() {
     }
   };
 
-  const filteredTrips = trips.filter((trip) => {
-    if (!searchText) return true;
+  const filteredTrips = useMemo(() => {
+    if (!searchText) return trips;
 
-    return (
-      trip.company?.name?.toLowerCase().includes(searchText.toLowerCase()) ||
-      trip.driver?.full_name
-        ?.toLowerCase()
-        .includes(searchText.toLowerCase()) ||
-      trip.driver?.phone_number?.includes(searchText) ||
-      trip.vehicle?.licence_plate
-        ?.toLowerCase()
-        .includes(searchText.toLowerCase())
-    );
-  });
+    const lowerSearch = searchText.toLowerCase();
+    return trips.filter((trip) => {
+      return (
+        trip.company?.name?.toLowerCase().includes(lowerSearch) ||
+        trip.driver?.full_name?.toLowerCase().includes(lowerSearch) ||
+        trip.driver?.phone_number?.includes(searchText) ||
+        trip.vehicle?.licence_plate?.toLowerCase().includes(lowerSearch)
+      );
+    });
+  }, [trips, searchText]);
 
   return (
     <Layout style={{ padding: "0 50px" }}>

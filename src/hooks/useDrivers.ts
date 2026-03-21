@@ -8,6 +8,7 @@ export const useDrivers = () => {
     CreateDriverPayload
   >(driverApi, {
     queryKey: ["drivers"],
+    staleTime: 1000 * 60 * 10, // 10 dakika
   });
 
   return {
