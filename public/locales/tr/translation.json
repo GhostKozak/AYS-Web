@@ -124,7 +124,9 @@
     "PASSWORD_MIN_LENGTH": "Şifre en az 8 karakter olmalıdır.",
     "PASSWORD_UPPERCASE": "Şifre en az bir büyük harf içermelidir.",
     "PASSWORD_LOWERCASE": "Şifre en az bir küçük harf içermelidir.",
-    "PASSWORD_SPECIAL": "Şifre en az bir özel karakter içermelidir."
+    "PASSWORD_SPECIAL": "Şifre en az bir özel karakter içermelidir.",
+    "PASSWORD_COMPLEXITY": "Şifre en az bir büyük harf, bir küçük harf ve bir özel karakter içermelidir.",
+    "PASSWORDS_DO_NOT_MATCH": "Şifreler birbiriyle eşleşmiyor!"
   },
 
   "Audit": {
@@ -139,6 +141,14 @@
     "BEFORE": "Önceki",
     "AFTER": "Sonraki",
     "CHANGES": "Değişiklikler"
+  },
+
+  "Profile": {
+    "TITLE": "Profil",
+    "EDIT_INFO": "Kişisel Bilgileri Düzenle",
+    "CHANGE_PASSWORD": "Şifre Değiştir",
+    "INFO_UPDATE_SUCCESS": "Kişisel bilgiler başarıyla güncellendi.",
+    "PASSWORD_UPDATE_SUCCESS": "Şifre başarıyla güncellendi."
   },
 
   "Users": {

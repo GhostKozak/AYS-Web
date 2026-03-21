@@ -8,10 +8,10 @@ export const useAuth = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
-  const { data: user } = useQuery<User | null>({
+  const { data: user, refetch } = useQuery<User | null>({
     queryKey: ["currentUser"],
     queryFn: () => getUser(),
-    staleTime: Infinity,
+    staleTime: 1000 * 60 * 5, // 5 minutes instead of Infinity
     initialData: () => getUser(),
   });
 
@@ -21,6 +21,8 @@ export const useAuth = () => {
       const newUser = { ...currentUser, ...updatedUser };
       setStoredUser(newUser);
       queryClient.setQueryData(["currentUser"], newUser);
+      queryClient.invalidateQueries({ queryKey: ["currentUser"] });
+      refetch();
     }
   };
 

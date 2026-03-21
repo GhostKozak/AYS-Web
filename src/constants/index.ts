@@ -35,7 +35,8 @@ export const ROUTES = {
   FAQ: '/sss',
   FIELD_OPS: '/field-operations',
   AUDIT: '/audit',
-  USERS: '/users'
+  USERS: '/users',
+  PROFILE: '/profile'
 } as const;
 
 // HTTP Status Codes

@@ -1,6 +1,7 @@
 import apiClient from './apiClient';
 import { API_ENDPOINTS } from '../constants';
 import type { LoginPayload, LoginResponse } from '../types';
+import { clearAuth } from '../utils/auth.utils';
 
 export const authApi = {
   login: async (credentials: LoginPayload): Promise<LoginResponse> => {
@@ -9,9 +10,7 @@ export const authApi = {
   },
 
   logout: () => {
-    // Backend doesn't have a logout endpoint, so we just clear local storage
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('user');
+    clearAuth();
     window.location.href = '/login';
   }
 };

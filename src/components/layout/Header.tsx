@@ -136,7 +136,7 @@ function Header() {
       {
         key: "1",
         label: (
-          <Link to={ROUTES.DASHBOARD}>{t("Header.ACCOUNT_SETTINGS")}</Link>
+          <Link to={ROUTES.PROFILE}>{t("Header.ACCOUNT_SETTINGS")}</Link>
         ),
       },
       { key: "2", label: t("Header.SUBSCRIPTION") },

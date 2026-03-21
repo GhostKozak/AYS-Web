@@ -124,7 +124,9 @@
     "PASSWORD_MIN_LENGTH": "Password must be at least 8 characters long.",
     "PASSWORD_UPPERCASE": "Password must contain at least one uppercase letter.",
     "PASSWORD_LOWERCASE": "Password must contain at least one lowercase letter.",
-    "PASSWORD_SPECIAL": "Password must contain at least one special character."
+    "PASSWORD_SPECIAL": "Password must contain at least one special character.",
+    "PASSWORD_COMPLEXITY": "Password must contain at least one uppercase letter, one lowercase letter, and one special character.",
+    "PASSWORDS_DO_NOT_MATCH": "Passwords do not match!"
   },
 
   "Audit": {
@@ -139,6 +141,14 @@
     "BEFORE": "Before",
     "AFTER": "After",
     "CHANGES": "Changes"
+  },
+
+  "Profile": {
+    "TITLE": "Profile",
+    "EDIT_INFO": "Edit Personal Info",
+    "CHANGE_PASSWORD": "Change Password",
+    "INFO_UPDATE_SUCCESS": "Personal info updated successfully.",
+    "PASSWORD_UPDATE_SUCCESS": "Password updated successfully."
   },
 
   "Users": {

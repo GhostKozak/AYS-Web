@@ -19,6 +19,7 @@ const FAQ = lazy(() => import("../pages/FAQ"));
 const FieldDashboard = lazy(() => import("../pages/field/FieldDashboard"));
 const AuditPage = lazy(() => import("../pages/common/AuditPage"));
 const UserManagementPage = lazy(() => import("../pages/common/UserManagementPage"));
+const ProfilePage = lazy(() => import("../pages/profile/Profile"));
 const NotFoundPage = lazy(() => import("../pages/common/NotFoundPage"));
 
 function AppRoutes() {
@@ -119,6 +120,14 @@ function AppRoutes() {
                 <UserManagementPage />
               </Suspense>
             </RoleGuard>
+          ),
+        },
+        {
+          path: ROUTES.PROFILE,
+          element: (
+            <Suspense fallback={<PageLoader />}>
+              <ProfilePage />
+            </Suspense>
           ),
         },
         {
