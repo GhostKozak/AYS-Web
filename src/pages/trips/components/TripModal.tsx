@@ -20,11 +20,13 @@ interface TripFormValues {
   company: string;
   vehicle: string;
   driver: string;
-  departure_time?: string;
-  arrival_time?: string;
+  departure_time?: dayjs.Dayjs;
+  arrival_time?: dayjs.Dayjs;
+  parked_at?: dayjs.Dayjs;
   unload_status?: string;
   has_gps_tracking?: boolean;
   is_in_temporary_parking_lot?: boolean;
+  is_in_parking_lot?: boolean;
   is_trip_canceled?: boolean;
   notes?: string;
 }
@@ -32,7 +34,7 @@ interface TripFormValues {
 interface TripModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onFinish: (values: TripFormValues) => void;
+  onFinish: (values: any) => void;
   onCreated?: () => void;
   selectedRecord?: TripType;
   isLoading?: boolean;
@@ -75,7 +77,6 @@ const TripModal = ({
           r.arrival_time
             ? dayjs(r.arrival_time).format("DD.MM.YYYY HH:mm:ss")
             : "-",
-        // Fix: Değer yoksa "-" döndür, böylece değişiklik yok sayılır
         getNewValue: (f) =>
           f.arrival_time
             ? dayjs(f.arrival_time).format("DD.MM.YYYY HH:mm:ss")
@@ -92,6 +93,19 @@ const TripModal = ({
         getNewValue: (f) =>
           f.departure_time
             ? dayjs(f.departure_time).format("DD.MM.YYYY HH:mm:ss")
+            : "-",
+      },
+      {
+        label: t("Trips.PARKED_AT"),
+        dbKey: "parked_at",
+        formKey: "parked_at",
+        getOldValue: (r) =>
+          r.parked_at
+            ? dayjs(r.parked_at).format("DD.MM.YYYY HH:mm:ss")
+            : "-",
+        getNewValue: (f) =>
+          f.parked_at
+            ? dayjs(f.parked_at).format("DD.MM.YYYY HH:mm:ss")
             : "-",
       },
       {
@@ -139,8 +153,6 @@ const TripModal = ({
         getNewValue: (f) =>
           f.unload_status ? t(`Trips.STATUS_${f.unload_status}`) : "-",
       },
-      // Boolean değerler için "-" yerine direk Hayır dönebiliriz çünkü Switch uncheck ise false'dur.
-      // Ama null gelme ihtimaline karşı yine de kontrol edelim.
       {
         label: t("Trips.GPS_TRACKING"),
         key: "has_gps_tracking",
@@ -158,6 +170,14 @@ const TripModal = ({
           f.is_in_temporary_parking_lot ? t("Common.YES") : t("Common.NO"),
       },
       {
+        label: t("Trips.IN_PARKING_LOT"),
+        key: "is_in_parking_lot",
+        getOldValue: (r) =>
+          r.is_in_parking_lot ? t("Common.YES") : t("Common.NO"),
+        getNewValue: (f) =>
+          f.is_in_parking_lot ? t("Common.YES") : t("Common.NO"),
+      },
+      {
         label: t("Trips.TRIP_CANCELED"),
         key: "is_trip_canceled",
         getOldValue: (r) =>
@@ -168,7 +188,6 @@ const TripModal = ({
       {
         key: "notes",
         label: t("Trips.NOTES"),
-        // Notlar için özel kontrol
         getOldValue: (r) => r.notes || "-",
         getNewValue: (f) => f.notes || "-",
       },
@@ -246,10 +265,12 @@ const TripModal = ({
           driver: selectedRecord.driver._id,
           departure_time: toInputDate(selectedRecord.departure_time),
           arrival_time: toInputDate(selectedRecord.arrival_time),
+          parked_at: toInputDate(selectedRecord.parked_at),
           unload_status: selectedRecord.unload_status,
           has_gps_tracking: selectedRecord.has_gps_tracking,
           is_in_temporary_parking_lot:
             selectedRecord.is_in_temporary_parking_lot,
+          is_in_parking_lot: selectedRecord.is_in_parking_lot,
           is_trip_canceled: selectedRecord.is_trip_canceled,
           notes: selectedRecord.notes,
         });
@@ -266,18 +287,16 @@ const TripModal = ({
 
     if (driverExists) {
       const selectedDriver = drivers.find((d) => d._id === value);
-      // Seçili sürücünün bilgilerini gizli veya salt okunur alanlara set edebiliriz
       form.setFieldsValue({
         driver_full_name: selectedDriver?.full_name,
         driver_phone_number: selectedDriver?.phone_number,
       });
     } else {
-      // Yeni sürücü yazılıyorsa alanları temizle ki kullanıcı girsin
       form.setFieldsValue({ driver_full_name: value, driver_phone_number: "" });
     }
   };
 
-  const extractId = (res: { _id?: string; id?: string; data?: { _id?: string; id?: string; data?: { _id?: string } } } | string | undefined): string | undefined => {
+  const extractId = (res: any): string | undefined => {
     if (typeof res === "string") return res;
     if (!res) return undefined;
     return (
@@ -288,7 +307,7 @@ const TripModal = ({
   const handleFinish = async (values: TripFormValues) => {
     setSubmitting(true);
     try {
-      const finalValues: TripFormValues & { company?: string; vehicle?: string; driver?: string } = { ...values };
+      const finalValues: any = { ...values };
 
       // Company
       const companyExists = companies.some((c) => c._id === values.company);
@@ -312,7 +331,6 @@ const TripModal = ({
 
       // Driver
       if (!isExistingDriver) {
-        // Yeni sürücü oluştur
         const payload = {
           full_name: values.driver_full_name,
           phone_number: values.driver_phone_number,
@@ -323,17 +341,8 @@ const TripModal = ({
         if (newId) finalValues.driver = newId;
       }
 
-      // Update form to reflect newly-created ids so UI shows selected values
-      form.setFieldsValue({
-        company: finalValues.company,
-        vehicle: finalValues.vehicle,
-        driver: finalValues.driver,
-      });
-
-      // Convert datetime-local back to ISO strings before sending
       const toISO = (val?: dayjs.Dayjs | string) => {
         if (!val) return undefined;
-        // DatePicker value is a dayjs object
         const d = dayjs(val);
         return d.isValid() ? d.toISOString() : undefined;
       };
@@ -342,16 +351,11 @@ const TripModal = ({
         ...finalValues,
         departure_time: toISO(finalValues.departure_time),
         arrival_time: toISO(finalValues.arrival_time),
+        parked_at: toISO(finalValues.parked_at),
       };
 
-      await onFinish(submissionData as TripFormValues);
-
-      // Notify parent to refresh lists if provided
-      try {
-        onCreated?.();
-      } catch (e) {
-        /* ignore */
-      }
+      await onFinish(submissionData);
+      onCreated?.();
     } catch (error) {
       console.error("Sefer kaydedilirken hata oluştu:", error);
     } finally {
@@ -368,7 +372,7 @@ const TripModal = ({
       onCancel={onClose}
       footer={null}
       destroyOnHidden
-      width={hasChanges ? 900 : 700}
+      width={hasChanges ? 950 : 750}
       styles={{ body: { transition: "all 0.3s ease" } }}
     >
       <Row gutter={24}>
@@ -376,11 +380,17 @@ const TripModal = ({
           <Form
             name="tipForm"
             form={form}
-            labelCol={{ span: 8 }}
-            wrapperCol={{ span: 16 }}
-            style={{ maxWidth: 600, paddingBlock: 32 }}
+            layout="horizontal"
+            labelCol={{ span: 10 }}
+            wrapperCol={{ span: 14 }}
             onFinish={handleFinish}
             autoComplete="off"
+            initialValues={{
+                has_gps_tracking: false,
+                is_in_temporary_parking_lot: false,
+                is_in_parking_lot: false,
+                is_trip_canceled: false
+            }}
           >
             <Form.Item
               label={t("Trips.COMPANY_NAME")}
@@ -428,7 +438,6 @@ const TripModal = ({
               />
             </Form.Item>
 
-            {/* Sürücü mevcut değilse (Yeni ekleniyorsa) bu alanları göster */}
             {!isExistingDriver && (
               <>
                 <Form.Item
@@ -453,47 +462,53 @@ const TripModal = ({
               </>
             )}
 
-            <Form.Item label={t("Trips.DEPARTURE_TIME")} name="departure_time">
-              <DatePicker style={{ width: '100%' }} showTime format="DD.MM.YYYY HH:mm:ss" />
+            <Form.Item label={t("Trips.ARRIVAL_TIME")} name="arrival_time">
+              <DatePicker style={{ width: '100%' }} showTime format="DD.MM.YYYY HH:mm" />
             </Form.Item>
 
-            <Form.Item label={t("Trips.ARRIVAL_TIME")} name="arrival_time">
-              <DatePicker style={{ width: '100%' }} showTime format="DD.MM.YYYY HH:mm:ss" />
+            <Form.Item label={t("Trips.DEPARTURE_TIME")} name="departure_time">
+              <DatePicker style={{ width: '100%' }} showTime format="DD.MM.YYYY HH:mm" />
             </Form.Item>
 
             <Form.Item label={t("Trips.UNLOAD_STATUS")} name="unload_status">
               <Select placeholder={t("Trips.UNLOAD_STATUS")} options={unloadStatusOptions} />
             </Form.Item>
 
-            <Form.Item
-              label={t("Trips.GPS_TRACKING")}
-              name="has_gps_tracking"
-              valuePropName="checked"
-            >
-              <Switch />
-            </Form.Item>
+            <Row gutter={16}>
+              <Col span={12}>
+                <Form.Item label={t("Trips.GPS_TRACKING")} name="has_gps_tracking" valuePropName="checked" labelCol={{ span: 16 }} wrapperCol={{ span: 8 }}>
+                  <Switch />
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item label={t("Trips.TEMP_PARKING")} name="is_in_temporary_parking_lot" valuePropName="checked" labelCol={{ span: 16 }} wrapperCol={{ span: 8 }}>
+                  <Switch />
+                </Form.Item>
+              </Col>
+            </Row>
 
-            <Form.Item
-              label={t("Trips.TEMP_PARKING")}
-              name="is_in_temporary_parking_lot"
-              valuePropName="checked"
-            >
-              <Switch />
-            </Form.Item>
+            <Row gutter={16}>
+              <Col span={12}>
+                <Form.Item label={t("Trips.IN_PARKING_LOT")} name="is_in_parking_lot" valuePropName="checked" labelCol={{ span: 16 }} wrapperCol={{ span: 8 }}>
+                  <Switch />
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item label={t("Trips.TRIP_CANCELED")} name="is_trip_canceled" valuePropName="checked" labelCol={{ span: 16 }} wrapperCol={{ span: 8 }}>
+                  <Switch />
+                </Form.Item>
+              </Col>
+            </Row>
 
-            <Form.Item
-              label={t("Trips.TRIP_CANCELED")}
-              name="is_trip_canceled"
-              valuePropName="checked"
-            >
-              <Switch />
+            <Form.Item label={t("Trips.PARKED_AT")} name="parked_at">
+              <DatePicker style={{ width: '100%' }} showTime format="DD.MM.YYYY HH:mm" />
             </Form.Item>
 
             <Form.Item label={t("Trips.NOTES")} name="notes">
-              <Input.TextArea rows={4} />
+              <Input.TextArea rows={3} />
             </Form.Item>
 
-            <Form.Item label={null} wrapperCol={{ offset: 8, span: 16 }}>
+            <Form.Item label={null} wrapperCol={{ offset: 10, span: 14 }}>
               <Button
                 type="primary"
                 htmlType="submit"

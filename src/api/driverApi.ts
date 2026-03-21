@@ -5,7 +5,7 @@ import type { CreateDriverPayload } from "../types";
 export const driverApi = {
   getAll: async () => {
     const response = await apiClient.get(API_ENDPOINTS.DRIVERS);
-    return response.data.data;
+    return response.data.data ?? response.data;
   },
 
   create: async (payload: CreateDriverPayload) => {

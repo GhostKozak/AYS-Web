@@ -9,7 +9,9 @@
     "DRIVERS": "Drivers",
     "VEHICLES": "Vehicles",
     "TRIPS": "Trips",
-    "FAQ": "FAQ"
+    "FAQ": "FAQ",
+    "AUDIT": "Audit Logs",
+    "USERS": "User Management"
   },
 
   "Header": {
@@ -99,6 +101,30 @@
     "REQUIRED": "This field is required!"
   },
 
+  "Audit": {
+    "TITLE": "Audit Logs",
+    "DATE": "Date",
+    "USER": "User",
+    "ACTION": "Action",
+    "ENTITY": "Entity",
+    "ENTITY_ID": "Entity ID",
+    "DETAILS": "Details"
+  },
+
+  "Users": {
+    "TITLE": "User Management",
+    "USERNAME": "Username",
+    "FIRST_NAME": "First Name",
+    "LAST_NAME": "Last Name",
+    "EMAIL": "Email",
+    "ROLE": "Role",
+    "ADD_USER": "Add User",
+    "EDIT_USER": "Edit User",
+    "CREATE_SUCCESS": "User created successfully.",
+    "UPDATE_SUCCESS": "User updated successfully.",
+    "DELETE_SUCCESS": "User deleted successfully."
+  },
+
   "Dashboard": {
     "TITLE": "Dashboard",
     "TOP_COMPANIES": "Top Companies",
@@ -181,7 +207,9 @@
     "LICENSE_PLATE": "License Plate",
     "UNLOAD_STATUS": "Unload Status",
     "GPS_TRACKING": "GPS Tracking",
-    "TEMP_PARKING": "Temp. Parking",
+    "TEMP_PARKING": "Temp Parking (KK)",
+    "IN_PARKING_LOT": "In Parking Lot",
+    "PARKED_AT": "Parked At",
     "TRIP_CANCELED": "Trip Canceled",
     "NOTES": "Notes",
     "SEARCH": "Search trip, plate or driver...",

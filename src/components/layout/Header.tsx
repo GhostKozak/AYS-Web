@@ -66,8 +66,8 @@ function Header() {
     i18n.changeLanguage(newLang);
   };
 
-  const menuItems: MenuProps["items"] = useMemo(
-    () => [
+  const menuItems: MenuProps["items"] = useMemo(() => {
+    const items: MenuProps["items"] = [
       {
         key: "dashboard",
         label: <Link to={ROUTES.DASHBOARD}>{t("Breadcrumbs.DASHBOARD")}</Link>,
@@ -88,9 +88,23 @@ function Header() {
         key: "trips",
         label: <Link to={ROUTES.TRIPS}>{t("Breadcrumbs.TRIPS")}</Link>,
       },
-    ],
-    [t],
-  );
+    ];
+
+    if (userObject?.role === "admin") {
+      items.push(
+        {
+          key: "audit",
+          label: <Link to={ROUTES.AUDIT}>{t("Breadcrumbs.AUDIT")}</Link>,
+        },
+        {
+          key: "users",
+          label: <Link to={ROUTES.USERS}>{t("Breadcrumbs.USERS")}</Link>,
+        }
+      );
+    }
+
+    return items;
+  }, [t, userObject?.role]);
 
   const userMenuItems: MenuProps["items"] = useMemo(
     () => [

@@ -54,6 +54,8 @@ export interface TripType {
   unload_status: string;
   has_gps_tracking: boolean;
   is_in_temporary_parking_lot: boolean;
+  is_in_parking_lot: boolean;
+  parked_at?: string;
   is_trip_canceled: boolean;
   notes: string;
   deleted: boolean;
@@ -73,6 +75,8 @@ export interface CreateTripPayload {
   unload_status?: string;
   has_gps_tracking?: boolean;
   is_in_temporary_parking_lot?: boolean;
+  is_in_parking_lot?: boolean;
+  parked_at?: string;
   is_trip_canceled?: boolean;
   notes?: string;
 }
@@ -90,6 +94,14 @@ export interface CreateVehiclePayload {
 
 export interface CreateCompanyPayload {
   name: string;
+}
+
+export interface CreateUserPayload {
+  email: string;
+  password?: string;
+  firstName: string;
+  lastName: string;
+  role?: UserRole;
 }
 
 export type DiffChange = {
@@ -128,6 +140,22 @@ export type DailyStat = {
 
 export type UserRole = 'admin' | 'editor' | 'viewer' | 'user';
 
+export interface LoginPayload {
+  email: string;
+  password: string;
+}
+
+export interface LoginResponse {
+  access_token: string;
+  user: {
+    id: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    role: UserRole;
+  };
+}
+
 export const UserRole = {
   ADMIN: 'admin',
   EDITOR: 'editor',
@@ -141,4 +169,21 @@ export interface User {
   firstName: string;
   lastName: string;
   role: UserRole;
+  isActive?: boolean;
+  lastLoginAt?: string;
+  failedLoginAttempts?: number;
+  lockedUntil?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AuditType {
+  _id: string;
+  user: Pick<User, 'firstName' | 'lastName' | 'email' | 'role'> | null;
+  userEmail: string; // Fallback for legacy or unpopulated
+  action: string;
+  entity: string;
+  entityId?: string;
+  details: any;
+  createdAt: string;
 }

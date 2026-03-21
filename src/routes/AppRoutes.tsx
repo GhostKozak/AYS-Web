@@ -11,6 +11,10 @@ import ErrorPage from "../pages/common/ErrorPage";
 import { ROUTES } from "../constants";
 import FAQ from "../pages/FAQ";
 import FieldDashboard from "../pages/field/FieldDashboard";
+import AuditPage from "../pages/common/AuditPage";
+import UserManagementPage from "../pages/common/UserManagementPage";
+import { RoleGuard } from "../components/auth/RoleGuard";
+import { UserRole } from "../types";
 
 function AppRoutes() {
   return createBrowserRouter([
@@ -55,6 +59,22 @@ function AppRoutes() {
         {
           path: ROUTES.FIELD_OPS,
           Component: FieldDashboard,
+        },
+        {
+          path: ROUTES.AUDIT,
+          element: (
+            <RoleGuard allowedRoles={[UserRole.ADMIN]}>
+              <AuditPage />
+            </RoleGuard>
+          ),
+        },
+        {
+          path: ROUTES.USERS,
+          element: (
+            <RoleGuard allowedRoles={[UserRole.ADMIN]}>
+              <UserManagementPage />
+            </RoleGuard>
+          ),
         },
         {
           path: "*",

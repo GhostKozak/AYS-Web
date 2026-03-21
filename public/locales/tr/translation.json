@@ -9,7 +9,9 @@
     "DRIVERS": "Sürücüler",
     "VEHICLES": "Araçlar",
     "TRIPS": "Seferler",
-    "FAQ": "SSS"
+    "FAQ": "SSS",
+    "AUDIT": "Denetim Kayıtları",
+    "USERS": "Kullanıcı Yönetimi"
   },
 
   "Header": {
@@ -99,6 +101,30 @@
     "REQUIRED": "Bu alan zorunludur!"
   },
 
+  "Audit": {
+    "TITLE": "Denetim Kayıtları",
+    "DATE": "Tarih",
+    "USER": "Kullanıcı",
+    "ACTION": "İşlem",
+    "ENTITY": "Varlık",
+    "ENTITY_ID": "Varlık ID",
+    "DETAILS": "Detaylar"
+  },
+
+  "Users": {
+    "TITLE": "Kullanıcı Yönetimi",
+    "USERNAME": "Kullanıcı Adı",
+    "FIRST_NAME": "Ad",
+    "LAST_NAME": "Soyad",
+    "EMAIL": "E-posta",
+    "ROLE": "Yetki",
+    "ADD_USER": "Kullanıcı Ekle",
+    "EDIT_USER": "Kullanıcı Düzenle",
+    "CREATE_SUCCESS": "Kullanıcı başarıyla oluşturuldu.",
+    "UPDATE_SUCCESS": "Kullanıcı başarıyla güncellendi.",
+    "DELETE_SUCCESS": "Kullanıcı başarıyla silindi."
+  },
+
   "Dashboard": {
     "TITLE": "Gösterge Paneli",
     "TOP_COMPANIES": "En Çok Gelen Firmalar",
@@ -182,6 +208,8 @@
     "UNLOAD_STATUS": "Boşaltma Durumu",
     "GPS_TRACKING": "ATS",
     "TEMP_PARKING": "Koridor Kesik (KK)",
+    "IN_PARKING_LOT": "Park Alanında",
+    "PARKED_AT": "Park Zamanı",
     "TRIP_CANCELED": "Sefer İptali",
     "NOTES": "Notlar",
     "SEARCH": "Sefer, Plaka veya Sürücü Ara...",

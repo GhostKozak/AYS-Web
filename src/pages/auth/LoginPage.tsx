@@ -1,24 +1,33 @@
 import { Form, Input, Button, Card, message } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router";
-import apiClient from "../../api/apiClient";
-import { API_ENDPOINTS, ROUTES } from "../../constants";
+import { authApi } from "../../api/authApi";
+import { ROUTES } from "../../constants";
 import { useTranslation } from "react-i18next";
-
 import { useState } from "react";
 import { setToken, setUser } from "../../utils/auth.utils";
+import type { LoginPayload } from "../../types";
 
 function LoginPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
-  const onFinish = async (values: any) => {
+  const onFinish = async (values: LoginPayload) => {
     setLoading(true);
     try {
-      const response = await apiClient.post(API_ENDPOINTS.AUTH.LOGIN, values);
-      setToken(response.data.access_token);
-      setUser(response.data.user);
+      const data = await authApi.login(values);
+      setToken(data.access_token);
+      
+      // Adapt Backend User to Frontend User if needed
+      // Currently backend returns {id, email, firstName, lastName, role}
+      // Frontend User type expects {_id, email, firstName, lastName, role, ...}
+      const frontendUser = {
+        ...data.user,
+        _id: data.user.id,
+      };
+      
+      setUser(frontendUser as any);
       message.success(t("Login.SUCCESS"));
       navigate(ROUTES.DASHBOARD);
     } catch (error: any) {

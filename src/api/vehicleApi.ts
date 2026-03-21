@@ -5,7 +5,7 @@ import type { CreateVehiclePayload } from "../types";
 export const vehicleApi = {
   getAll: async () => {
     const response = await apiClient.get(API_ENDPOINTS.VEHICLES);
-    return response.data.data;
+    return response.data.data ?? response.data;
   },
 
   create: async (payload: CreateVehiclePayload) => {

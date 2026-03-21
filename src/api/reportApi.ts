@@ -18,47 +18,51 @@ export interface ActivityStat {
   value: number;
 }
 
-export interface StatusStat {
-  unload_status: string;
-  count: number;
-}
-
 export interface DashboardSummary {
-  totalTrips: number;
+  today: {
+    totalTrips: number;
+    waitingToUnload: number;
+    topCompanies: CompanyStat[];
+  };
   totalCompanies: number;
   totalDrivers: number;
-  activeTrips: number;
+}
+
+export interface StatusDistributionResponse {
+  statuses: Record<string, number>;
+  inParkingLot: number;
+  canceled: number;
 }
 
 export const reportApi = {
   getTopCompanies: async (period: ReportPeriod = 'month'): Promise<CompanyStat[]> => {
     const response = await apiClient.get(API_ENDPOINTS.REPORTS.TOP_COMPANIES, { params: { period } });
-    return response.data.data || [];
+    return response.data.data ?? response.data ?? [];
   },
 
   getUnloadWaiting: async (period: ReportPeriod = 'month') => {
     const response = await apiClient.get(API_ENDPOINTS.REPORTS.UNLOAD_WAITING, { params: { period } });
-    return response.data;
+    return response.data.data ?? response.data;
   },
 
-  getStatusDistribution: async (period: ReportPeriod = 'month'): Promise<StatusStat[]> => {
+  getStatusDistribution: async (period: ReportPeriod = 'month'): Promise<StatusDistributionResponse> => {
     const response = await apiClient.get(API_ENDPOINTS.REPORTS.STATUS_DISTRIBUTION, { params: { period } });
-    return response.data.data || [];
+    return response.data.data;
   },
 
   getAverageTurnaround: async (period: ReportPeriod = 'month') => {
     const response = await apiClient.get(API_ENDPOINTS.REPORTS.AVERAGE_TURNAROUND, { params: { period } });
-    return response.data.data;
+    return response.data.data ?? response.data;
   },
 
   getTrend: async (period: ReportPeriod = 'month'): Promise<TrendStat[]> => {
     const response = await apiClient.get(API_ENDPOINTS.REPORTS.TREND, { params: { period } });
-    return response.data.data || [];
+    return response.data.data ?? response.data ?? [];
   },
 
   getDashboardSummary: async (): Promise<DashboardSummary> => {
     const response = await apiClient.get(API_ENDPOINTS.REPORTS.DASHBOARD_SUMMARY);
-    return response.data.data;
+    return response.data.data ?? response.data;
   },
 
   exportExcel: async (period: ReportPeriod = 'month') => {

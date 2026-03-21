@@ -196,6 +196,34 @@ export default function TripTable({
           record.is_in_temporary_parking_lot === value,
       },
       {
+        title: (
+          <Tooltip title={t("Trips.IN_PARKING_LOT")}>
+            <span>P</span>
+          </Tooltip>
+        ),
+        dataIndex: "is_in_parking_lot",
+        key: "is_in_parking_lot",
+        render: (val: boolean) => (val ? <Tag color="blue">Park</Tag> : null),
+        filters: [
+          { text: "Park", value: true },
+          { text: t("Common.NO"), value: false },
+        ],
+        onFilter: (value, record) => record.is_in_parking_lot === value,
+      },
+      {
+        title: t("Trips.PARKED_AT"),
+        dataIndex: "parked_at",
+        key: "parked_at",
+        render: (date: string) =>
+          date
+            ? new Date(date).toLocaleString("tr-TR", {
+                hour: "2-digit",
+                minute: "2-digit",
+              })
+            : "-",
+        width: 100,
+      },
+      {
         title: t("Trips.TRIP_CANCELED"),
         dataIndex: "is_trip_canceled",
         key: "is_trip_canceled",
@@ -251,7 +279,7 @@ export default function TripTable({
     ];
 
     return allColumns.filter((col) => col.visible !== false);
-  }, []);
+  }, [t, filters, onEdit, onDelete]);
 
   return (
     <Table
@@ -270,11 +298,14 @@ export default function TripTable({
         showExpandColumn: true,
         expandRowByClick: true,
         expandedRowRender: (record) => (
-          <p style={{ margin: 0 }}>
-            {t("Trips.NOTES")}: {record.notes}
-          </p>
+          <div style={{ margin: 0 }}>
+            <p><strong>{t("Trips.NOTES")}:</strong> {record.notes}</p>
+            {record.parked_at && (
+              <p><strong>{t("Trips.PARKED_AT")}:</strong> {new Date(record.parked_at).toLocaleString("tr-TR")}</p>
+            )}
+          </div>
         ),
-        rowExpandable: (record) => !!record.notes,
+        rowExpandable: (record) => !!record.notes || !!record.parked_at,
       }}
     />
   );

@@ -2,8 +2,6 @@
 export const API_ENDPOINTS = {
   AUTH: {
     LOGIN: '/auth/login',
-    LOGOUT: '/auth/logout',
-    REFRESH: '/auth/refresh'
   },
   COMPANIES: '/companies',
   COMPANIES_SEARCH: '/companies/search',
@@ -20,7 +18,10 @@ export const API_ENDPOINTS = {
     DASHBOARD_SUMMARY: '/reports/dashboard-summary',
     EXPORT_EXCEL: '/reports/export/excel',
     EXPORT_PDF: '/reports/export/pdf'
-  }
+  },
+  AUDIT: '/audit',
+  USERS: '/users',
+  DRIVERS_BY_PHONE: (phone: string) => `/drivers/by-phone/${phone}`
 } as const;
 
 // Route Paths
@@ -32,7 +33,9 @@ export const ROUTES = {
   VEHICLES: '/vehicles',
   TRIPS: '/trips',
   FAQ: '/sss',
-  FIELD_OPS: '/field-operations'
+  FIELD_OPS: '/field-operations',
+  AUDIT: '/audit',
+  USERS: '/users'
 } as const;
 
 // HTTP Status Codes

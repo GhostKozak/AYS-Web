@@ -102,19 +102,8 @@ const DriverModal = ({
               <Select
                 placeholder={t("Drivers.COMPANY_REQUIRED")}
                 showSearch
-                optionFilterProp="children"
-                filterOption={(input, option) =>
-                  (option?.children as unknown as string)
-                    .toLowerCase()
-                    .includes(input.toLowerCase())
-                }
-              >
-                {companies.map((company) => (
-                  <Select.Option key={company._id} value={company._id}>
-                    {company.name}
-                  </Select.Option>
-                ))}
-              </Select>
+                options={companies.map(c => ({ label: c.name, value: c._id }))}
+              />
             </Form.Item>
 
             <Form.Item
