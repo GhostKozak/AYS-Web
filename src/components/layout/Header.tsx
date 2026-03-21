@@ -29,7 +29,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useIsMobile } from "../../hooks/useIsMobile";
 
-import { clearAuth, getUser, isLoggedIn } from "../../utils/auth.utils";
+import { useAuth } from "../../hooks/useAuth";
 
 function Header() {
   const { t, i18n } = useTranslation();
@@ -39,6 +39,8 @@ function Header() {
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const location = useLocation();
+
+  const { user: userObject, logout, isLoggedIn: authenticated } = useAuth();
 
   const { useToken } = theme;
   const { token } = useToken();
@@ -52,18 +54,28 @@ function Header() {
   const showModal = () => setIsModalOpen(true);
   const handleCancel = () => setIsModalOpen(false);
 
-  const userObject = getUser();
-  const authenticated = isLoggedIn();
   const currentLang = i18n.language || "tr";
 
   const handleLogout = () => {
-    clearAuth();
-    navigate(ROUTES.LOGIN);
+    logout();
   };
 
   const toggleLang = () => {
     const newLang = currentLang === "tr" ? "en" : "tr";
     i18n.changeLanguage(newLang);
+  };
+
+  const getRoleColor = (role?: string) => {
+    switch (role) {
+      case "admin":
+        return "#87d068";
+      case "editor":
+        return "#2db7f5";
+      case "viewer":
+        return "#108ee9";
+      default:
+        return undefined;
+    }
   };
 
   const menuItems: MenuProps["items"] = useMemo(() => {
@@ -159,7 +171,7 @@ function Header() {
         ),
       },
     ],
-    [t],
+    [t, userObject, themeMode, toggleTheme]
   );
 
   return (
@@ -254,10 +266,8 @@ function Header() {
                   style={{ backgroundColor: token.colorPrimary }}
                 />
                 <span>{userObject?.firstName}</span>
-                <Tag
-                  color={userObject?.role === "admin" ? "#87d068" : "#2db7f5"}
-                >
-                  {userObject?.role}
+                <Tag color={getRoleColor(userObject?.role)}>
+                  {userObject?.role?.toUpperCase()}
                 </Tag>
               </a>
             </Dropdown>
@@ -313,11 +323,9 @@ function Header() {
                  <div style={{ fontWeight: "bold" }}>
                    {userObject.firstName} {userObject.lastName}
                  </div>
-                 <Tag
-                   color={userObject.role === "admin" ? "#87d068" : "#2db7f5"}
-                 >
-                   {userObject.role}
-                 </Tag>
+                  <Tag color={getRoleColor(userObject.role)}>
+                    {userObject.role.toUpperCase()}
+                  </Tag>
                </div>
              </Flex>
            </div>

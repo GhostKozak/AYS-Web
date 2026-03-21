@@ -110,7 +110,11 @@
   },
 
   "Validation": {
-    "REQUIRED": "This field is required!"
+    "REQUIRED": "This field is required!",
+    "PASSWORD_MIN_LENGTH": "Password must be at least 8 characters long.",
+    "PASSWORD_UPPERCASE": "Password must contain at least one uppercase letter.",
+    "PASSWORD_LOWERCASE": "Password must contain at least one lowercase letter.",
+    "PASSWORD_SPECIAL": "Password must contain at least one special character."
   },
 
   "Audit": {

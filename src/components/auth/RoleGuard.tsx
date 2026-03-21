@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
-import { STORAGE_KEYS } from "../../constants";
-import type { UserRole, User } from "../../types";
+import type { UserRole } from "../../types";
+import { useAuth } from "../../hooks/useAuth";
 
 interface RoleGuardProps {
   children: ReactNode;
@@ -13,8 +13,7 @@ export const RoleGuard = ({
   allowedRoles,
   fallback = null,
 }: RoleGuardProps) => {
-  const userString = localStorage.getItem(STORAGE_KEYS.USER);
-  const user: User | null = userString ? JSON.parse(userString) : null;
+  const { user } = useAuth();
 
   if (!user || !allowedRoles.includes(user.role)) {
     return <>{fallback}</>;

@@ -1,6 +1,7 @@
 import { Form, Input, Button, Card, message } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router";
+import { useQueryClient } from "@tanstack/react-query";
 import { authApi } from "../../api/authApi";
 import { ROUTES } from "../../constants";
 import { useTranslation } from "react-i18next";
@@ -11,6 +12,7 @@ import type { LoginPayload } from "../../types";
 function LoginPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [loading, setLoading] = useState(false);
 
   const onFinish = async (values: LoginPayload) => {
@@ -28,6 +30,7 @@ function LoginPage() {
       };
       
       setUser(frontendUser as any);
+      queryClient.invalidateQueries({ queryKey: ["currentUser"] });
       message.success(t("Login.SUCCESS"));
       navigate(ROUTES.DASHBOARD);
     } catch (error: any) {

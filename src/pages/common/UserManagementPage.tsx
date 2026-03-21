@@ -4,15 +4,18 @@ import { userApi } from "../../api/userApi";
 import { useTranslation } from "react-i18next";
 import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useState } from "react";
+import { useAuth } from "../../hooks/useAuth";
 import dayjs from "dayjs";
 import type { User, CreateUserPayload } from "../../types";
 import { UserRole as UserRoleConst } from "../../types";
+import { getUser } from "../../utils/auth.utils";
 
 const { Title } = Typography;
 
 function UserManagementPage() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
+  const { updateCurrentUser } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [form] = Form.useForm();
@@ -34,8 +37,13 @@ function UserManagementPage() {
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<CreateUserPayload> }) => 
       userApi.update(id, data),
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
+      // Mevcut oturum açmış kullanıcıysa Header'ı hemen güncelle
+      const currentStoredUser = getUser();
+      if (variables.id === currentStoredUser?._id) {
+        updateCurrentUser(variables.data);
+      }
       message.success(t("Users.UPDATE_SUCCESS"));
       setIsModalOpen(false);
     },
@@ -161,7 +169,26 @@ function UserManagementPage() {
             <Input />
           </Form.Item>
           {!editingUser && (
-            <Form.Item name="password" label={t("Login.PASSWORD_PLACEHOLDER")} rules={[{ required: true, min: 8 }]}>
+            <Form.Item
+              name="password"
+              label={t("Login.PASSWORD_PLACEHOLDER")}
+              rules={[
+                { required: true, message: t("Validation.REQUIRED") },
+                { min: 8, message: t("Validation.PASSWORD_MIN_LENGTH") },
+                {
+                  pattern: /(?=.*[A-Z])/,
+                  message: t("Validation.PASSWORD_UPPERCASE"),
+                },
+                {
+                  pattern: /(?=.*[a-z])/,
+                  message: t("Validation.PASSWORD_LOWERCASE"),
+                },
+                {
+                  pattern: /(?=.*[!@#$%^&*(),.?":{}|<>])/,
+                  message: t("Validation.PASSWORD_SPECIAL"),
+                },
+              ]}
+            >
               <Input.Password />
             </Form.Item>
           )}

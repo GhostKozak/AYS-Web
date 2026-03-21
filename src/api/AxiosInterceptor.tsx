@@ -59,11 +59,13 @@ export const AxiosInterceptor = () => {
             navigate(ROUTES.LOGIN);
           } else if (status === 403) {
             notification.error({
+              key: "403-forbidden",
               title: t("Common.ERROR"),
               description: t("Errors.UNAUTHORIZED_DESC"),
             });
           } else if (status >= 500) {
             notification.error({
+              key: "500-server-error",
               title: t("Common.ERROR"),
               description:
                 error.response?.data?.message || t("Errors.SERVER_ERROR_DESC"),

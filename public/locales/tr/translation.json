@@ -110,7 +110,11 @@
   },
 
   "Validation": {
-    "REQUIRED": "Bu alan zorunludur!"
+    "REQUIRED": "Bu alan zorunludur!",
+    "PASSWORD_MIN_LENGTH": "Şifre en az 8 karakter olmalıdır.",
+    "PASSWORD_UPPERCASE": "Şifre en az bir büyük harf içermelidir.",
+    "PASSWORD_LOWERCASE": "Şifre en az bir küçük harf içermelidir.",
+    "PASSWORD_SPECIAL": "Şifre en az bir özel karakter içermelidir."
   },
 
   "Audit": {
