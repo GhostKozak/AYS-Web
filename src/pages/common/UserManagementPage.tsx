@@ -1,4 +1,4 @@
-import { Table, Button, Space, Typography, Tag, Modal, Form, Input, Select, Switch, message } from "antd";
+import { Table, Button, Space, Typography, Tag, Modal, Form, Input, Select, Switch, App } from "antd";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { userApi } from "../../api/userApi";
 import { useTranslation } from "react-i18next";
@@ -16,6 +16,7 @@ function UserManagementPage() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const { updateCurrentUser } = useAuth();
+  const { message, modal } = App.useApp();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [form] = Form.useForm();
@@ -131,7 +132,7 @@ function UserManagementPage() {
             icon={<DeleteOutlined />} 
             danger 
             onClick={() => {
-              Modal.confirm({
+              modal.confirm({
                 title: t("Common.ARE_YOU_SURE"),
                 onOk: () => deleteMutation.mutate(record._id),
               });

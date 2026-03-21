@@ -1,4 +1,4 @@
-import { Form, Input, Button, Card, message } from "antd";
+import { Form, Input, Button, Card, App } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router";
 import { useQueryClient } from "@tanstack/react-query";
@@ -13,6 +13,7 @@ function LoginPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { message } = App.useApp();
   const [loading, setLoading] = useState(false);
 
   const onFinish = async (values: LoginPayload) => {

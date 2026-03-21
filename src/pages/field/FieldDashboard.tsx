@@ -8,7 +8,7 @@ import {
   Row,
   Tag,
   Typography,
-  message,
+  App,
   Segmented,
   Empty,
 } from "antd";
@@ -35,6 +35,7 @@ function FieldDashboard() {
   // Önceki acil durum sayısını tutmak için ref kullanıyoruz
   const prevUrgentCountRef = useRef(0);
 
+  const { message } = App.useApp();
   const queryClient = useQueryClient();
 
   const handleRefresh = () => {
@@ -112,7 +113,7 @@ function FieldDashboard() {
           borderLeft: `6px solid ${borderColor}`,
           boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
         }}
-        bodyStyle={{ padding: "12px 16px" }}
+        styles={{ body: { padding: "12px 16px" } }}
       >
         <Row justify="space-between" align="middle">
           <Col span={16}>

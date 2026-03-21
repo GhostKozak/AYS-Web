@@ -346,7 +346,7 @@ const TripModal = ({
         const d = dayjs(val);
         return d.isValid() ? d.toISOString() : undefined;
       };
-      
+
       const submissionData = {
         ...finalValues,
         departure_time: toISO(finalValues.departure_time),
@@ -386,10 +386,10 @@ const TripModal = ({
             onFinish={handleFinish}
             autoComplete="off"
             initialValues={{
-                has_gps_tracking: false,
-                is_in_temporary_parking_lot: false,
-                is_in_parking_lot: false,
-                is_trip_canceled: false
+              has_gps_tracking: false,
+              is_in_temporary_parking_lot: false,
+              is_in_parking_lot: false,
+              is_trip_canceled: false
             }}
           >
             <Form.Item
