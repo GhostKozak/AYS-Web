@@ -48,10 +48,14 @@ function Trips() {
     try {
       await deleteTrip(record._id);
       notification.success({
-        message: <span>{t("Trips.DELETE_SUCCESS")}</span>,
+        title: t("Common.SUCCESS"),
+        description: t("Trips.DELETE_SUCCESS"),
       });
     } catch (error) {
-      notification.error({ message: t("Errors.DELETE_FAILED") });
+      notification.error({
+        title: t("Common.ERROR"),
+        description: t("Errors.DELETE_FAILED"),
+      });
     }
   };
 
@@ -102,20 +106,22 @@ function Trips() {
       if (selectedRecord) {
         await updateTrip({ id: selectedRecord._id, ...payload });
         notification.info({
-          message: <span>{t("Trips.UPDATE_SUCCESS")}</span>,
+          title: t("Common.INFO"),
+          description: t("Trips.UPDATE_SUCCESS"),
         });
       } else {
         await createTrip(payload);
         notification.success({
-          message: <span>{t("Trips.CREATE_SUCCESS")}</span>,
+          title: t("Common.SUCCESS"),
+          description: t("Trips.CREATE_SUCCESS"),
         });
       }
       setIsModalOpen(false);
     } catch (error: any) {
       if (error.response?.status === 400) {
         notification.error({
-          message:
-            error.response?.data?.message || t("Errors.OPERATION_FAILED"),
+          title: t("Common.ERROR"),
+          description: error.response?.data?.message || t("Errors.OPERATION_FAILED"),
         });
       }
     }

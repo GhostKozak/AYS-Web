@@ -13,7 +13,7 @@ const STATUS_COLORS: Record<string, string> = {
 
 function UnloadedStatus() {
   const { t } = useTranslation();
-  const { data: rawData, isLoading } = useStatusDistribution("today");
+  const { data: rawData, isLoading } = useStatusDistribution("all", "UNLOADED");
 
   const data = rawData ? [
     ...Object.entries(rawData.statuses || {}).map(([key, value]) => ({

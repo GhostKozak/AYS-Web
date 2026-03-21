@@ -42,12 +42,14 @@ function Drivers() {
     try {
       await deleteDriver(record._id);
       notification.success({
-        message: (
-          <span>{t("Drivers.DELETE_SUCCESS", { name: record.full_name })}</span>
-        ),
+        title: t("Common.SUCCESS"),
+        description: t("Drivers.DELETE_SUCCESS", { name: record.full_name }),
       });
     } catch (error) {
-      notification.error({ message: t("Errors.DELETE_FAILED") });
+      notification.error({
+        title: t("Common.ERROR"),
+        description: t("Errors.DELETE_FAILED"),
+      });
     }
   };
 
@@ -81,28 +83,22 @@ function Drivers() {
       if (selectedRecord) {
         await updateDriver({ id: selectedRecord._id, ...payload });
         notification.info({
-          message: (
-            <span>
-              {t("Drivers.UPDATE_SUCCESS", { name: values.full_name })}
-            </span>
-          ),
+          title: t("Common.INFO"),
+          description: t("Drivers.UPDATE_SUCCESS", { name: values.full_name }),
         });
       } else {
         await createDriver(payload);
         notification.success({
-          message: (
-            <span>
-              {t("Drivers.CREATE_SUCCESS", { name: values.full_name })}
-            </span>
-          ),
+          title: t("Common.SUCCESS"),
+          description: t("Drivers.CREATE_SUCCESS", { name: values.full_name }),
         });
       }
       setIsModalOpen(false);
     } catch (error: any) {
       if (error.response?.status === 400) {
         notification.error({
-          message:
-            error.response?.data?.message || t("Errors.OPERATION_FAILED"),
+          title: t("Common.ERROR"),
+          description: error.response?.data?.message || t("Errors.OPERATION_FAILED"),
         });
       }
     }

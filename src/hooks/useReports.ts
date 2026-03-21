@@ -15,10 +15,10 @@ export const useUnloadWaiting = (period: ReportPeriod = 'month') => {
   });
 };
 
-export const useStatusDistribution = (period: ReportPeriod = 'month') => {
+export const useStatusDistribution = (period: ReportPeriod = 'month', excludeStatus?: string | string[]) => {
   return useQuery({
-    queryKey: ['reports', 'status-distribution', period],
-    queryFn: () => reportApi.getStatusDistribution(period),
+    queryKey: ['reports', 'status-distribution', period, excludeStatus],
+    queryFn: () => reportApi.getStatusDistribution(period, excludeStatus),
   });
 };
 

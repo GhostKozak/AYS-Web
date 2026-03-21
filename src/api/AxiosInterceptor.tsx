@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { App } from "antd";
 import { useNavigate } from "react-router";
+import { useTranslation } from "react-i18next";
 import apiClient from "./apiClient";
 import { ROUTES } from "../constants";
 import { CheckCircleOutlined, DisconnectOutlined } from "@ant-design/icons";
@@ -8,6 +9,7 @@ import { clearAuth } from "../utils/auth.utils";
 
 export const AxiosInterceptor = () => {
   const { message, notification } = App.useApp();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [isOffline, setIsOffline] = useState(!navigator.onLine);
   const [showOnline, setShowOnline] = useState(false);
@@ -52,19 +54,19 @@ export const AxiosInterceptor = () => {
           const { status } = error.response;
 
           if (status === 401) {
-            message.warning("Oturum süreniz doldu, lütfen tekrar giriş yapın.");
+            message.warning(t("Errors.PLEASE_LOGIN_AGAIN"));
             clearAuth();
             navigate(ROUTES.LOGIN);
           } else if (status === 403) {
             notification.error({
-              message: "Yetkisiz Erişim",
-              description: "Bu işlemi yapmaya yetkiniz bulunmamaktadır.",
+              title: t("Common.ERROR"),
+              description: t("Errors.UNAUTHORIZED_DESC"),
             });
           } else if (status >= 500) {
             notification.error({
-              message: "Sunucu Hatası",
+              title: t("Common.ERROR"),
               description:
-                "Sunucuda bir hata oluştu. Lütfen daha sonra tekrar deneyiniz.",
+                error.response?.data?.message || t("Errors.SERVER_ERROR_DESC"),
             });
           }
         } else if (error.code === "ERR_NETWORK") {
@@ -80,7 +82,7 @@ export const AxiosInterceptor = () => {
     return () => {
       apiClient.interceptors.response.eject(interceptor);
     };
-  }, [message, notification, navigate, isOffline]);
+  }, [message, notification, navigate, isOffline, t]);
 
   return (
     <>
@@ -105,12 +107,12 @@ export const AxiosInterceptor = () => {
           {isOffline ? (
             <>
               <DisconnectOutlined />
-              İnternet bağlantınızı kontrol ediniz
+              {t("Errors.NETWORK_ERROR_DESC")}
             </>
           ) : (
             <>
               <CheckCircleOutlined />
-              Bağlantı sağlandı
+              {t("Common.SUCCESS")}
             </>
           )}
         </div>

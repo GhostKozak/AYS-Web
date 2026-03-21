@@ -45,9 +45,11 @@ export const reportApi = {
     return response.data.data ?? response.data;
   },
 
-  getStatusDistribution: async (period: ReportPeriod = 'month'): Promise<StatusDistributionResponse> => {
-    const response = await apiClient.get(API_ENDPOINTS.REPORTS.STATUS_DISTRIBUTION, { params: { period } });
-    return response.data.data;
+  getStatusDistribution: async (period: ReportPeriod = 'month', excludeStatus?: string | string[]): Promise<StatusDistributionResponse> => {
+    const response = await apiClient.get(API_ENDPOINTS.REPORTS.STATUS_DISTRIBUTION, { 
+      params: { period, excludeStatus } 
+    });
+    return response.data.data ?? response.data;
   },
 
   getAverageTurnaround: async (period: ReportPeriod = 'month') => {

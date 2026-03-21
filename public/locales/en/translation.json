@@ -78,7 +78,11 @@
     "EXPORT_EXCEL": "Export to Excel",
     "EXPORT_PDF": "Export to PDF",
     "EXPORT_SUCCESS": "File downloaded successfully.",
-    "EXPORT_ERROR": "Error downloading file."
+    "EXPORT_ERROR": "Error downloading file.",
+    "SUCCESS": "Success",
+    "ERROR": "Error",
+    "INFO": "Information",
+    "WARNING": "Warning"
   },
 
   "Table": {
@@ -94,7 +98,15 @@
     "UNEXPECTED_ERROR": "An unexpected error occurred.",
     "DELETE_FAILED": "Deletion failed.",
     "PAGE_NOT_FOUND": "Sorry, the page you are looking for does not exist.",
-    "GENERAL_ERROR": "An error occurred."
+    "GENERAL_ERROR": "An error occurred.",
+    "SESSION_EXPIRED": "Session Expired",
+    "PLEASE_LOGIN_AGAIN": "Please login again.",
+    "UNAUTHORIZED_ACCESS": "Unauthorized Access",
+    "UNAUTHORIZED_DESC": "You do not have permission to perform this action.",
+    "SERVER_ERROR": "Server Error",
+    "SERVER_ERROR_DESC": "A server error occurred. Please try again later.",
+    "NETWORK_ERROR": "Connection Error",
+    "NETWORK_ERROR_DESC": "Please check your internet connection."
   },
 
   "Validation": {
@@ -129,7 +141,7 @@
     "TITLE": "Dashboard",
     "TOP_COMPANIES": "Top Companies",
     "MONTHLY_COMPANIES": "Companies This Month",
-    "TODAY_UNLOAD_STATUS": "Unloading Status Today",
+    "TODAY_UNLOAD_STATUS": "General Unloading Status",
     "LATEST_TRIPS": "Recent Trips",
     "WEEKLY_ACTIVITY": "Weekly Activity",
     "YEARLY_ACTIVITY": "Yearly Activity",

@@ -78,7 +78,11 @@
     "EXPORT_EXCEL": "Excel'e Aktar",
     "EXPORT_PDF": "PDF'e Aktar",
     "EXPORT_SUCCESS": "Dosya başarıyla indirildi.",
-    "EXPORT_ERROR": "Dosya indirilirken bir hata oluştu."
+    "EXPORT_ERROR": "Dosya indirilirken bir hata oluştu.",
+    "SUCCESS": "Başarılı",
+    "ERROR": "Hata",
+    "INFO": "Bilgi",
+    "WARNING": "Uyarı"
   },
 
   "Table": {
@@ -94,7 +98,15 @@
     "UNEXPECTED_ERROR": "Beklenmedik bir hata oluştu.",
     "DELETE_FAILED": "Silme işlemi başarısız.",
     "PAGE_NOT_FOUND": "Üzgünüz, aradığınız sayfa mevcut değil.",
-    "GENERAL_ERROR": "Bir hata oluştu."
+    "GENERAL_ERROR": "Bir hata oluştu.",
+    "SESSION_EXPIRED": "Oturum Süresi Doldu",
+    "PLEASE_LOGIN_AGAIN": "Lütfen tekrar giriş yapınız.",
+    "UNAUTHORIZED_ACCESS": "Yetkisiz Erişim",
+    "UNAUTHORIZED_DESC": "Bu işlemi yapmaya yetkiniz bulunmamaktadır.",
+    "SERVER_ERROR": "Sunucu Hatası",
+    "SERVER_ERROR_DESC": "Sunucuda bir hata oluştu. Lütfen daha sonra tekrar deneyiniz.",
+    "NETWORK_ERROR": "Bağlantı Hatası",
+    "NETWORK_ERROR_DESC": "İnternet bağlantınızı kontrol ediniz."
   },
 
   "Validation": {
@@ -129,7 +141,7 @@
     "TITLE": "Gösterge Paneli",
     "TOP_COMPANIES": "En Çok Gelen Firmalar",
     "MONTHLY_COMPANIES": "Bu Ay Gelen Firmalar",
-    "TODAY_UNLOAD_STATUS": "Bugünkü Boşaltma Durumu",
+    "TODAY_UNLOAD_STATUS": "Genel Boşaltma Durumu",
     "LATEST_TRIPS": "Son Hareketler",
     "WEEKLY_ACTIVITY": "Haftalık Aktivite",
     "YEARLY_ACTIVITY": "Yıllık Yoğunluk",

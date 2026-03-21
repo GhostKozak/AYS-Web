@@ -40,10 +40,14 @@ function Companies() {
     try {
       await deleteCompany(record._id);
       notification.success({
-        message: t("Companies.DELETE_SUCCESS", { name: record.name }),
+        title: t("Common.SUCCESS"),
+        description: t("Companies.DELETE_SUCCESS", { name: record.name }),
       });
     } catch (error) {
-      notification.error({ message: t("Errors.DELETE_FAILED") });
+      notification.error({
+        title: t("Common.ERROR"),
+        description: t("Errors.DELETE_FAILED"),
+      });
     }
   };
 
@@ -52,26 +56,22 @@ function Companies() {
       if (selectedRecord) {
         await updateCompany({ id: selectedRecord._id, name: values.name });
         notification.info({
-          message: (
-            <span>
-              {t("Companies.UPDATE_SUCCESS", { name: selectedRecord.name })}
-            </span>
-          ),
+          title: t("Common.INFO"),
+          description: t("Companies.UPDATE_SUCCESS", { name: selectedRecord.name }),
         });
       } else {
         await createCompany({ name: values.name });
         notification.success({
-          message: (
-            <span>{t("Companies.CREATE_SUCCESS", { name: values.name })}</span>
-          ),
+          title: t("Common.SUCCESS"),
+          description: t("Companies.CREATE_SUCCESS", { name: values.name }),
         });
       }
       setIsModalOpen(false);
     } catch (error: any) {
       if (error.response?.status === 400) {
         notification.error({
-          message:
-            error.response?.data?.message || t("Errors.OPERATION_FAILED"),
+          title: t("Common.ERROR"),
+          description: error.response?.data?.message || t("Errors.OPERATION_FAILED"),
         });
       }
     }

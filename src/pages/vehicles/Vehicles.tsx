@@ -39,14 +39,14 @@ function Vehicles() {
     try {
       await deleteVehicle(record._id);
       notification.success({
-        message: (
-          <span>
-            {t("Vehicles.DELETE_SUCCESS", { plate: record.licence_plate })}
-          </span>
-        ),
+        title: t("Common.SUCCESS"),
+        description: t("Vehicles.DELETE_SUCCESS", { plate: record.licence_plate }),
       });
     } catch (error) {
-      notification.error({ message: t("Errors.DELETE_FAILED") });
+      notification.error({
+        title: t("Common.ERROR"),
+        description: t("Errors.DELETE_FAILED"),
+      });
     }
   };
 
@@ -62,13 +62,10 @@ function Vehicles() {
           vehicle_type: values.vehicle_type,
         });
         notification.info({
-          message: (
-            <span>
-              {t("Vehicles.UPDATE_SUCCESS", {
-                plate: values.licence_plate,
-              })}
-            </span>
-          ),
+          title: t("Common.INFO"),
+          description: t("Vehicles.UPDATE_SUCCESS", {
+            plate: values.licence_plate,
+          }),
         });
       } else {
         await createVehicle({
@@ -76,21 +73,18 @@ function Vehicles() {
           vehicle_type: values.vehicle_type,
         });
         notification.success({
-          message: (
-            <span>
-              {t("Vehicles.CREATE_SUCCESS", {
-                plate: values.licence_plate,
-              })}
-            </span>
-          ),
+          title: t("Common.SUCCESS"),
+          description: t("Vehicles.CREATE_SUCCESS", {
+            plate: values.licence_plate,
+          }),
         });
       }
       setIsModalOpen(false);
     } catch (error: any) {
       if (error.response?.status === 400) {
         notification.error({
-          message:
-            error.response?.data?.message || t("Errors.OPERATION_FAILED"),
+          title: t("Common.ERROR"),
+          description: error.response?.data?.message || t("Errors.OPERATION_FAILED"),
         });
       }
     }
