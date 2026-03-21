@@ -11,8 +11,10 @@ import {
   Flex,
   FloatButton,
   Typography,
-  App,
   Space,
+  Modal,
+  Progress,
+  Result,
 } from "antd";
 import CompanyDistribution from "./components/CompanyDistribution";
 import MonthlyCompanyDistribution from "./components/MonthlyCompanyDistribution";
@@ -32,8 +34,8 @@ const ResponsiveGridLayout = WidthProvider(Responsive);
 
 function DashboardPage() {
   const { t } = useTranslation();
-  const { message } = App.useApp();
-  const [isExporting, setIsExporting] = useState(false);
+  const [exportStatus, setExportStatus] = useState<'idle' | 'downloading' | 'success' | 'error'>('idle');
+  const [exportProgress, setExportProgress] = useState(0);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const { layouts, visibleWidgets, onLayoutChange, toggleWidget, resetLayout } =
@@ -42,11 +44,22 @@ function DashboardPage() {
   usePageTitle(t("Dashboard.TITLE"));
 
   const handleExport = async (type: 'excel' | 'pdf') => {
-    setIsExporting(true);
+    setExportStatus('downloading');
+    setExportProgress(0); // Başlangıçta 0
+
+    const onProgress = (progressEvent: any) => {
+      if (progressEvent.total) {
+        const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+        setExportProgress(percentCompleted);
+      } else {
+        setExportProgress((prev) => Math.min(prev + 10, 90)); 
+      }
+    };
+
     try {
       const data = type === 'excel' 
-        ? await reportApi.exportExcel('today')
-        : await reportApi.exportPdf('today');
+        ? await reportApi.exportExcel('today', onProgress)
+        : await reportApi.exportPdf('today', onProgress);
       
       const blob = new Blob([data], { 
         type: type === 'excel' 
@@ -61,16 +74,19 @@ function DashboardPage() {
       document.body.appendChild(link);
       link.click();
       link.remove();
-      message.success(t("Common.EXPORT_SUCCESS"));
+      
+      setExportProgress(100);
+      setExportStatus('success');
     } catch (error) {
       console.error(error);
-      message.error(t("Common.EXPORT_ERROR"));
-    } finally {
-      setIsExporting(false);
+      setExportStatus('error');
     }
   };
 
-
+  const closeExportModal = () => {
+    setExportStatus('idle');
+    setExportProgress(0);
+  };
 
   return (
     <div style={{ padding: "24px" }}>
@@ -87,7 +103,7 @@ function DashboardPage() {
             icon={<FileExcelOutlined />}
             style={{ backgroundColor: "#217346" }}
             onClick={() => handleExport('excel')}
-            loading={isExporting}
+            loading={exportStatus === 'downloading'}
           >
             {t("Common.EXPORT_EXCEL")}
           </Button>
@@ -96,7 +112,7 @@ function DashboardPage() {
             danger
             icon={<FilePdfOutlined />}
             onClick={() => handleExport('pdf')}
-            loading={isExporting}
+            loading={exportStatus === 'downloading'}
           >
             {t("Common.EXPORT_PDF")}
           </Button>
@@ -247,6 +263,43 @@ function DashboardPage() {
           </Button>
         </div>
       </Drawer>
+
+      {/* Export İlerleme Modalı */}
+      <Modal
+        title={t("Common.EXPORTING")}
+        open={exportStatus !== 'idle'}
+        closable={exportStatus !== 'downloading'}
+        onCancel={closeExportModal}
+        footer={null}
+        mask={{ closable: false }}
+        centered
+      >
+        <Flex vertical align="center" justify="center" gap="middle" style={{ padding: '20px 0' }}>
+          {exportStatus === 'downloading' && (
+            <>
+              <Progress type="circle" percent={exportProgress} />
+              <Text>{t("Common.PLEASE_WAIT")}</Text>
+            </>
+          )}
+          {exportStatus === 'success' && (
+            <Result
+              status="success"
+              title={t("Common.EXPORT_COMPLETED")}
+              extra={<Button type="primary" onClick={closeExportModal}>{t("Common.CLOSE")}</Button>}
+              style={{ padding: 0 }}
+            />
+          )}
+          {exportStatus === 'error' && (
+            <Result
+              status="error"
+              title={t("Common.EXPORT_FAILED")}
+              subTitle={t("Common.EXPORT_ERROR")}
+              extra={<Button type="primary" onClick={closeExportModal}>{t("Common.CLOSE")}</Button>}
+              style={{ padding: 0 }}
+            />
+          )}
+        </Flex>
+      </Modal>
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import apiClient from "./apiClient";
 import { API_ENDPOINTS } from "../constants";
+import type { AxiosProgressEvent } from "axios";
 
 export type ReportPeriod = 'today' | 'month' | 'year' | 'all';
 
@@ -67,18 +68,20 @@ export const reportApi = {
     return response.data.data ?? response.data;
   },
 
-  exportExcel: async (period: ReportPeriod = 'month') => {
+  exportExcel: async (period: ReportPeriod = 'month', onProgress?: (progressEvent: AxiosProgressEvent) => void) => {
     const response = await apiClient.get(API_ENDPOINTS.REPORTS.EXPORT_EXCEL, {
       params: { period },
-      responseType: 'blob'
+      responseType: 'blob',
+      onDownloadProgress: onProgress
     });
     return response.data;
   },
 
-  exportPdf: async (period: ReportPeriod = 'month') => {
+  exportPdf: async (period: ReportPeriod = 'month', onProgress?: (progressEvent: AxiosProgressEvent) => void) => {
     const response = await apiClient.get(API_ENDPOINTS.REPORTS.EXPORT_PDF, { 
       params: { period },
-      responseType: 'blob' 
+      responseType: 'blob',
+      onDownloadProgress: onProgress
     });
     return response.data;
   }
