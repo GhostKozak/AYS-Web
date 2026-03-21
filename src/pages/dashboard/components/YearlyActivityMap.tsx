@@ -19,7 +19,7 @@ const YearlyActivityMap = () => {
   const currentLocale = "tr-TR"; // Sabit kalabilir ya da i18n'den alınabilir (önceki gibi)
 
   return (
-    <div style={{ height: 220, width: "100%", marginBlock: 30 }}>
+    <div style={{ height: "100%", width: "100%", minHeight: 180 }}>
       <ResponsiveCalendar
         data={data}
         from={fromDate}

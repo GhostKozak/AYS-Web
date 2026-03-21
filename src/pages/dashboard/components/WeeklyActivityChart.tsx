@@ -17,7 +17,7 @@ const WeeklyActivityChart = () => {
   if (isLoading) return <Skeleton active paragraph={{ rows: 10 }} />;
 
   return (
-    <div style={{ height: 370, width: "100%" }}>
+    <div style={{ height: "100%", width: "100%", minHeight: 300 }}>
       <ResponsiveBar
         data={data}
         keys={["count"]}

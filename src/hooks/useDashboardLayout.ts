@@ -18,6 +18,38 @@ const DEFAULT_LAYOUT: any = {
     { i: "weekly", x: 0, y: 4, w: 6, h: 4 },
     { i: "yearly", x: 6, y: 4, w: 6, h: 4 },
   ],
+  md: [
+    { i: "company", x: 0, y: 0, w: 5, h: 4 },
+    { i: "monthlyCompany", x: 5, y: 0, w: 5, h: 4 },
+    { i: "unloaded", x: 0, y: 4, w: 5, h: 4 },
+    { i: "live", x: 5, y: 4, w: 5, h: 4 },
+    { i: "weekly", x: 0, y: 8, w: 10, h: 4 },
+    { i: "yearly", x: 0, y: 12, w: 10, h: 4 },
+  ],
+  sm: [
+    { i: "company", x: 0, y: 0, w: 6, h: 4 },
+    { i: "monthlyCompany", x: 0, y: 4, w: 6, h: 4 },
+    { i: "unloaded", x: 0, y: 8, w: 6, h: 4 },
+    { i: "live", x: 0, y: 12, w: 6, h: 4 },
+    { i: "weekly", x: 0, y: 16, w: 6, h: 4 },
+    { i: "yearly", x: 0, y: 20, w: 6, h: 5 },
+  ],
+  xs: [
+    { i: "company", x: 0, y: 0, w: 4, h: 4 },
+    { i: "monthlyCompany", x: 0, y: 4, w: 4, h: 4 },
+    { i: "unloaded", x: 0, y: 8, w: 4, h: 4 },
+    { i: "live", x: 0, y: 12, w: 4, h: 4 },
+    { i: "weekly", x: 0, y: 16, w: 4, h: 4 },
+    { i: "yearly", x: 0, y: 20, w: 4, h: 5 },
+  ],
+  xxs: [
+    { i: "company", x: 0, y: 0, w: 2, h: 4 },
+    { i: "monthlyCompany", x: 0, y: 4, w: 2, h: 4 },
+    { i: "unloaded", x: 0, y: 8, w: 2, h: 4 },
+    { i: "live", x: 0, y: 12, w: 2, h: 4 },
+    { i: "weekly", x: 0, y: 16, w: 2, h: 4 },
+    { i: "yearly", x: 0, y: 20, w: 2, h: 5 },
+  ],
 };
 
 const DEFAULT_VISIBLE: VisibleWidgets = {

@@ -34,10 +34,10 @@ function UnloadedStatus() {
   if (isLoading) return <Skeleton active paragraph={{ rows: 8 }} />;
 
   return (
-    <div style={{ width: "100%", height: 300, marginBlock: 25 }}>
+    <div style={{ width: "100%", height: "100%", minHeight: 250 }}>
       <ResponsivePie
         data={data}
-        margin={{ top: 40, right: 80, bottom: 80, left: 80 }}
+        margin={{ top: 30, right: 40, bottom: 60, left: 40 }}
         innerRadius={0.6}
         padAngle={0.7}
         cornerRadius={3}
@@ -57,14 +57,14 @@ function UnloadedStatus() {
             direction: "row",
             justify: false,
             translateX: 0,
-            translateY: 56,
+            translateY: 50,
             itemsSpacing: 0,
-            itemWidth: 100,
+            itemWidth: 80,
             itemHeight: 18,
             itemTextColor: "#fff",
             itemDirection: "left-to-right",
             itemOpacity: 1,
-            symbolSize: 18,
+            symbolSize: 14,
             symbolShape: "circle",
           },
         ]}

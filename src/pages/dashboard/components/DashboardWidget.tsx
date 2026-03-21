@@ -36,7 +36,7 @@ export const DashboardWidget = React.forwardRef<
     return (
       <div
         ref={ref}
-        style={style}
+        style={{ ...style, height: "100%" }}
         className={className}
         onMouseDown={onMouseDown}
         onMouseUp={onMouseUp}
@@ -65,14 +65,13 @@ export const DashboardWidget = React.forwardRef<
             />
           }
           variant="borderless"
+          style={{ height: "100%", display: "flex", flexDirection: "column" }}
           styles={{
             body: {
-              height: "100%",
-              display: "flex",
-              flexDirection: "column",
               flex: 1,
               padding: "10px",
-              overflow: "hidden",
+              overflow: "auto",
+              minHeight: 0,
             },
           }}
         >

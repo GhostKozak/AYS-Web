@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Card, Flex, Avatar, Tag, Typography, Space, theme } from "antd";
+import { Flex, Avatar, Tag, Typography, Space, theme } from "antd";
 import { TruckOutlined, ClockCircleOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import { useTrips } from "../../../hooks/useTrips";
@@ -63,14 +63,11 @@ export default function LiveOperationsList() {
   }, [trips]);
 
   return (
-    <Card
-      variant="borderless"
-      styles={{
-        body: {
-          maxHeight: "350px",
-          overflow: "scroll",
-          padding: "0 12px 12px 12px",
-        },
+    <div
+      style={{
+        height: "100%",
+        overflowY: "auto",
+        padding: "0 4px",
       }}
     >
       <Flex vertical gap={0}>
@@ -148,6 +145,6 @@ export default function LiveOperationsList() {
           })
         )}
       </Flex>
-    </Card>
+    </div>
   );
 }
