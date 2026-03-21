@@ -4,7 +4,8 @@ import { USER_ROLES, type DriverType } from "../../../types";
 import { Trans, useTranslation } from "react-i18next";
 import { formatPhoneNumber, getUniqueOptions } from "../../../utils";
 import { useMemo } from "react";
-import type { ColumnType } from "antd/lib/table";
+import type { ColumnType } from "antd/es/table";
+import type { TableRowSelection } from "antd/es/table/interface";
 import { hasRole } from "../../../utils/auth.utils";
 
 type Props = {
@@ -12,6 +13,7 @@ type Props = {
   isLoading: boolean;
   onEdit: (c: DriverType) => void;
   onDelete: (c: DriverType) => void;
+  rowSelection?: TableRowSelection<DriverType>;
 };
 
 export default function DriverTable({
@@ -19,6 +21,7 @@ export default function DriverTable({
   isLoading,
   onEdit,
   onDelete,
+  rowSelection,
 }: Props) {
   const { t } = useTranslation();
 
@@ -144,6 +147,7 @@ export default function DriverTable({
       dataSource={drivers}
       loading={isLoading}
       rowKey="_id"
+      rowSelection={rowSelection}
       scroll={{ x: 1000 }}
       pagination={{
         showSizeChanger: true,

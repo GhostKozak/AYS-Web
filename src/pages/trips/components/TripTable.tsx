@@ -8,7 +8,8 @@ import {
   getUniqueOptions,
 } from "../../../utils";
 import { useMemo } from "react";
-import type { ColumnType } from "antd/lib/table";
+import type { ColumnType } from "antd/es/table";
+import type { TableRowSelection } from "antd/es/table/interface";
 import { hasRole } from "../../../utils/auth.utils";
 
 type Props = {
@@ -16,6 +17,7 @@ type Props = {
   isLoading: boolean;
   onEdit: (c: TripType) => void;
   onDelete: (c: TripType) => void;
+  rowSelection?: TableRowSelection<TripType>;
 };
 
 export default function TripTable({
@@ -23,6 +25,7 @@ export default function TripTable({
   isLoading,
   onEdit,
   onDelete,
+  rowSelection,
 }: Props) {
   const { t } = useTranslation();
 
@@ -287,6 +290,7 @@ export default function TripTable({
       dataSource={trips}
       loading={isLoading}
       rowKey="_id"
+      rowSelection={rowSelection}
       scroll={{ x: 1500 }}
       pagination={{
         showSizeChanger: true,

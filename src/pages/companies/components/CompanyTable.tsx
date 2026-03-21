@@ -5,13 +5,15 @@ import { Trans, useTranslation } from "react-i18next";
 import { getUniqueOptions } from "../../../utils";
 import { useMemo } from "react";
 import { hasRole } from "../../../utils/auth.utils";
-import type { ColumnType } from "antd/lib/table";
+import type { ColumnType } from "antd/es/table";
+import type { TableRowSelection } from "antd/es/table/interface";
 
 type Props = {
   companies: CompanyType[];
   isLoading: boolean;
   onEdit: (c: CompanyType) => void;
   onDelete: (c: CompanyType) => void;
+  rowSelection?: TableRowSelection<CompanyType>;
 };
 
 export default function CompaniesTable({
@@ -19,6 +21,7 @@ export default function CompaniesTable({
   isLoading,
   onEdit,
   onDelete,
+  rowSelection,
 }: Props) {
   const { t } = useTranslation();
 
@@ -123,6 +126,7 @@ export default function CompaniesTable({
       dataSource={companies}
       loading={isLoading}
       rowKey="_id"
+      rowSelection={rowSelection}
       pagination={{
         showSizeChanger: true,
         showQuickJumper: true,

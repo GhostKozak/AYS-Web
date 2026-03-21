@@ -1,5 +1,5 @@
-import { App, Button, Flex, Layout } from "antd";
-import { useState, useMemo } from "react";
+import { App, Button, Flex, Layout, Space, Popconfirm } from "antd";
+import React, { useState, useMemo } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router";
@@ -9,6 +9,7 @@ import {
   FileExcelOutlined,
   PlusOutlined,
   SearchOutlined,
+  DeleteOutlined,
 } from "@ant-design/icons";
 
 import { USER_ROLES, type TripType } from "../../types";
@@ -40,6 +41,8 @@ function Trips() {
   const [selectedRecord, setSelectedRecord] = useState<TripType | undefined>(
     undefined,
   );
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+  const [isBulkDeleting, setIsBulkDeleting] = useState(false);
 
   const { trips, isLoading, createTrip, updateTrip, deleteTrip } = useTrips();
   const isMobile = useIsMobile(1024);
@@ -59,11 +62,34 @@ function Trips() {
         title: t("Common.SUCCESS"),
         description: t("Trips.DELETE_SUCCESS"),
       });
+      setSelectedRowKeys(prev => prev.filter(key => key !== record._id));
     } catch (error) {
       notification.error({
         title: t("Common.ERROR"),
         description: t("Errors.DELETE_FAILED"),
       });
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    setIsBulkDeleting(true);
+    try {
+      const results = await Promise.allSettled(
+        selectedRowKeys.map((id) => deleteTrip(id.toString()))
+      );
+      const successCount = results.filter(r => r.status === 'fulfilled').length;
+      notification.success({
+        title: t("Common.SUCCESS"),
+        description: t("Common.BULK_DELETE_SUCCESS", { count: successCount }),
+      });
+      setSelectedRowKeys([]);
+    } catch (error) {
+      notification.error({
+        title: t("Common.ERROR"),
+        description: t("Errors.DELETE_FAILED"),
+      });
+    } finally {
+      setIsBulkDeleting(false);
     }
   };
 
@@ -184,10 +210,25 @@ function Trips() {
           onChange={(e) => handleSearch(e.target.value)}
         />
         <RoleGuard allowedRoles={[USER_ROLES.ADMIN, USER_ROLES.EDITOR]}>
-          <Button color="cyan" variant="solid" size="large" onClick={handleAdd}>
-            <PlusOutlined />{" "}
-            {isMobile ? t("Common.ADD") : t("Trips.ADD_BUTTON")}
-          </Button>
+          <Space>
+            {selectedRowKeys.length > 0 && (
+              <Popconfirm
+                title={t("Common.BULK_DELETE_CONFIRM_TITLE")}
+                description={t("Common.BULK_DELETE_CONFIRM_DESC", { count: selectedRowKeys.length })}
+                onConfirm={handleBulkDelete}
+                okText={t("Common.YES")}
+                cancelText={t("Common.NO")}
+              >
+                <Button color="danger" variant="solid" size="large" loading={isBulkDeleting}>
+                  <DeleteOutlined /> {t("Common.BULK_DELETE", { count: selectedRowKeys.length })}
+                </Button>
+              </Popconfirm>
+            )}
+            <Button color="cyan" variant="solid" size="large" onClick={handleAdd}>
+              <PlusOutlined />{" "}
+              {isMobile ? t("Common.ADD") : t("Trips.ADD_BUTTON")}
+            </Button>
+          </Space>
         </RoleGuard>
       </Flex>
       {isMobile ? (
@@ -203,6 +244,10 @@ function Trips() {
           isLoading={isLoading}
           onDelete={handleDelete}
           onEdit={handleEdit}
+          rowSelection={{
+            selectedRowKeys,
+            onChange: setSelectedRowKeys,
+          }}
         />
       )}
       <TripModal

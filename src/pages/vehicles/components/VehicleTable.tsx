@@ -4,7 +4,8 @@ import { USER_ROLES, type VehicleType } from "../../../types";
 import { Trans, useTranslation } from "react-i18next";
 import { formatLicencePlate, getUniqueOptions } from "../../../utils";
 import { useMemo } from "react";
-import type { ColumnType } from "antd/lib/table";
+import type { ColumnType } from "antd/es/table";
+import type { TableRowSelection } from "antd/es/table/interface";
 import { hasRole } from "../../../utils/auth.utils";
 
 type Props = {
@@ -12,6 +13,7 @@ type Props = {
   isLoading: boolean;
   onEdit: (c: VehicleType) => void;
   onDelete: (c: VehicleType) => void;
+  rowSelection?: TableRowSelection<VehicleType>;
 };
 
 export default function VehicleTable({
@@ -19,6 +21,7 @@ export default function VehicleTable({
   isLoading,
   onEdit,
   onDelete,
+  rowSelection,
 }: Props) {
   const { t } = useTranslation();
 
@@ -137,6 +140,7 @@ export default function VehicleTable({
       dataSource={vehicles}
       loading={isLoading}
       rowKey="_id"
+      rowSelection={rowSelection}
       pagination={{
         showSizeChanger: true,
         showQuickJumper: true,

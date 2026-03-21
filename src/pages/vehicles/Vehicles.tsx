@@ -1,5 +1,5 @@
-import { App, Button, Flex, Layout } from "antd";
-import { useState } from "react";
+import { App, Button, Flex, Layout, Space, Popconfirm } from "antd";
+import React, { useState } from "react";
 import { useSearchParams } from "react-router";
 import { usePageTitle } from "../../hooks/usePageTitle";
 import { useTranslation } from "react-i18next";
@@ -9,6 +9,7 @@ import {
   FileExcelOutlined,
   PlusOutlined,
   SearchOutlined,
+  DeleteOutlined,
 } from "@ant-design/icons";
 import { useVehicles } from "../../hooks/useVehicles";
 import { USER_ROLES, type VehicleType, type VehicleTypeEnum } from "../../types";
@@ -33,6 +34,8 @@ function Vehicles() {
   const [selectedRecord, setSelectedRecord] = useState<VehicleType | undefined>(
     undefined,
   );
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+  const [isBulkDeleting, setIsBulkDeleting] = useState(false);
 
   const { vehicles, isLoading, createVehicle, updateVehicle, deleteVehicle } =
     useVehicles();
@@ -49,11 +52,36 @@ function Vehicles() {
         title: t("Common.SUCCESS"),
         description: t("Vehicles.DELETE_SUCCESS", { plate: record.licence_plate }),
       });
+      setSelectedRowKeys(prev => prev.filter(key => key !== record._id));
     } catch (error) {
       notification.error({
         title: t("Common.ERROR"),
         description: t("Errors.DELETE_FAILED"),
       });
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    setIsBulkDeleting(true);
+    try {
+      const results = await Promise.allSettled(
+        selectedRowKeys.map((id) => deleteVehicle(id.toString()))
+      );
+      
+      const successCount = results.filter(r => r.status === 'fulfilled').length;
+      
+      notification.success({
+        title: t("Common.SUCCESS"),
+        description: t("Common.BULK_DELETE_SUCCESS", { count: successCount }),
+      });
+      setSelectedRowKeys([]);
+    } catch (error) {
+      notification.error({
+        title: t("Common.ERROR"),
+        description: t("Errors.DELETE_FAILED"),
+      });
+    } finally {
+      setIsBulkDeleting(false);
     }
   };
 
@@ -149,10 +177,25 @@ function Vehicles() {
           onChange={(e) => setSearchText(e.target.value)}
         />
         <RoleGuard allowedRoles={[USER_ROLES.ADMIN, USER_ROLES.EDITOR]}>
-          <Button color="cyan" variant="solid" size="large" onClick={handleAdd}>
-            <PlusOutlined />{" "}
-            {isMobile ? t("Common.ADD") : t("Vehicles.ADD_BUTTON")}
-          </Button>
+          <Space>
+            {selectedRowKeys.length > 0 && (
+              <Popconfirm
+                title={t("Common.BULK_DELETE_CONFIRM_TITLE")}
+                description={t("Common.BULK_DELETE_CONFIRM_DESC", { count: selectedRowKeys.length })}
+                onConfirm={handleBulkDelete}
+                okText={t("Common.YES")}
+                cancelText={t("Common.NO")}
+              >
+                <Button color="danger" variant="solid" size="large" loading={isBulkDeleting}>
+                  <DeleteOutlined /> {t("Common.BULK_DELETE", { count: selectedRowKeys.length })}
+                </Button>
+              </Popconfirm>
+            )}
+            <Button color="cyan" variant="solid" size="large" onClick={handleAdd}>
+              <PlusOutlined />{" "}
+              {isMobile ? t("Common.ADD") : t("Vehicles.ADD_BUTTON")}
+            </Button>
+          </Space>
         </RoleGuard>
       </Flex>
       {isMobile ? (
@@ -168,6 +211,10 @@ function Vehicles() {
           isLoading={isLoading}
           onEdit={handleEdit}
           onDelete={handleDelete}
+          rowSelection={{
+            selectedRowKeys,
+            onChange: setSelectedRowKeys,
+          }}
         />
       )}
 
