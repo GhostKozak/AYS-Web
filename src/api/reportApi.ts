@@ -35,6 +35,12 @@ export interface StatusDistributionResponse {
   canceled: number;
 }
 
+export interface ParkingLotStats {
+  totalCapacity: number;
+  currentCount: number;
+  breakdown: Record<string, number>;
+}
+
 export const reportApi = {
   getTopCompanies: async (period: ReportPeriod = 'month'): Promise<CompanyStat[]> => {
     const response = await apiClient.get(API_ENDPOINTS.REPORTS.TOP_COMPANIES, { params: { period } });
@@ -58,13 +64,18 @@ export const reportApi = {
     return response.data.data ?? response.data;
   },
 
-  getTrend: async (period: ReportPeriod = 'month'): Promise<TrendStat[]> => {
-    const response = await apiClient.get(API_ENDPOINTS.REPORTS.TREND, { params: { period } });
+  getTrend: async (period: ReportPeriod = 'month', year?: number): Promise<TrendStat[]> => {
+    const response = await apiClient.get(API_ENDPOINTS.REPORTS.TREND, { params: { period, year } });
     return response.data.data ?? response.data ?? [];
   },
 
   getDashboardSummary: async (): Promise<DashboardSummary> => {
     const response = await apiClient.get(API_ENDPOINTS.REPORTS.DASHBOARD_SUMMARY);
+    return response.data.data ?? response.data;
+  },
+
+  getParkingLotDashboard: async (totalCapacity: number = 100): Promise<ParkingLotStats> => {
+    const response = await apiClient.get(API_ENDPOINTS.REPORTS.PARKING_LOT, { params: { totalCapacity } });
     return response.data.data ?? response.data;
   },
 

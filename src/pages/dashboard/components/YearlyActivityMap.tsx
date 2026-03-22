@@ -4,20 +4,23 @@ import { Skeleton, theme } from "antd";
 import { useTranslation } from "react-i18next";
 import { useIsMobile } from "../../../hooks/useIsMobile";
 
-const currentYear = new Date().getFullYear();
-const fromDate = `${currentYear}-01-01`;
-const toDate = `${currentYear}-12-31`;
+const YearlyActivityMap = ({ year }: { year?: number }) => {
+  const currentYear = year || new Date().getFullYear();
+  const fromDate = `${currentYear}-01-01`;
+  const toDate = `${currentYear}-12-31`;
 
-const YearlyActivityMap = () => {
-  const { data: rawData, isLoading } = useReportTrend("year");
+  // 'all' periyodu günlük verileri (YYYY-MM-DD) döndürdüğü için takvim görünümü için bunu kullanıyoruz
+  const { data: rawData, isLoading } = useReportTrend("all", currentYear);
   const { token } = theme.useToken();
   const { t, i18n } = useTranslation();
   const isMobile = useIsMobile();
 
-  const data = (rawData || []).map((item) => ({
-    day: item.timestamp,
-    value: item.count,
-  }));
+  const data = (rawData || [])
+    .filter((item) => item.timestamp.startsWith(currentYear.toString()))
+    .map((item) => ({
+      day: item.timestamp,
+      value: item.count,
+    }));
 
   if (isLoading) return <Skeleton active paragraph={{ rows: 6 }} />;
 
@@ -55,22 +58,22 @@ const YearlyActivityMap = () => {
           }}
           tooltip={({ day, value, color }) => {
             const dateObj = new Date(day);
-            const dateStr = !isNaN(dateObj.getTime()) 
+            const dateStr = !isNaN(dateObj.getTime())
               ? dateObj.toLocaleDateString(i18n.language || "tr-TR", { day: "numeric", month: "long", weekday: "long" })
               : day;
             return (
-              <div style={{ 
-                padding: "8px 12px", 
-                backgroundColor: token.colorBgElevated, 
-                color: token.colorText, 
+              <div style={{
+                padding: "8px 12px",
+                backgroundColor: token.colorBgElevated,
+                color: token.colorText,
                 borderRadius: token.borderRadius,
                 boxShadow: token.boxShadowSecondary
               }}>
                 <strong>{dateStr}</strong>
                 <br />
-                <span style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 4 }}>
+                <span style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 4, whiteSpace: "nowrap" }}>
                   <span style={{ width: 10, height: 10, backgroundColor: color, borderRadius: "50%" }}></span>
-                  {value} {t("Breadcrumbs.TRIPS").toLowerCase()}
+                  {value} {t("Trips.TOTAL").toLowerCase()}
                 </span>
               </div>
             );

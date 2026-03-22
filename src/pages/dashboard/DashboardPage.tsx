@@ -18,7 +18,7 @@ import {
   Result,
 } from "antd";
 import CompanyDistribution from "./components/CompanyDistribution";
-import MonthlyCompanyDistribution from "./components/MonthlyCompanyDistribution";
+import ParkingLotDistribution from "./components/ParkingLotDistribution";
 import StatsOverview from "./components/StatsOverview";
 import UnloadedStatus from "./components/UnloadedStatus";
 import WeeklyActivityChart from "./components/WeeklyActivityChart";
@@ -29,7 +29,33 @@ import { DashboardWidget } from "./components/DashboardWidget";
 import { FileExcelOutlined, FilePdfOutlined, SettingOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import { reportApi } from "../../api/reportApi";
+import { Select } from "antd";
 
+const YearlyActivityMapContainer = ({ onClose }: { onClose: () => void }) => {
+  const { t } = useTranslation();
+  const currentYear = new Date().getFullYear();
+  const [selectedYear, setSelectedYear] = useState(currentYear);
+  
+  const years = Array.from({ length: 5 }, (_, i) => currentYear - i);
+
+  return (
+    <DashboardWidget
+      title={t("Dashboard.YEARLY_ACTIVITY")}
+      onClose={onClose}
+      extra={
+        <Select
+          size="small"
+          value={selectedYear}
+          onChange={setSelectedYear}
+          style={{ width: 100 }}
+          options={years.map(y => ({ label: y.toString(), value: y }))}
+        />
+      }
+    >
+      <YearlyActivityMap year={selectedYear} />
+    </DashboardWidget>
+  );
+};
 const { Text } = Typography;
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -134,7 +160,7 @@ function DashboardPage() {
         onLayoutChange={onLayoutChange as any}
       >
         {visibleWidgets.company && (
-          <div key="company" data-grid={{ x: 0, y: 0, w: 3, h: 4 }}>
+          <div key="company">
             <DashboardWidget
               title={t("Dashboard.TOP_COMPANIES")}
               onClose={() => toggleWidget("company", false)}
@@ -144,13 +170,13 @@ function DashboardPage() {
           </div>
         )}
 
-        {visibleWidgets.monthlyCompany && (
-          <div key="monthlyCompany">
+        {visibleWidgets.parkingLot && (
+          <div key="parkingLot">
             <DashboardWidget
-              title={t("Dashboard.MONTHLY_COMPANIES")}
-              onClose={() => toggleWidget("monthlyCompany", false)}
+              title={t("Dashboard.PARKING_LOT_TITLE")}
+              onClose={() => toggleWidget("parkingLot", false)}
             >
-              <MonthlyCompanyDistribution />
+              <ParkingLotDistribution />
             </DashboardWidget>
           </div>
         )}
@@ -197,12 +223,9 @@ function DashboardPage() {
 
         {visibleWidgets.yearly && (
           <div key="yearly">
-            <DashboardWidget
-              title={t("Dashboard.YEARLY_ACTIVITY")}
-              onClose={() => toggleWidget("yearly", false)}
-            >
-              <YearlyActivityMap />
-            </DashboardWidget>
+            <YearlyActivityMapContainer 
+              onClose={() => toggleWidget("yearly", false)} 
+            />
           </div>
         )}
       </ResponsiveGridLayout>
@@ -230,10 +253,10 @@ function DashboardPage() {
             {t("Dashboard.TOP_COMPANIES")}
           </Checkbox>
           <Checkbox
-            checked={visibleWidgets.monthlyCompany}
-            onChange={(e) => toggleWidget("monthlyCompany", e.target.checked)}
+            checked={visibleWidgets.parkingLot}
+            onChange={(e) => toggleWidget("parkingLot", e.target.checked)}
           >
-            {t("Dashboard.MONTHLY_COMPANIES")}
+            {t("Dashboard.PARKING_LOT_TITLE")}
           </Checkbox>
           <Checkbox
             checked={visibleWidgets.unloaded}

@@ -16,6 +16,7 @@ export const API_ENDPOINTS = {
     AVERAGE_TURNAROUND: '/reports/average-turnaround',
     TREND: '/reports/trend',
     DASHBOARD_SUMMARY: '/reports/dashboard-summary',
+    PARKING_LOT: '/reports/parking-lot-dashboard',
     EXPORT_EXCEL: '/reports/export/excel',
     EXPORT_PDF: '/reports/export/pdf'
   },

@@ -23,14 +23,16 @@ function UnloadedStatus() {
   const isMobile = useIsMobile();
 
   const data = rawData ? [
-    ...Object.entries(rawData.statuses || {}).map(([key, value]) => ({
-      id: t(`Trips.STATUS_${key}`),
-      label: t(`Trips.STATUS_${key}`),
-      value: value as number,
-      color: STATUS_COLORS[key] || STATUS_COLORS.UNKNOWN
-    })),
+    ...Object.entries(rawData.statuses || {})
+      .filter(([_, value]) => (value as number) > 0)
+      .map(([key, value]) => ({
+        id: t(`Trips.STATUS_${key}`),
+        label: t(`Trips.STATUS_${key}`),
+        value: value as number,
+        color: STATUS_COLORS[key] || STATUS_COLORS.UNKNOWN
+      })),
     // İptal edilenler ayrı bir alandaysa ekleyelim
-    ...(rawData.canceled ? [{
+    ...(rawData.canceled && rawData.canceled > 0 ? [{
       id: t("Trips.STATUS_CANCELED"),
       label: t("Trips.STATUS_CANCELED"),
       value: rawData.canceled,

@@ -12,11 +12,13 @@ function CompanyDistribution() {
   const { token } = theme.useToken();
   const isMobile = useIsMobile();
 
-  const data = (rawData || []).map((item: any) => ({
-    id: item.companyName,
-    label: item.companyName,
-    value: item.tripCount,
-  }));
+  const data = (rawData || [])
+    .filter((item: any) => item.tripCount > 0)
+    .map((item: any) => ({
+      id: item.companyName,
+      label: item.companyName,
+      value: item.tripCount,
+    }));
 
   const legendHeight = data.length * 20;
   const bottomMargin = isMobile ? (legendHeight + 50) : (legendHeight + 50);

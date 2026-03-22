@@ -29,10 +29,10 @@ export const useAverageTurnaround = (period: ReportPeriod = 'month') => {
   });
 };
 
-export const useReportTrend = (period: ReportPeriod = 'month') => {
+export const useReportTrend = (period: ReportPeriod = 'month', year?: number) => {
   return useQuery({
-    queryKey: ['reports', 'trend', period],
-    queryFn: () => reportApi.getTrend(period),
+    queryKey: ['reports', 'trend', period, year],
+    queryFn: () => reportApi.getTrend(period, year),
   });
 };
 
@@ -40,5 +40,12 @@ export const useDashboardSummary = () => {
   return useQuery({
     queryKey: ['reports', 'dashboard-summary'],
     queryFn: () => reportApi.getDashboardSummary(),
+  });
+};
+
+export const useParkingLot = (totalCapacity: number = 100) => {
+  return useQuery({
+    queryKey: ['reports', 'parking-lot', totalCapacity],
+    queryFn: () => reportApi.getParkingLotDashboard(totalCapacity),
   });
 };

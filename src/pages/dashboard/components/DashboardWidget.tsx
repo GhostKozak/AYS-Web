@@ -12,6 +12,7 @@ interface DashboardWidgetProps {
   onMouseDown?: React.MouseEventHandler;
   onMouseUp?: React.MouseEventHandler;
   onTouchEnd?: React.TouchEventHandler;
+  extra?: React.ReactNode;
 }
 
 // forwardRef kullanmak zorundayız çünkü react-grid-layout DOM elemanına erişmek ister
@@ -29,6 +30,7 @@ export const DashboardWidget = React.forwardRef<
       onMouseDown,
       onMouseUp,
       onTouchEnd,
+      extra,
       ...props
     },
     ref,
@@ -54,15 +56,18 @@ export const DashboardWidget = React.forwardRef<
             </div>
           }
           extra={
-            <Button
-              type="text"
-              icon={<CloseOutlined />}
-              size="small"
-              onClick={(e) => {
-                e.stopPropagation(); // Tıklama drag işlemini tetiklemesin
-                onClose();
-              }}
-            />
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              {extra}
+              <Button
+                type="text"
+                icon={<CloseOutlined />}
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onClose();
+                }}
+              />
+            </div>
           }
           variant="borderless"
           style={{ height: "100%", display: "flex", flexDirection: "column" }}

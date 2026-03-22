@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import type { Layout } from "react-grid-layout";
 
-type WidgetKey = "weekly" | "live" | "yearly" | "company" | "monthlyCompany" | "unloaded";
+type WidgetKey = "weekly" | "live" | "yearly" | "company" | "parkingLot" | "unloaded";
 type VisibleWidgets = Record<WidgetKey, boolean>;
 
 const LAYOUT_KEY = "dashboard_layouts";
@@ -12,7 +12,7 @@ const VISIBLE_KEY = "dashboard_visible_widgets";
 const DEFAULT_LAYOUT: any = {
   lg: [
     { i: "company", x: 0, y: 0, w: 3, h: 4 },
-    { i: "monthlyCompany", x: 3, y: 0, w: 3, h: 4 },
+    { i: "parkingLot", x: 3, y: 0, w: 3, h: 4 },
     { i: "unloaded", x: 6, y: 0, w: 3, h: 4 },
     { i: "live", x: 9, y: 0, w: 3, h: 4 },
     { i: "weekly", x: 0, y: 4, w: 6, h: 4 },
@@ -20,7 +20,7 @@ const DEFAULT_LAYOUT: any = {
   ],
   md: [
     { i: "company", x: 0, y: 0, w: 5, h: 4 },
-    { i: "monthlyCompany", x: 5, y: 0, w: 5, h: 4 },
+    { i: "parkingLot", x: 5, y: 0, w: 5, h: 4 },
     { i: "unloaded", x: 0, y: 4, w: 5, h: 4 },
     { i: "live", x: 5, y: 4, w: 5, h: 4 },
     { i: "weekly", x: 0, y: 8, w: 10, h: 4 },
@@ -28,7 +28,7 @@ const DEFAULT_LAYOUT: any = {
   ],
   sm: [
     { i: "company", x: 0, y: 0, w: 6, h: 4 },
-    { i: "monthlyCompany", x: 0, y: 4, w: 6, h: 4 },
+    { i: "parkingLot", x: 0, y: 4, w: 6, h: 4 },
     { i: "unloaded", x: 0, y: 8, w: 6, h: 4 },
     { i: "live", x: 0, y: 12, w: 6, h: 4 },
     { i: "weekly", x: 0, y: 16, w: 6, h: 4 },
@@ -36,7 +36,7 @@ const DEFAULT_LAYOUT: any = {
   ],
   xs: [
     { i: "company", x: 0, y: 0, w: 4, h: 4 },
-    { i: "monthlyCompany", x: 0, y: 4, w: 4, h: 4 },
+    { i: "parkingLot", x: 0, y: 4, w: 4, h: 4 },
     { i: "unloaded", x: 0, y: 8, w: 4, h: 4 },
     { i: "live", x: 0, y: 12, w: 4, h: 4 },
     { i: "weekly", x: 0, y: 16, w: 4, h: 4 },
@@ -44,7 +44,7 @@ const DEFAULT_LAYOUT: any = {
   ],
   xxs: [
     { i: "company", x: 0, y: 0, w: 2, h: 4 },
-    { i: "monthlyCompany", x: 0, y: 4, w: 2, h: 4 },
+    { i: "parkingLot", x: 0, y: 4, w: 2, h: 4 },
     { i: "unloaded", x: 0, y: 8, w: 2, h: 4 },
     { i: "live", x: 0, y: 12, w: 2, h: 4 },
     { i: "weekly", x: 0, y: 16, w: 2, h: 4 },
@@ -57,7 +57,7 @@ const DEFAULT_VISIBLE: VisibleWidgets = {
   live: true,
   yearly: true,
   company: true,
-  monthlyCompany: true,
+  parkingLot: true,
   unloaded: true,
 };
 
