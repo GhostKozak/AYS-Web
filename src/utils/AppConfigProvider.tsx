@@ -59,8 +59,68 @@ export const AppConfigProvider: React.FC<{ children: ReactNode }> = ({
 
   const antdTheme = useMemo(
     () => ({
-      algorithm:
-        themeMode === "light" ? theme.defaultAlgorithm : theme.darkAlgorithm,
+      algorithm: themeMode === "light" ? theme.defaultAlgorithm : theme.darkAlgorithm,
+      token:
+        themeMode === "dark"
+          ? {
+            // --- Ana Renkler ---
+            colorPrimary: "#1677ff", // Modern ve canlı bir mavi
+            colorInfo: "#1677ff",
+            colorSuccess: "#52c41a",
+            colorWarning: "#faad14",
+            colorError: "#ff4d4f",
+
+            // --- Arka Plan (Smooth Transition için katmanlı yapılar) ---
+            colorBgBase: "#0d1117", // En alt katman (GitHub tarzı derinlik)
+            colorBgContainer: "#161b22", // Kartlar ve tablolar için bir tık açık ton
+            colorBgElevated: "#1f242c", // Modal ve Popover'lar için en üst katman
+
+            // --- Metin Renkleri ---
+            colorTextBase: "#e6edf3", // Saf beyaz yerine göz yormayan açık gri
+            colorTextSecondary: "#8b949e", // Yardımcı metinler
+
+            // --- Kenarlık ve Bölücüler ---
+            colorBorder: "#30363d", // Yumuşak geçişli borderlar
+            colorBorderSecondary: "#21262d",
+
+            // --- Etkileşim ve Smoothness ---
+            borderRadius: 8, // Daha modern bir yuvarlama
+            wireframe: true, // Ant Design v5'in yeni görsel stili
+
+            // Geçiş efektleri için kontrol (CSS'e de yansır)
+            motionDurationSlow: "0.3s",
+            motionDurationMid: "0.2s",
+            motionDurationFast: "0.1s",
+          }
+          : {
+            // --- Ana Karakter Renkleri ---
+            colorPrimary: '#0052CC',          // Güven veren, modern bir kurumsal mavi
+            colorInfo: '#0052CC',
+            colorSuccess: '#389e0d',          // Daha doğal, doygun bir yeşil
+            colorWarning: '#fa8c16',
+            colorError: '#f5222d',
+
+            // --- Arka Plan Katmanları (Derinlik için) ---
+            colorBgBase: '#f4f7f9',           // Sayfanın ana zemini (Hafif grimsi mavi)
+            colorBgContainer: '#ffffff',      // Kartlar, Tablolar ve Formlar (Saf beyaz)
+            colorBgElevated: '#ffffff',       // Modal ve Popover'lar
+
+            // --- Metin ve Okunabilirlik ---
+            colorTextBase: '#172b4d',         // Tam siyah yerine çok koyu lacivert (Premium hissettirir)
+            colorTextSecondary: '#44546f',    // İkincil açıklamalar ve etiketler
+
+            // --- Kenarlıklar ve Bölücüler ---
+            colorBorder: '#dfe1e6',           // Yumuşak, neredeyse hissedilmeyen borderlar
+            colorBorderSecondary: '#ebecf0',
+
+            // --- Etkileşim ve Smoothness ---
+            borderRadius: 8,                  // Modern köşeler
+            controlHeight: 36,                // Elemanlar arası ferahlık
+
+            // Smooth Transition (Geçiş Efektleri)
+            motionDurationSlow: '0.3s',
+            motionDurationMid: '0.2s',
+          },
     }),
     [themeMode]
   );

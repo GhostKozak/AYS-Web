@@ -33,15 +33,14 @@ function ParkingLotDistribution() {
 
   const occupancyRate = data ? Math.round((data.currentCount / data.totalCapacity) * 100) : 0;
 
-  const legendHeight = chartData.length * 20;
-  const bottomMargin = isMobile ? (legendHeight + 40) : (legendHeight + 40);
+
 
   return (
     <div style={{ width: "100%", height: "100%", minHeight: isMobile ? 350 : 400, display: "flex", flexDirection: "column" }}>
       <div style={{ flex: 1, position: "relative" }}>
         <ResponsivePie
           data={chartData}
-          margin={{ top: 20, right: 20, bottom: bottomMargin, left: 20 }}
+          margin={{ top: 40, right: 80, bottom: 40, left: 80 }}
           innerRadius={0.5}
           padAngle={3}
           cornerRadius={3}
@@ -49,7 +48,13 @@ function ParkingLotDistribution() {
           colors={{ datum: "data.color" }}
           borderWidth={1}
           borderColor={{ from: "color", modifiers: [["darker", 0.2]] }}
-          enableArcLinkLabels={false}
+          enableArcLinkLabels={true}
+          arcLinkLabelsSkipAngle={10}
+          arcLinkLabelsTextColor={token.colorText}
+          arcLinkLabelsThickness={2}
+          arcLinkLabelsColor={{ from: "color" }}
+          arcLinkLabelsDiagonalLength={isMobile ? 10 : 16}
+          arcLinkLabelsStraightLength={isMobile ? 12 : 24}
           theme={{
             tooltip: {
               container: {
@@ -63,28 +68,11 @@ function ParkingLotDistribution() {
           }}
           arcLabelsSkipAngle={10}
           arcLabelsTextColor={{ from: "color", modifiers: [["darker", 2]] }}
-          legends={[
-            {
-              anchor: "bottom",
-              direction: "column",
-              justify: false,
-              translateX: -75,
-              translateY: bottomMargin - 15,
-              itemsSpacing: 4,
-              itemWidth: 150,
-              itemHeight: 18,
-              itemTextColor: token.colorText,
-              itemDirection: "left-to-right",
-              itemOpacity: 1,
-              symbolSize: 14,
-              symbolShape: "circle",
-            },
-          ]}
         />
       </div>
       
       <div style={{ padding: "0 10px 10px 10px" }}>
-        <Space direction="vertical" style={{ width: "100%" }} size={0}>
+        <Space orientation="vertical" style={{ width: "100%" }} size={0}>
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
             <Text type="secondary" style={{ fontSize: 12 }}>{t("Dashboard.PARKING_FULLNESS")}</Text>
             <Text strong style={{ fontSize: 12 }}>{data?.currentCount} / {data?.totalCapacity}</Text>

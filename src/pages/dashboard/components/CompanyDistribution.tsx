@@ -20,8 +20,7 @@ function CompanyDistribution() {
       value: item.tripCount,
     }));
 
-  const legendHeight = data.length * 20;
-  const bottomMargin = isMobile ? (legendHeight + 50) : (legendHeight + 50);
+
 
   return (
     <div style={{ width: "100%", height: "100%", minHeight: isMobile ? 300 : 350, display: "flex", flexDirection: "column" }}>
@@ -45,7 +44,7 @@ function CompanyDistribution() {
         ) : (
         <ResponsivePie
           data={data}
-        margin={{ top: 20, right: 20, bottom: bottomMargin, left: 20 }}
+        margin={{ top: 40, right: 80, bottom: 40, left: 80 }}
         innerRadius={0.5}
         padAngle={3}
         cornerRadius={3}
@@ -53,7 +52,7 @@ function CompanyDistribution() {
         colors={{ scheme: "dark2" }}
         borderWidth={1}
         borderColor={{ from: "color", modifiers: [["darker", 0.2]] }}
-        enableArcLinkLabels={false}
+        enableArcLinkLabels={true}
         arcLinkLabelsSkipAngle={10}
         arcLinkLabelsTextColor={token.colorText}
         arcLinkLabelsThickness={2}
@@ -73,23 +72,6 @@ function CompanyDistribution() {
         arcLinkLabelsStraightLength={isMobile ? 12 : 24}
         arcLabelsSkipAngle={10}
         arcLabelsTextColor={{ from: "color", modifiers: [["darker", 2]] }}
-        legends={[
-          {
-            anchor: "bottom",
-            direction: "column",
-            justify: false,
-            translateX: -75,
-            translateY: bottomMargin - 20,
-            itemsSpacing: 4,
-            itemWidth: 150,
-            itemHeight: 18,
-            itemTextColor: token.colorText,
-            itemDirection: "left-to-right",
-            itemOpacity: 1,
-            symbolSize: 14,
-            symbolShape: "circle",
-          },
-        ]}
         />
         )}
       </div>
