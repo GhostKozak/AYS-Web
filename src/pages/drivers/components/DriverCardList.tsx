@@ -87,7 +87,7 @@ export default function DriverCardList({
                 </Tag>
               }
             >
-              <Space orientation="vertical" style={{ width: "100%" }}>
+              <Space direction="vertical" style={{ width: "100%" }}>
                 <Flex justify="space-between">
                   <Text type="secondary">{t("Drivers.PHONE_NUMBER")}:</Text>
                   <Text>{formatPhoneNumber(item.phone_number)}</Text>
@@ -98,13 +98,13 @@ export default function DriverCardList({
                 </Flex>
                 <Divider size="small" style={{ margin: "8px 0" }} />
                 <Flex justify="space-between">
-                  <Text type="secondary">{t("Companies.CREATED_AT")}:</Text>
+                  <Text type="secondary">{t("Table.CREATED_AT")}:</Text>
                   <Text>
                     {new Date(item.createdAt).toLocaleDateString("tr-TR")}
                   </Text>
                 </Flex>
                 <Flex justify="space-between">
-                  <Text type="secondary">{t("Companies.UPDATED_AT")}:</Text>
+                  <Text type="secondary">{t("Table.UPDATED_AT")}:</Text>
                   <Text>
                     {new Date(item.updatedAt).toLocaleDateString("tr-TR")}
                   </Text>

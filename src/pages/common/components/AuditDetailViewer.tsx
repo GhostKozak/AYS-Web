@@ -72,7 +72,7 @@ export default function AuditDetailViewer({ action, details, oldValue, newValue 
       if (details.trim() !== '') {
         parsedDetails = JSON.parse(details);
       }
-    } catch (e) {
+    } catch (e: any) {
       // ignore
     }
   }
@@ -80,7 +80,7 @@ export default function AuditDetailViewer({ action, details, oldValue, newValue 
   // CREATE Action
   if (action === 'CREATE' && newValue !== undefined) {
     return (
-      <Card size="small" title={<Text type="success">{t("Audit.AFTER", "Oluşturulan Kayıt")}</Text>} style={{ borderColor: '#b7eb8f', wordBreak: 'break-all' }}>
+      <Card size="small" title={<Text type="success">{t("Audit.CREATED_RECORD")}</Text>} style={{ borderColor: '#b7eb8f', wordBreak: 'break-all' }}>
         <div style={{ overflowX: 'auto' }}>
           {typeof newValue === 'object' && newValue !== null ? (
             <JsonView data={newValue} shouldExpandNode={allExpanded} style={jsonStyle} />
@@ -95,7 +95,7 @@ export default function AuditDetailViewer({ action, details, oldValue, newValue 
   // DELETE Action
   if (action === 'DELETE' && oldValue !== undefined) {
     return (
-      <Card size="small" title={<Text type="danger">{t("Audit.BEFORE", "Silinen Kayıt")}</Text>} style={{ borderColor: '#ffa39e', wordBreak: 'break-all' }}>
+      <Card size="small" title={<Text type="danger">{t("Audit.DELETED_RECORD")}</Text>} style={{ borderColor: '#ffa39e', wordBreak: 'break-all' }}>
         <div style={{ overflowX: 'auto' }}>
           {typeof oldValue === 'object' && oldValue !== null ? (
             <JsonView data={oldValue} shouldExpandNode={allExpanded} style={jsonStyle} />
@@ -129,13 +129,13 @@ export default function AuditDetailViewer({ action, details, oldValue, newValue 
       <>
         <div style={{ marginBottom: 16, textAlign: 'right' }}>
           <Space>
-            <Text>{t("Audit.SHOW_ONLY_CHANGES", "Sadece Değişimleri Göster")}</Text>
+            <Text>{t("Audit.SHOW_ONLY_CHANGES")}</Text>
             <Switch checked={showOnlyChanges} onChange={setShowOnlyChanges} />
           </Space>
         </div>
         <Row gutter={[16, 16]}>
         <Col xs={24} md={12}>
-          <Card title={<Text type="danger">{t("Audit.BEFORE", "Önceki")}</Text>} size="small" style={{ borderColor: '#ffa39e', wordBreak: 'break-all' }}>
+          <Card title={<Text type="danger">{t("Audit.BEFORE")}</Text>} size="small" style={{ borderColor: '#ffa39e', wordBreak: 'break-all' }}>
             <div style={{ overflowX: 'auto' }}>
               {typeof displayBefore === 'object' && displayBefore !== null ? (
                 <JsonView data={displayBefore} shouldExpandNode={allExpanded} style={jsonStyle} />
@@ -146,7 +146,7 @@ export default function AuditDetailViewer({ action, details, oldValue, newValue 
           </Card>
         </Col>
         <Col xs={24} md={12}>
-          <Card title={<Text type="success">{t("Audit.AFTER", "Sonraki")}</Text>} size="small" style={{ borderColor: '#b7eb8f', wordBreak: 'break-all' }}>
+          <Card title={<Text type="success">{t("Audit.AFTER")}</Text>} size="small" style={{ borderColor: '#b7eb8f', wordBreak: 'break-all' }}>
             <div style={{ overflowX: 'auto' }}>
               {typeof displayAfter === 'object' && displayAfter !== null ? (
                 <JsonView data={displayAfter} shouldExpandNode={allExpanded} style={jsonStyle} />
@@ -163,7 +163,7 @@ export default function AuditDetailViewer({ action, details, oldValue, newValue 
 
   // Completely empty fallback
   if (parsedDetails === undefined && oldValue === undefined && newValue === undefined) {
-    return <Text type="secondary">{t("Table.NO_DATA", "Veri bulunamadı")}</Text>;
+    return <Text type="secondary">{t("Table.NO_DATA")}</Text>;
   }
 
   // Normal JSON view for anything else

@@ -91,7 +91,7 @@ export default function TripCardList({
                 </Tag>
               }
             >
-              <Space orientation="vertical" style={{ width: "100%" }}>
+              <Space direction="vertical" style={{ width: "100%" }}>
                 <Flex justify="space-between">
                   <Text type="secondary">{t("Trips.FULL_NAME")}:</Text>
                   <Text>{item.driver?.full_name}</Text>

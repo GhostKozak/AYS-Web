@@ -10,7 +10,7 @@ import {
 import { useMemo } from "react";
 import type { ColumnType } from "antd/es/table";
 import type { TableRowSelection } from "antd/es/table/interface";
-import { hasRole } from "../../../utils/auth.utils";
+import { useAuth } from "../../../hooks/useAuth";
 
 type Props = {
   trips: TripType[];
@@ -20,6 +20,11 @@ type Props = {
   rowSelection?: TableRowSelection<TripType>;
 };
 
+// Defined outside component to avoid re-creating type on every render
+interface AuthenticatedColumnType extends ColumnType<TripType> {
+  visible?: boolean;
+}
+
 export default function TripTable({
   trips,
   isLoading,
@@ -28,6 +33,8 @@ export default function TripTable({
   rowSelection,
 }: Props) {
   const { t } = useTranslation();
+  const { user } = useAuth();
+  const canEdit = user?.role === USER_ROLES.ADMIN || user?.role === USER_ROLES.EDITOR;
 
   const filters = useMemo(() => {
     return {
@@ -56,10 +63,6 @@ export default function TripTable({
       ).map((date) => ({ text: date, value: date })),
     };
   }, [trips]);
-
-  interface AuthenticatedColumnType extends ColumnType<TripType> {
-    visible?: boolean;
-  }
 
   const columns = useMemo(() => {
     const allColumns: AuthenticatedColumnType[] = [
@@ -108,7 +111,7 @@ export default function TripTable({
         dataIndex: ["driver", "full_name"],
         key: "driver",
         filters: filters.driverName,
-        onFilter: (value, record) => record.driver.full_name === value,
+        onFilter: (value, record) => record.driver?.full_name === value,
         filterSearch: true,
       },
       {
@@ -117,7 +120,7 @@ export default function TripTable({
         key: "driver_phone",
         render: (phoneNumber: string) => formatPhoneNumber(phoneNumber) || "-",
         filters: filters.driverPhone,
-        onFilter: (value, record) => record.driver.phone_number === value,
+        onFilter: (value, record) => record.driver?.phone_number === value,
         filterSearch: true,
       },
       {
@@ -125,7 +128,7 @@ export default function TripTable({
         dataIndex: ["company", "name"],
         key: "company",
         filters: filters.company,
-        onFilter: (value, record) => record.company.name === value,
+        onFilter: (value, record) => record.company?.name === value,
         filterSearch: true,
       },
       {
@@ -134,7 +137,7 @@ export default function TripTable({
         key: "vehicle",
         render: (plate: string) => (plate ? formatLicencePlate(plate) : "-"),
         filters: filters.vehicle,
-        onFilter: (value, record) => record.vehicle.licence_plate === value,
+        onFilter: (value, record) => record.vehicle?.licence_plate === value,
         filterSearch: true,
       },
       {
@@ -143,9 +146,10 @@ export default function TripTable({
         key: "unload_status",
         render: (val: string) => {
           if (!val) return "-";
-          
+
           const colorMap: Record<string, string> = {
             WAITING: "warning",
+            IN_PROGRESS: "processing",
             UNLOADING: "processing",
             UNLOADED: "success",
             COMPLETED: "success",
@@ -160,6 +164,7 @@ export default function TripTable({
         },
         filters: [
           { text: t("Trips.STATUS_WAITING"), value: "WAITING" },
+          { text: t("Trips.STATUS_IN_PROGRESS"), value: "IN_PROGRESS" },
           { text: t("Trips.STATUS_UNLOADING"), value: "UNLOADING" },
           { text: t("Trips.STATUS_UNLOADED"), value: "UNLOADED" },
           { text: t("Trips.STATUS_COMPLETED"), value: "COMPLETED" },
@@ -190,9 +195,9 @@ export default function TripTable({
         ),
         dataIndex: "is_in_temporary_parking_lot",
         key: "is_in_temporary_parking_lot",
-        render: (val: boolean) => (val ? <Tag color="green">Kesik</Tag> : null),
+        render: (val: boolean) => (val ? <Tag color="green">{t("Trips.TEMP_PARKING_SHORT", { defaultValue: "Kesik" })}</Tag> : null),
         filters: [
-          { text: "Kesik", value: true },
+          { text: t("Trips.TEMP_PARKING_SHORT", { defaultValue: "Kesik" }), value: true },
           { text: t("Common.NO"), value: false },
         ],
         onFilter: (value, record) =>
@@ -206,9 +211,9 @@ export default function TripTable({
         ),
         dataIndex: "is_in_parking_lot",
         key: "is_in_parking_lot",
-        render: (val: boolean) => (val ? <Tag color="blue">Park</Tag> : null),
+        render: (val: boolean) => (val ? <Tag color="blue">{t("FieldOps.TAG_PARK")}</Tag> : null),
         filters: [
-          { text: "Park", value: true },
+          { text: t("FieldOps.TAG_PARK"), value: true },
           { text: t("Common.NO"), value: false },
         ],
         onFilter: (value, record) => record.is_in_parking_lot === value,
@@ -233,7 +238,7 @@ export default function TripTable({
         render: (val: boolean) =>
           val ? <Tag color="red">{t("Common.CANCEL")}</Tag> : null,
         filters: [
-          { text: "İptal", value: true },
+          { text: t("Common.CANCEL"), value: true },
           { text: t("Common.NO"), value: false },
         ],
         onFilter: (value, record) => record.is_trip_canceled === value,
@@ -243,7 +248,8 @@ export default function TripTable({
         key: "action",
         fixed: "right",
         width: 200,
-        visible: hasRole([USER_ROLES.ADMIN, USER_ROLES.EDITOR]),
+        // Only show action column for users who can edit
+        visible: canEdit,
         render: (_: any, record: TripType) => (
           <Space>
             <Button
@@ -282,7 +288,7 @@ export default function TripTable({
     ];
 
     return allColumns.filter((col) => col.visible !== false);
-  }, [t, filters, onEdit, onDelete]);
+  }, [t, filters, onEdit, onDelete, canEdit]);
 
   return (
     <Table

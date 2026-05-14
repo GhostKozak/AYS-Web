@@ -89,7 +89,7 @@ export default function VehicleCardList({
                 </Tag>
               }
             >
-              <Space orientation="vertical" style={{ width: "100%" }}>
+              <Space direction="vertical" style={{ width: "100%" }}>
                 <Flex justify="space-between">
                   <Text type="secondary">{t("Vehicles.VEHICLE_TYPE")}:</Text>
                   <Text>{t(`Vehicles.TYPE_${item.vehicle_type}`)}</Text>

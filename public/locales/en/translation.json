@@ -47,6 +47,8 @@
     "ERROR": "Invalid email or password!",
     "EMAIL_REQUIRED": "Enter your email!",
     "PASSWORD_REQUIRED": "Enter your password!",
+    "INVALID_CREDENTIALS": "Invalid email or password!",
+    "EMAIL_INVALID": "Please enter a valid email address!",
     "BUTTON": "Log In"
   },
 
@@ -145,13 +147,19 @@
     "VIEW_DETAILS": "View Details",
     "BEFORE": "Before",
     "AFTER": "After",
-    "CHANGES": "Changes"
+    "CHANGES": "Changes",
+    "CREATED_RECORD": "Created Record",
+    "DELETED_RECORD": "Deleted Record",
+    "SHOW_ONLY_CHANGES": "Show Only Changes"
   },
 
   "Profile": {
     "TITLE": "Profile",
     "EDIT_INFO": "Edit Personal Info",
     "CHANGE_PASSWORD": "Change Password",
+    "NEW_PASSWORD": "New Password",
+    "NEW_PASSWORD_CONFIRM": "Confirm New Password",
+    "UPDATE_PASSWORD_BTN": "Update Password",
     "INFO_UPDATE_SUCCESS": "Personal info updated successfully.",
     "PASSWORD_UPDATE_SUCCESS": "Password updated successfully."
   },
@@ -167,7 +175,8 @@
     "EDIT_USER": "Edit User",
     "CREATE_SUCCESS": "User created successfully.",
     "UPDATE_SUCCESS": "User updated successfully.",
-    "DELETE_SUCCESS": "User deleted successfully."
+    "DELETE_SUCCESS": "User deleted successfully.",
+    "LAST_LOGIN": "Last Login"
   },
 
   "Dashboard": {
@@ -203,7 +212,9 @@
     "CREATE_SUCCESS": "{{name}} created successfully.",
     "UPDATE_SUCCESS": "{{name}} updated successfully.",
     "DELETE_SUCCESS": "{{name}} deleted successfully.",
-    "TOTAL": "total companies"
+    "TOTAL": "total companies",
+    "NAME_TOO_SHORT": "Company name must be at least 2 characters",
+    "NAME_TOO_LONG": "Company name must be at most 100 characters"
   },
 
   "Drivers": {
@@ -222,7 +233,8 @@
     "CREATE_SUCCESS": "{{name}} created successfully.",
     "UPDATE_SUCCESS": "{{name}} updated successfully.",
     "DELETE_SUCCESS": "{{name}} deleted successfully.",
-    "TOTAL": "total drivers"
+    "TOTAL": "total drivers",
+    "PHONE_FORMAT_ERROR": "Please enter a valid Turkish phone number (05XXXXXXXXX)"
   },
 
   "Vehicles": {
@@ -243,7 +255,9 @@
     "TYPE_TRUCK": "Truck",
     "TYPE_VAN": "Van",
     "TYPE_LORRY": "Lorry",
-    "TYPE_TRAILER": "Trailer"
+    "TYPE_TRAILER": "Trailer",
+    "PLATE_TOO_SHORT": "Plate must be at least 5 characters",
+    "PLATE_TOO_LONG": "Plate must be at most 10 characters"
   },
 
   "Trips": {
@@ -279,7 +293,12 @@
     "STATUS_IN_PROGRESS": "In Progress",
     "STATUS_COMPLETED": "Completed",
     "STATUS_CANCELED": "Canceled",
-    "STATUS_UNKNOWN": "Unknown"
+    "STATUS_UNKNOWN": "Unknown",
+    "CREATE_NEW_COMPANY": "Create new company: {{name}}",
+    "CREATE_NEW_VEHICLE": "Create new vehicle: {{plate}}",
+    "CREATE_NEW_DRIVER": "Create new driver: {{name}}",
+    "NEW_DRIVER": "Add New Driver",
+    "TEMP_PARKING_SHORT": "Temp"
   },
 
   "Other": {

@@ -1,4 +1,4 @@
-import { Modal, Form, Input, Button, Select, Switch, Row, Col, DatePicker } from "antd";
+import { Modal, Form, Input, Button, Select, Switch, Row, Col, DatePicker, App } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import dayjs from "dayjs";
 import { useCompanies } from "../../../hooks/useCompanies";
@@ -11,7 +11,7 @@ import {
   type VehicleType,
 } from "../../../types";
 import { useTranslation } from "react-i18next";
-import { calculateDiffs, formatLicencePlate } from "../../../utils/index";
+import { calculateDiffs, formatLicencePlate, formatPhoneNumber } from "../../../utils/index";
 import DiffViewer from "../../common/DiffViewer";
 
 interface TripFormValues {
@@ -56,14 +56,14 @@ const TripModal = ({
 }: TripModalProps) => {
   const [form] = Form.useForm();
   const [companySearch, setCompanySearch] = useState("");
-  const [driverSearch, setDriverSearch] = useState("");
   const [vehicleSearch, setVehicleSearch] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const { createCompany } = useCompanies();
   const { createDriver } = useDrivers();
   const { createVehicle } = useVehicles();
-  const [isExistingDriver, setIsExistingDriver] = useState(false);
+  const [isNewDriver, setIsNewDriver] = useState(false);
   const { t } = useTranslation();
+  const { message } = App.useApp();
 
   const currentValues = Form.useWatch([], form);
 
@@ -203,7 +203,7 @@ const TripModal = ({
       });
     }
     return existing;
-  }, [companies, companySearch]);
+  }, [companies, companySearch, t]);
 
   const vehicleOptions = useMemo(() => {
     const existing = vehicles.map((v) => ({
@@ -220,37 +220,25 @@ const TripModal = ({
       });
     }
     return existing;
-  }, [vehicles, vehicleSearch]);
+  }, [vehicles, vehicleSearch, t]);
 
   const driverOptions = useMemo(() => {
-    const existing = drivers.map((d) => ({ label: d.full_name, value: d._id }));
-    if (driverSearch && !drivers.some((d) => d.full_name === driverSearch)) {
-      existing.push({
-        label: t("Trips.CREATE_NEW_DRIVER", { name: driverSearch }),
-        value: driverSearch,
-      });
-    }
-    return existing;
-  }, [drivers, driverSearch]);
+    return drivers.map((d) => ({
+      label: `${d.full_name} — ${formatPhoneNumber(d.phone_number)}`,
+      value: d._id,
+      // Stored separately so filterOption can search phone without parsing label
+      phone: d.phone_number,
+      name: d.full_name,
+    }));
+  }, [drivers]);
 
-  const unloadStatusOptions = useMemo(
-    () => [
-      { value: "WAITING", label: t("Trips.STATUS_WAITING") },
-      { value: "UNLOADING", label: t("Trips.STATUS_UNLOADING") },
-      { value: "UNLOADED", label: t("Trips.STATUS_UNLOADED") },
-      { value: "COMPLETED", label: t("Trips.STATUS_COMPLETED") },
-      { value: "CANCELED", label: t("Trips.STATUS_CANCELED") },
-      { value: "UNKNOWN", label: t("Trips.STATUS_UNKNOWN") },
-    ],
-    [t]
-  );
 
   const hasChanges = diffs.length > 0;
 
   useEffect(() => {
     if (isOpen) {
       if (selectedRecord) {
-        setIsExistingDriver(true);
+        setIsNewDriver(false);
         const toInputDate = (iso?: string) => {
           if (!iso) return undefined;
           const d = dayjs(iso);
@@ -258,11 +246,11 @@ const TripModal = ({
         };
 
         form.setFieldsValue({
-          driver_full_name: selectedRecord.driver.full_name,
-          driver_phone_number: selectedRecord.driver.phone_number,
+          driver_full_name: selectedRecord.driver?.full_name ?? "",
+          driver_phone_number: selectedRecord.driver?.phone_number ?? "",
           company: selectedRecord.company?._id,
           vehicle: selectedRecord.vehicle?._id,
-          driver: selectedRecord.driver._id,
+          driver: selectedRecord.driver?._id,
           departure_time: toInputDate(selectedRecord.departure_time),
           arrival_time: toInputDate(selectedRecord.arrival_time),
           parked_at: toInputDate(selectedRecord.parked_at),
@@ -276,25 +264,13 @@ const TripModal = ({
         });
       } else {
         form.resetFields();
-        setIsExistingDriver(false);
+        form.setFieldsValue({
+          arrival_time: dayjs(),
+        });
+        setIsNewDriver(false);
       }
     }
   }, [isOpen, selectedRecord, form]);
-
-  const handleDriverChange = (value: string) => {
-    const driverExists = drivers.some((d) => d._id === value);
-    setIsExistingDriver(driverExists);
-
-    if (driverExists) {
-      const selectedDriver = drivers.find((d) => d._id === value);
-      form.setFieldsValue({
-        driver_full_name: selectedDriver?.full_name,
-        driver_phone_number: selectedDriver?.phone_number,
-      });
-    } else {
-      form.setFieldsValue({ driver_full_name: value, driver_phone_number: "" });
-    }
-  };
 
   const extractId = (res: any): string | undefined => {
     if (typeof res === "string") return res;
@@ -309,12 +285,21 @@ const TripModal = ({
     try {
       const finalValues: any = { ...values };
 
-      // Company
-      const companyExists = companies.some((c) => c._id === values.company);
-      if (!companyExists && values.company) {
-        const res = await createCompany({ name: values.company });
-        const newId = extractId(res);
-        if (newId) finalValues.company = newId;
+      // Driver's Company Injection
+      if (!isNewDriver) {
+        const selectedDriver = drivers.find((d) => d._id === values.driver);
+        if (selectedDriver && selectedDriver.company) {
+          finalValues.company = selectedDriver.company._id;
+        }
+      } else {
+        // Company Creation
+        const companyExists = companies.some((c) => c._id === values.company);
+        if (!companyExists && values.company) {
+          const res = await createCompany({ name: values.company });
+          const newId = extractId(res);
+          if (newId) finalValues.company = newId;
+          else throw new Error("Could not create company, no ID returned.");
+        }
       }
 
       // Vehicle
@@ -327,10 +312,11 @@ const TripModal = ({
         const res = await createVehicle(payload);
         const newId = extractId(res);
         if (newId) finalValues.vehicle = newId;
+        else throw new Error("Could not create vehicle, no ID returned.");
       }
 
-      // Driver
-      if (!isExistingDriver) {
+      // Driver Creation
+      if (isNewDriver) {
         const payload = {
           full_name: values.driver_full_name,
           phone_number: values.driver_phone_number,
@@ -339,6 +325,7 @@ const TripModal = ({
         const res = await createDriver(payload);
         const newId = extractId(res);
         if (newId) finalValues.driver = newId;
+        else throw new Error("Could not create driver, no ID returned.");
       }
 
       const toISO = (val?: dayjs.Dayjs | string) => {
@@ -356,8 +343,9 @@ const TripModal = ({
 
       await onFinish(submissionData);
       onCreated?.();
-    } catch (error) {
-      console.error("Sefer kaydedilirken hata oluştu:", error);
+    } catch (error: any) {
+      const errMsg = error?.response?.data?.message || error?.message || t("Errors.OPERATION_FAILED");
+      message.error(errMsg);
     } finally {
       setSubmitting(false);
     }
@@ -378,7 +366,7 @@ const TripModal = ({
       <Row gutter={24}>
         <Col span={hasChanges ? 12 : 24}>
           <Form
-            name="tipForm"
+            name="tripForm"
             form={form}
             layout="horizontal"
             labelCol={{ span: 10 }}
@@ -389,57 +377,53 @@ const TripModal = ({
               has_gps_tracking: false,
               is_in_temporary_parking_lot: false,
               is_in_parking_lot: false,
-              is_trip_canceled: false
+              is_trip_canceled: false,
+              unload_status: "WAITING",
             }}
           >
-            <Form.Item
-              label={t("Trips.COMPANY_NAME")}
-              name="company"
-              rules={[{ required: true, message: t("Trips.COMPANY_REQUIRED") }]}
-            >
-              <Select
-                placeholder={t("Trips.COMPANY_REQUIRED")}
-                showSearch
-                filterOption={false}
-                onSearch={(val) => setCompanySearch(val)}
-                notFoundContent={null}
-                options={companyOptions}
-              />
+            <Form.Item label={t("Trips.NEW_DRIVER", { defaultValue: "Yeni Sürücü Ekle" })} labelCol={{ span: 10 }} wrapperCol={{ span: 14 }}>
+              <Switch checked={isNewDriver} onChange={(checked) => setIsNewDriver(checked)} />
             </Form.Item>
 
-            <Form.Item
-              label={t("Trips.LICENSE_PLATE")}
-              name="vehicle"
-              rules={[{ required: true, message: t("Trips.VEHICLE_REQUIRED") }]}
-            >
-              <Select
-                placeholder={t("Trips.VEHICLE_REQUIRED")}
-                showSearch
-                filterOption={false}
-                onSearch={(val) => setVehicleSearch(val)}
-                notFoundContent={null}
-                options={vehicleOptions}
-              />
-            </Form.Item>
-
-            <Form.Item
-              label={t("Trips.FULL_NAME")}
-              name="driver"
-              rules={[{ required: true, message: t("Trips.DRIVER_REQUIRED") }]}
-            >
-              <Select
-                placeholder={t("Trips.DRIVER_REQUIRED")}
-                showSearch
-                filterOption={false}
-                onSearch={(val) => setDriverSearch(val)}
-                notFoundContent={null}
-                onChange={handleDriverChange}
-                options={driverOptions}
-              />
-            </Form.Item>
-
-            {!isExistingDriver && (
+            {!isNewDriver ? (
+              <Form.Item
+                label={t("Trips.FULL_NAME")}
+                name="driver"
+                rules={[{ required: true, message: t("Trips.DRIVER_REQUIRED") }]}
+              >
+                <Select
+                  placeholder={t("Trips.DRIVER_REQUIRED")}
+                  showSearch={{
+                    filterOption: (input, option: any) => {
+                      const q = input.toLowerCase();
+                      const digits = q.replace(/\D/g, "");
+                      const matchesName = option?.name?.toLowerCase().includes(q);
+                      const matchesPhone = digits.length > 0 && option?.phone?.replace(/\D/g, "").includes(digits);
+                      return matchesName || matchesPhone;
+                    },
+                  }}
+                  notFoundContent={null}
+                  options={driverOptions}
+                />
+              </Form.Item>
+            ) : (
               <>
+                <Form.Item
+                  label={t("Trips.COMPANY_NAME")}
+                  name="company"
+                  rules={[{ required: true, message: t("Trips.COMPANY_REQUIRED") }]}
+                >
+                  <Select
+                    placeholder={t("Trips.COMPANY_REQUIRED")}
+                    showSearch={{
+                      filterOption: false,
+                    }}
+                    onSearch={(val) => setCompanySearch(val)}
+                    notFoundContent={null}
+                    options={companyOptions}
+                  />
+                </Form.Item>
+
                 <Form.Item
                   label={t("Trips.FULL_NAME")}
                   name="driver_full_name"
@@ -447,31 +431,52 @@ const TripModal = ({
                     { required: true, message: t("Trips.DRIVER_REQUIRED") },
                   ]}
                 >
-                  <Input placeholder={t("Trips.FULL_NAME")} />
+                  <Input placeholder={t("Trips.FULL_NAME")} autoComplete="new-password" />
                 </Form.Item>
 
                 <Form.Item
                   label={t("Trips.PHONE_NUMBER")}
                   name="driver_phone_number"
                   rules={[
-                    { required: true, message: t("Trips.PHONE_REQUIRED") },
+                    { required: true, message: t("Drivers.PHONE_REQUIRED") },
+                    {
+                      pattern: /^05\d{9}$/,
+                      message: t("Drivers.PHONE_FORMAT_ERROR"),
+                    },
                   ]}
                 >
-                  <Input placeholder="05XX XXX XX XX" />
+                  <Input placeholder="05XX XXX XX XX" autoComplete="new-password" maxLength={11} />
                 </Form.Item>
               </>
             )}
+
+            <Form.Item
+              label={t("Trips.LICENSE_PLATE")}
+              name="vehicle"
+              rules={[{ required: true, message: t("Trips.VEHICLE_REQUIRED", { defaultValue: "Araç seçimi zorunludur" }) }]}
+            >
+              <Select
+                placeholder={t("Trips.VEHICLE_REQUIRED")}
+                showSearch={{ filterOption: false }}
+                onSearch={(val) => setVehicleSearch(val)}
+                notFoundContent={null}
+                options={vehicleOptions}
+              />
+            </Form.Item>
 
             <Form.Item label={t("Trips.ARRIVAL_TIME")} name="arrival_time">
               <DatePicker style={{ width: '100%' }} showTime format="DD.MM.YYYY HH:mm" />
             </Form.Item>
 
-            <Form.Item label={t("Trips.DEPARTURE_TIME")} name="departure_time">
-              <DatePicker style={{ width: '100%' }} showTime format="DD.MM.YYYY HH:mm" />
+            {/* Hidden Fields */}
+            <Form.Item hidden name="departure_time">
+              <Input />
             </Form.Item>
-
-            <Form.Item label={t("Trips.UNLOAD_STATUS")} name="unload_status">
-              <Select placeholder={t("Trips.UNLOAD_STATUS")} options={unloadStatusOptions} />
+            <Form.Item hidden name="unload_status">
+              <Input />
+            </Form.Item>
+            <Form.Item hidden name="is_trip_canceled" valuePropName="checked">
+              <Switch />
             </Form.Item>
 
             <Row gutter={16}>
@@ -490,19 +495,24 @@ const TripModal = ({
             <Row gutter={16}>
               <Col span={12}>
                 <Form.Item label={t("Trips.IN_PARKING_LOT")} name="is_in_parking_lot" valuePropName="checked" labelCol={{ span: 16 }} wrapperCol={{ span: 8 }}>
-                  <Switch />
-                </Form.Item>
-              </Col>
-              <Col span={12}>
-                <Form.Item label={t("Trips.TRIP_CANCELED")} name="is_trip_canceled" valuePropName="checked" labelCol={{ span: 16 }} wrapperCol={{ span: 8 }}>
-                  <Switch />
+                  <Switch
+                    onChange={(checked) => {
+                      if (checked) {
+                        form.setFieldValue("parked_at", dayjs());
+                      } else {
+                        form.setFieldValue("parked_at", undefined);
+                      }
+                    }}
+                  />
                 </Form.Item>
               </Col>
             </Row>
 
-            <Form.Item label={t("Trips.PARKED_AT")} name="parked_at">
-              <DatePicker style={{ width: '100%' }} showTime format="DD.MM.YYYY HH:mm" />
-            </Form.Item>
+            {currentValues?.is_in_parking_lot && (
+              <Form.Item label={t("Trips.PARKED_AT")} name="parked_at">
+                <DatePicker style={{ width: '100%' }} showTime format="DD.MM.YYYY HH:mm" />
+              </Form.Item>
+            )}
 
             <Form.Item label={t("Trips.NOTES")} name="notes">
               <Input.TextArea rows={3} />

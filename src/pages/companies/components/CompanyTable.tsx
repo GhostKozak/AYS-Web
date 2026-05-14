@@ -4,7 +4,7 @@ import { USER_ROLES, type CompanyType } from "../../../types";
 import { Trans, useTranslation } from "react-i18next";
 import { getUniqueOptions } from "../../../utils";
 import { useMemo } from "react";
-import { hasRole } from "../../../utils/auth.utils";
+import { useAuth } from "../../../hooks/useAuth";
 import type { ColumnType } from "antd/es/table";
 import type { TableRowSelection } from "antd/es/table/interface";
 
@@ -16,6 +16,10 @@ type Props = {
   rowSelection?: TableRowSelection<CompanyType>;
 };
 
+interface AuthenticatedColumnType extends ColumnType<CompanyType> {
+  visible?: boolean;
+}
+
 export default function CompaniesTable({
   companies,
   isLoading,
@@ -24,6 +28,8 @@ export default function CompaniesTable({
   rowSelection,
 }: Props) {
   const { t } = useTranslation();
+  const { user } = useAuth();
+  const canEdit = user?.role === USER_ROLES.ADMIN || user?.role === USER_ROLES.EDITOR;
 
   const filters = useMemo(() => {
     return {
@@ -31,11 +37,6 @@ export default function CompaniesTable({
     };
   }, [companies]);
 
-  interface AuthenticatedColumnType extends ColumnType<CompanyType> {
-    visible?: boolean;
-  }
-
-  // const columns: ColumnsType<CompanyType> = [
   const columns = useMemo(() => {
     const allColumns: AuthenticatedColumnType[] = [
       {
@@ -50,7 +51,7 @@ export default function CompaniesTable({
         title: t("Table.CREATED_AT"),
         dataIndex: "createdAt",
         key: "createdAt",
-        visible: hasRole([USER_ROLES.ADMIN, USER_ROLES.EDITOR]),
+        visible: canEdit,
         render: (d: string) => new Date(d).toLocaleString("tr-TR"),
         sorter: (a, b) =>
           new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
@@ -69,7 +70,7 @@ export default function CompaniesTable({
         title: t("Table.STATUS"),
         dataIndex: "deleted",
         key: "deleted",
-        visible: hasRole([USER_ROLES.ADMIN, USER_ROLES.EDITOR]),
+        visible: canEdit,
         render: (deleted: boolean) => (
           <Tag color={deleted ? "red" : "green"}>
             {deleted ? t("Common.PASSIVE") : t("Common.ACTIVE")}
@@ -84,7 +85,7 @@ export default function CompaniesTable({
       {
         title: t("Table.ACTIONS"),
         key: "action",
-        visible: hasRole([USER_ROLES.ADMIN, USER_ROLES.EDITOR]),
+        visible: canEdit,
         render: (_: any, record: CompanyType) => (
           <Space size="middle">
             <Button
@@ -118,7 +119,7 @@ export default function CompaniesTable({
     ];
 
     return allColumns.filter((col) => col.visible !== false);
-  }, []);
+  }, [t, filters, onEdit, onDelete, canEdit]);
 
   return (
     <Table

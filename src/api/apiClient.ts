@@ -1,22 +1,14 @@
 import axios from 'axios';
 import { CONFIG } from '../constants';
-import { getToken } from '../utils/auth.utils';
 
+// Cookie-based auth: withCredentials sends the HttpOnly session cookie
+// automatically on every request. No Authorization header needed.
 const apiClient = axios.create({
   baseURL: CONFIG.API_BASE_URL,
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
   },
-});
-
-// Token'ı her isteğe eklemek için interceptor
-apiClient.interceptors.request.use((config) => {
-  const token = getToken();
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
 });
 
 export default apiClient;

@@ -1,5 +1,5 @@
 import { Modal, Form, Input, Button, Select, Row, Col } from "antd";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { type CompanyType, type DriverType } from "../../../types";
 import { useTranslation } from "react-i18next";
 import { calculateDiffs } from "../../../utils";
@@ -30,6 +30,7 @@ const DriverModal = ({
 }: DriverModalProps) => {
   const [form] = Form.useForm();
   const { t } = useTranslation();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const currentValues = Form.useWatch([], form);
 
@@ -89,7 +90,14 @@ const DriverModal = ({
             labelCol={{ span: 8 }}
             wrapperCol={{ span: 16 }}
             style={{ maxWidth: 600, paddingBlock: 32 }}
-            onFinish={onFinish}
+            onFinish={async (values) => {
+              setIsSubmitting(true);
+              try {
+                await onFinish(values);
+              } finally {
+                setIsSubmitting(false);
+              }
+            }}
             autoComplete="off"
           >
             <Form.Item
@@ -101,7 +109,10 @@ const DriverModal = ({
             >
               <Select
                 placeholder={t("Drivers.COMPANY_REQUIRED")}
-                showSearch
+                showSearch={{
+                  filterOption: (input, option: any) =>
+                    option?.label?.toLowerCase().includes(input.toLowerCase()),
+                }}
                 options={companies.map(c => ({ label: c.name, value: c._id }))}
               />
             </Form.Item>
@@ -113,19 +124,29 @@ const DriverModal = ({
                 { required: true, message: t("Drivers.FULL_NAME_REQUIRED") },
               ]}
             >
-              <Input />
+              <Input autoComplete="new-password" />
             </Form.Item>
 
             <Form.Item
               label={t("Drivers.PHONE_NUMBER")}
               name="phone_number"
-              rules={[{ required: true, message: t("Drivers.PHONE_REQUIRED") }]}
+              rules={[
+                { required: true, message: t("Drivers.PHONE_REQUIRED") },
+                {
+                  pattern: /^05\d{9}$/,
+                  message: t("Drivers.PHONE_FORMAT_ERROR", { defaultValue: "Geçerli bir Türkiye numarası giriniz (05XXXXXXXXX)" }),
+                },
+              ]}
             >
-              <Input />
+              <Input
+                placeholder="05XX XXX XX XX"
+                autoComplete="new-password"
+                maxLength={11}
+              />
             </Form.Item>
 
             <Form.Item label={null} wrapperCol={{ offset: 8, span: 16 }}>
-              <Button type="primary" htmlType="submit" loading={isLoading}>
+              <Button type="primary" htmlType="submit" loading={isLoading || isSubmitting}>
                 {selectedRecord ? t("Common.SAVE") : t("Common.ADD")}
               </Button>
             </Form.Item>

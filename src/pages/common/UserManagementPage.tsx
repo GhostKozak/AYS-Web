@@ -1,4 +1,4 @@
-import { Table, Button, Space, Typography, Tag, Modal, Form, Input, Select, Switch, App, Layout } from "antd";
+import { Table, Button, Space, Tag, Modal, Form, Input, Select, Switch, App, Layout } from "antd";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { userApi } from "../../api/userApi";
 import { useTranslation } from "react-i18next";
@@ -12,7 +12,7 @@ import { USER_ROLES } from "../../types";
 import { getUser } from "../../utils/auth.utils";
 import { useIsMobile } from "../../hooks/useIsMobile";
 
-const { Title } = Typography;
+
 
 function UserManagementPage() {
   const { t } = useTranslation();
@@ -139,7 +139,7 @@ function UserManagementPage() {
       ),
     },
     {
-      title: t("Dashboard.LATEST_TRIPS"), // Reusing translation for "Last" or will add new
+      title: t("Users.LAST_LOGIN"),
       dataIndex: "lastLoginAt",
       key: "lastLoginAt",
       render: (date: string) => date ? dayjs(date).format("DD.MM.YYYY HH:mm") : "-",

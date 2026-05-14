@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Table, Tag, Typography, Space, Input, Button, Modal, Layout, Flex } from "antd";
+import { Table, Tag, Space, Input, Button, Modal, Layout, Flex } from "antd";
 import { useQuery } from "@tanstack/react-query";
 import { auditApi } from "../../api/auditApi";
 import { useTranslation } from "react-i18next";
@@ -11,7 +11,7 @@ import { useIsMobile } from "../../hooks/useIsMobile";
 
 import type { AuditType } from "../../types";
 
-const { Title } = Typography;
+
 
 function AuditPage() {
   const { t } = useTranslation();

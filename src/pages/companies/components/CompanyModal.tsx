@@ -1,5 +1,5 @@
 import { Modal, Form, Input, Button, Row, Col } from "antd";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { type CompanyType } from "../../../types";
 import { useTranslation } from "react-i18next";
 import DiffViewer from "../../common/DiffViewer";
@@ -22,6 +22,7 @@ const CompanyModal = ({
 }: CompanyModalProps) => {
   const [form] = Form.useForm();
   const { t } = useTranslation();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const currentValues = Form.useWatch([], form);
 
@@ -36,7 +37,7 @@ const CompanyModal = ({
 
   const hasChanges = diffs.length > 0;
 
-  // Modal açıldığında form dolsun veya temizlensin
+  // Form değerlerini modal açıldığında doldur veya temizle
   useEffect(() => {
     if (isOpen) {
       if (selectedRecord) {
@@ -54,7 +55,6 @@ const CompanyModal = ({
           ? t("Companies.EDIT_FORM_TITLE")
           : t("Companies.ADD_FORM_TITLE")
       }
-      closable={{ "aria-label": "Custom Close Button" }}
       open={isOpen}
       onCancel={onClose}
       footer={null}
@@ -70,7 +70,14 @@ const CompanyModal = ({
             labelCol={{ span: 8 }}
             wrapperCol={{ span: 16 }}
             style={{ maxWidth: 600, paddingBlock: 32 }}
-            onFinish={onFinish}
+            onFinish={async (values) => {
+              setIsSubmitting(true);
+              try {
+                await onFinish(values);
+              } finally {
+                setIsSubmitting(false);
+              }
+            }}
             autoComplete="off"
           >
             <Form.Item
@@ -78,13 +85,20 @@ const CompanyModal = ({
               name="name"
               rules={[
                 { required: true, message: t("Companies.NAME_REQUIRED") },
+                { min: 2, message: t("Companies.NAME_TOO_SHORT", { defaultValue: "Şirket adı en az 2 karakter olmalıdır" }) },
+                { max: 100, message: t("Companies.NAME_TOO_LONG", { defaultValue: "Şirket adı en fazla 100 karakter olabilir" }) },
               ]}
             >
-              <Input />
+              <Input
+                autoComplete="new-password"
+                placeholder={t("Companies.COMPANY_NAME")}
+                maxLength={100}
+                showCount
+              />
             </Form.Item>
 
             <Form.Item label={null} wrapperCol={{ offset: 8, span: 16 }}>
-              <Button type="primary" htmlType="submit" loading={isLoading}>
+              <Button type="primary" htmlType="submit" loading={isLoading || isSubmitting}>
                 {selectedRecord ? t("Companies.SAVE_CHANGES") : t("Common.ADD")}
               </Button>
             </Form.Item>

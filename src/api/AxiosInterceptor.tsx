@@ -15,11 +15,12 @@ export const AxiosInterceptor = () => {
   const [showOnline, setShowOnline] = useState(false);
 
   useEffect(() => {
+    let timer: ReturnType<typeof setTimeout>;
     const handleOnline = () => {
       setIsOffline(false);
       setShowOnline(true);
-      const timer = setTimeout(() => setShowOnline(false), 3000);
-      return () => clearTimeout(timer);
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => setShowOnline(false), 3000);
     };
 
     const handleOffline = () => {
@@ -31,6 +32,7 @@ export const AxiosInterceptor = () => {
     window.addEventListener("offline", handleOffline);
 
     return () => {
+      if (timer) clearTimeout(timer);
       window.removeEventListener("online", handleOnline);
       window.removeEventListener("offline", handleOffline);
     };

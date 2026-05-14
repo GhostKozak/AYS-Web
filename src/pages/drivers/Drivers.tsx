@@ -21,7 +21,7 @@ import { useIsMobile } from "../../hooks/useIsMobile";
 import DriverCardList from "./components/DriverCardList";
 import { exportDriversToExcel } from "../../utils/excel.utils";
 import { RoleGuard } from "../../components/auth/RoleGuard";
-import { hasRole } from "../../utils/auth.utils";
+import { useAuth } from "../../hooks/useAuth";
 
 function Drivers() {
   const { t } = useTranslation();
@@ -44,7 +44,8 @@ function Drivers() {
     useDrivers();
   const { companies } = useCompanies();
   const isMobile = useIsMobile();
-  const isAdmin = hasRole([USER_ROLES.ADMIN]);
+  const { user } = useAuth();
+  const isAdmin = user?.role === USER_ROLES.ADMIN;
 
   const handleExport = () => {
     exportDriversToExcel(filteredDrivers);
@@ -58,7 +59,7 @@ function Drivers() {
         description: t("Drivers.DELETE_SUCCESS", { name: record.full_name }),
       });
       setSelectedRowKeys(prev => prev.filter(key => key !== record._id));
-    } catch (error) {
+    } catch (error: any) {
       notification.error({
         title: t("Common.ERROR"),
         description: t("Errors.DELETE_FAILED"),
@@ -80,7 +81,7 @@ function Drivers() {
         description: t("Common.BULK_DELETE_SUCCESS", { count: successCount }),
       });
       setSelectedRowKeys([]);
-    } catch (error) {
+    } catch (error: any) {
       notification.error({
         title: t("Common.ERROR"),
         description: t("Errors.DELETE_FAILED"),
@@ -90,9 +91,6 @@ function Drivers() {
     }
   };
 
-  const handleSearch = (value: string) => {
-    setSearchText(value);
-  };
 
   const handleAdd = () => {
     setSelectedRecord(undefined);
@@ -101,7 +99,6 @@ function Drivers() {
 
   const handleEdit = (record: DriverType) => {
     setSelectedRecord(record);
-    console.table(record);
     setIsModalOpen(true);
   };
 
@@ -132,12 +129,8 @@ function Drivers() {
       }
       setIsModalOpen(false);
     } catch (error: any) {
-      if (error.response?.status && [400, 409, 422].includes(error.response.status)) {
-        notification.error({
-          title: t("Common.ERROR"),
-          description: error.response?.data?.message || t("Errors.OPERATION_FAILED"),
-        });
-      }
+      const errMsg = error?.response?.data?.message || error?.message || t("Errors.OPERATION_FAILED");
+      notification.error({ title: t("Common.ERROR"), description: errMsg });
     }
   };
 
@@ -180,8 +173,8 @@ function Drivers() {
             )
           }
           size="large"
-          onSearch={handleSearch}
-          onChange={(e) => handleSearch(e.target.value)}
+          onSearch={setSearchText}
+          onChange={(e) => setSearchText(e.target.value)}
         />
         <RoleGuard allowedRoles={[USER_ROLES.ADMIN, USER_ROLES.EDITOR]}>
           <Space>

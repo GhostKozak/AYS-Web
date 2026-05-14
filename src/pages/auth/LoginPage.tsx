@@ -1,4 +1,4 @@
-import { Form, Input, Button, Card, App } from "antd";
+import { Form, Input, Button, Card, App, theme } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import { useLocation, useNavigate } from "react-router";
 import { useQueryClient } from "@tanstack/react-query";
@@ -10,8 +10,6 @@ import { setUser } from "../../utils/auth.utils";
 import type { LoginPayload } from "../../types";
 
 import warehouseImg from "../../assets/warehouse.png";
-
-import { theme } from "antd";
 
 const { useToken } = theme;
 
@@ -30,21 +28,27 @@ function LoginPage() {
     setLoading(true);
     try {
       const data = await authApi.login(values);
-      const frontendUser = {
-        ...data.user,
-        _id: data.user.id,
-      };
-      
+
+      // Normalize the user object (backend returns `id`, app expects `_id`)
+      const frontendUser = { ...data.user, _id: data.user.id };
+
+      // 1. Persist to localStorage so useAuth initialData hydrates immediately
       setUser(frontendUser as any);
-      // Update React Query cache immediately so AuthGuard sees the user
+
+      // 2. Set cache synchronously — AuthGuard will unblock on next render
       queryClient.setQueryData(["currentUser"], frontendUser);
-      queryClient.invalidateQueries({ queryKey: ["currentUser"] });
-      
+      // NOTE: Do NOT call invalidateQueries here. That would trigger a
+      // background /users/me fetch immediately after login, creating a race
+      // condition where the fresh response could race with the cache set.
+
       message.success(t("Login.SUCCESS"));
       navigate(from, { replace: true });
     } catch (error: any) {
-      console.error("Login error:", error);
-      const errorMessage = error.response?.data?.message || t("Login.ERROR");
+      const errorMessage =
+        error.response?.data?.message ||
+        (error.response?.status === 401
+          ? t("Login.INVALID_CREDENTIALS")
+          : t("Login.ERROR"));
       message.error(errorMessage);
     } finally {
       setLoading(false);
@@ -67,10 +71,24 @@ function LoginPage() {
       >
         <div style={{ width: "100%", maxWidth: 400 }} className="fadeIn">
           <div style={{ textAlign: "center", marginBottom: "40px" }}>
-            <h1 style={{ color: token.colorPrimary, fontSize: "42px", margin: "0 0 8px 0", fontWeight: "bold", letterSpacing: "-1.5px" }}>
+            <h1
+              style={{
+                color: token.colorPrimary,
+                fontSize: "42px",
+                margin: "0 0 8px 0",
+                fontWeight: "bold",
+                letterSpacing: "-1.5px",
+              }}
+            >
               {t("Common.APP_ABBREVIATION")}
             </h1>
-            <p style={{ color: token.colorTextSecondary, fontSize: "16px", fontWeight: "500" }}>
+            <p
+              style={{
+                color: token.colorTextSecondary,
+                fontSize: "16px",
+                fontWeight: "500",
+              }}
+            >
               {t("Common.APP_SUBTITLE")}
             </p>
           </div>
@@ -85,26 +103,37 @@ function LoginPage() {
             <Form onFinish={onFinish} layout="vertical" size="large">
               <Form.Item
                 name="email"
-                rules={[{ required: true, message: t("Login.EMAIL_REQUIRED") }]}
+                rules={[
+                  { required: true, message: t("Login.EMAIL_REQUIRED") },
+                  { type: "email", message: t("Login.EMAIL_INVALID") },
+                ]}
               >
                 <Input
-                  prefix={<UserOutlined style={{ color: token.colorTextQuaternary }} />}
+                  prefix={
+                    <UserOutlined
+                      style={{ color: token.colorTextQuaternary }}
+                    />
+                  }
                   placeholder={t("Login.EMAIL_PLACEHOLDER")}
-                  style={{ 
-                    borderRadius: token.borderRadius,
-                  }}
+                  autoComplete="email"
+                  style={{ borderRadius: token.borderRadius }}
                 />
               </Form.Item>
               <Form.Item
                 name="password"
-                rules={[{ required: true, message: t("Login.PASSWORD_REQUIRED") }]}
+                rules={[
+                  { required: true, message: t("Login.PASSWORD_REQUIRED") },
+                ]}
               >
                 <Input.Password
-                  prefix={<LockOutlined style={{ color: token.colorTextQuaternary }} />}
+                  prefix={
+                    <LockOutlined
+                      style={{ color: token.colorTextQuaternary }}
+                    />
+                  }
                   placeholder={t("Login.PASSWORD_PLACEHOLDER")}
-                  style={{ 
-                    borderRadius: token.borderRadius,
-                  }}
+                  autoComplete="current-password"
+                  style={{ borderRadius: token.borderRadius }}
                 />
               </Form.Item>
               <Form.Item style={{ marginTop: "40px", marginBottom: "8px" }}>
@@ -113,10 +142,10 @@ function LoginPage() {
                   htmlType="submit"
                   block
                   loading={loading}
-                  style={{ 
-                    height: "50px", 
-                    borderRadius: token.borderRadius, 
-                    fontWeight: "bold", 
+                  style={{
+                    height: "50px",
+                    borderRadius: token.borderRadius,
+                    fontWeight: "bold",
                     fontSize: "16px",
                   }}
                 >

@@ -6,7 +6,7 @@ import { formatPhoneNumber, getUniqueOptions } from "../../../utils";
 import { useMemo } from "react";
 import type { ColumnType } from "antd/es/table";
 import type { TableRowSelection } from "antd/es/table/interface";
-import { hasRole } from "../../../utils/auth.utils";
+import { useAuth } from "../../../hooks/useAuth";
 
 type Props = {
   drivers: DriverType[];
@@ -16,6 +16,10 @@ type Props = {
   rowSelection?: TableRowSelection<DriverType>;
 };
 
+interface AuthenticatedColumnType extends ColumnType<DriverType> {
+  visible?: boolean;
+}
+
 export default function DriverTable({
   drivers,
   isLoading,
@@ -24,6 +28,8 @@ export default function DriverTable({
   rowSelection,
 }: Props) {
   const { t } = useTranslation();
+  const { user } = useAuth();
+  const canEdit = user?.role === USER_ROLES.ADMIN || user?.role === USER_ROLES.EDITOR;
 
   const filters = useMemo(() => {
     return {
@@ -36,10 +42,6 @@ export default function DriverTable({
       company: getUniqueOptions(drivers, (driver) => driver.company?.name),
     };
   }, [drivers]);
-
-  interface AuthenticatedColumnType extends ColumnType<DriverType> {
-    visible?: boolean;
-  }
 
   const columns = useMemo(() => {
     const allColumns: AuthenticatedColumnType[] = [
@@ -72,7 +74,7 @@ export default function DriverTable({
         title: t("Table.CREATED_AT"),
         dataIndex: "createdAt",
         key: "createdAt",
-        visible: hasRole([USER_ROLES.ADMIN, USER_ROLES.EDITOR]),
+        visible: canEdit,
         render: (date: string) => new Date(date).toLocaleString("tr-TR"),
         sorter: (a, b) =>
           new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
@@ -91,7 +93,7 @@ export default function DriverTable({
         title: t("Table.STATUS"),
         dataIndex: "deleted",
         key: "deleted",
-        visible: hasRole([USER_ROLES.ADMIN, USER_ROLES.EDITOR]),
+        visible: canEdit,
         render: (deleted: boolean) => (
           <Tag color={deleted ? "red" : "green"}>
             {deleted ? t("Common.PASSIVE") : t("Common.ACTIVE")}
@@ -106,7 +108,7 @@ export default function DriverTable({
       {
         title: t("Table.ACTIONS"),
         key: "action",
-        visible: hasRole([USER_ROLES.ADMIN, USER_ROLES.EDITOR]),
+        visible: canEdit,
         render: (_: any, record: DriverType) => (
           <Space>
             <Button
@@ -139,7 +141,7 @@ export default function DriverTable({
       },
     ];
     return allColumns.filter((col) => col.visible !== false);
-  }, []);
+  }, [t, filters, onEdit, onDelete, canEdit]);
 
   return (
     <Table

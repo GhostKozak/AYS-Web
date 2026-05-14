@@ -20,6 +20,7 @@ interface AppConfigContext {
 
 const AppConfigContext = createContext<AppConfigContext | null>(null);
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAppConfig = (): AppConfigContext => {
   const context = useContext(AppConfigContext);
   if (!context) {

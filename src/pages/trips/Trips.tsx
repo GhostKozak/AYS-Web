@@ -25,7 +25,7 @@ import { useVehicles } from "../../hooks/useVehicles";
 import { useDrivers } from "../../hooks/useDrivers";
 import { exportTripsToExcel } from "../../utils/excel.utils";
 import { RoleGuard } from "../../components/auth/RoleGuard";
-import { hasRole } from "../../utils/auth.utils";
+import { useAuth } from "../../hooks/useAuth";
 
 function Trips() {
   const { t } = useTranslation();
@@ -51,7 +51,8 @@ function Trips() {
   const { drivers } = useDrivers();
   const { vehicles } = useVehicles();
   const queryClient = useQueryClient();
-  const isAdmin = hasRole([USER_ROLES.ADMIN]);
+  const { user } = useAuth();
+  const isAdmin = user?.role === USER_ROLES.ADMIN;
 
   const handleExport = () => {
     exportTripsToExcel(filteredTrips);
@@ -65,7 +66,7 @@ function Trips() {
         description: t("Trips.DELETE_SUCCESS"),
       });
       setSelectedRowKeys(prev => prev.filter(key => key !== record._id));
-    } catch (error) {
+    } catch (error: any) {
       notification.error({
         title: t("Common.ERROR"),
         description: t("Errors.DELETE_FAILED"),
@@ -85,7 +86,7 @@ function Trips() {
         description: t("Common.BULK_DELETE_SUCCESS", { count: successCount }),
       });
       setSelectedRowKeys([]);
-    } catch (error) {
+    } catch (error: any) {
       notification.error({
         title: t("Common.ERROR"),
         description: t("Errors.DELETE_FAILED"),
@@ -95,9 +96,6 @@ function Trips() {
     }
   };
 
-  const handleSearch = (value: string) => {
-    setSearchText(value);
-  };
 
   const handleAdd = () => {
     setSelectedRecord(undefined);
@@ -154,12 +152,11 @@ function Trips() {
       }
       setIsModalOpen(false);
     } catch (error: any) {
-      if (error.response?.status && [400, 409, 422].includes(error.response.status)) {
-        notification.error({
-          title: t("Common.ERROR"),
-          description: error.response?.data?.message || t("Errors.OPERATION_FAILED"),
-        });
-      }
+      const errMsg = error?.response?.data?.message || error?.message || t("Errors.OPERATION_FAILED");
+      notification.error({
+        title: t("Common.ERROR"),
+        description: errMsg,
+      });
     }
   };
 
@@ -208,8 +205,8 @@ function Trips() {
             )
           }
           size="large"
-          onSearch={handleSearch}
-          onChange={(e) => handleSearch(e.target.value)}
+          onSearch={setSearchText}
+          onChange={(e) => setSearchText(e.target.value)}
         />
         <RoleGuard allowedRoles={[USER_ROLES.ADMIN, USER_ROLES.EDITOR]}>
           <Space>
@@ -242,7 +239,7 @@ function Trips() {
         />
       ) : (
         <TripTable
-          trips={filteredTrips as unknown as TripType[]}
+          trips={filteredTrips}
           isLoading={isLoading}
           onDelete={handleDelete}
           onEdit={handleEdit}
@@ -262,7 +259,7 @@ function Trips() {
             queryClient.invalidateQueries({ queryKey: ["companies"] });
             queryClient.invalidateQueries({ queryKey: ["drivers"] });
             queryClient.invalidateQueries({ queryKey: ["vehicles"] });
-          } catch (e) {
+          } catch (error: any) {
             /* ignore */
           }
         }}

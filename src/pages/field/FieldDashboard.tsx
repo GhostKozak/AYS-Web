@@ -93,7 +93,7 @@ function FieldDashboard() {
 
     // Referansı güncelle
     prevUrgentCountRef.current = urgentTrips.length;
-  }, [urgentTrips.length, t]); // urgentTrips.length değiştiğinde çalışır
+  }, [urgentTrips.length, t, message]); // urgentTrips.length değiştiğinde çalışır
 
   // KART BİLEŞENİ
   const VehicleCard = ({

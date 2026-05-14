@@ -1,7 +1,4 @@
-import type { NavigateFunction } from "react-router";
-import { ROUTES } from "../constants";
 import type { DiffChange, DiffConfigItem } from "../types";
-import { clearAuth, getToken } from "./auth.utils";
 
 export const formatPhoneNumber = (phone_number: string): string => {
   const cleanNumber = String(phone_number).replace(/\D/g, "");
@@ -33,33 +30,6 @@ export const formatLicencePlate = (plate: string): string => {
   return plate
     .replace(/([A-Z]+)(\d+)/g, "$1 $2")
     .replace(/(\d+)([A-Z]+)/g, "$1 $2");
-};
-
-export const checkTokenValidity = (navigate: NavigateFunction) => {
-  const token = getToken();
-
-  if (!token) return;
-
-  try {
-    const payloadBase64 = token.split(".")[1];
-    if (!payloadBase64) throw new Error("Invalid token");
-
-    // Base64URL to Base64 (replace - with +, _ with /)
-    const base64 = payloadBase64.replace(/-/g, "+").replace(/_/g, "/");
-    const decodedJson = atob(base64);
-    const payload = JSON.parse(decodedJson);
-
-    const isExpired = payload.exp * 1000 < Date.now();
-
-    if (isExpired) {
-      clearAuth();
-      navigate(ROUTES.LOGIN);
-    }
-  } catch (error) {
-    console.error("Token check error:", error);
-    clearAuth();
-    navigate(ROUTES.LOGIN);
-  }
 };
 
 export const getUniqueOptions = <T,>(
@@ -120,7 +90,7 @@ export const calculateDiffs = <
     }
 
     // Eşitlik Kontrolü (Boşluk/Null yönetimi dahil)
-    if (oldVal != newVal && (oldVal || newVal)) {
+    if (oldVal !== newVal && (oldVal || newVal)) {
       if (!oldVal && !newVal) return;
       changes.push({ key, oldValue: oldVal, newValue: newVal });
     }

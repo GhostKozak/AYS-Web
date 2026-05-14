@@ -18,7 +18,7 @@ import { useIsMobile } from "../../hooks/useIsMobile";
 import VehicleCardList from "./components/VehicleCardList";
 import { exportVehiclesToExcel } from "../../utils/excel.utils";
 import { RoleGuard } from "../../components/auth/RoleGuard";
-import { hasRole } from "../../utils/auth.utils";
+import { useAuth } from "../../hooks/useAuth";
 
 function Vehicles() {
   const { t } = useTranslation();
@@ -41,7 +41,8 @@ function Vehicles() {
   const { vehicles, isLoading, createVehicle, updateVehicle, deleteVehicle } =
     useVehicles();
   const isMobile = useIsMobile();
-  const isAdmin = hasRole([USER_ROLES.ADMIN]);
+  const { user } = useAuth();
+  const isAdmin = user?.role === USER_ROLES.ADMIN;
 
   const handleExport = () => {
     exportVehiclesToExcel(filteredVehicles);
@@ -55,7 +56,7 @@ function Vehicles() {
         description: t("Vehicles.DELETE_SUCCESS", { plate: record.licence_plate }),
       });
       setSelectedRowKeys(prev => prev.filter(key => key !== record._id));
-    } catch (error) {
+    } catch (error: any) {
       notification.error({
         title: t("Common.ERROR"),
         description: t("Errors.DELETE_FAILED"),
@@ -77,7 +78,7 @@ function Vehicles() {
         description: t("Common.BULK_DELETE_SUCCESS", { count: successCount }),
       });
       setSelectedRowKeys([]);
-    } catch (error) {
+    } catch (error: any) {
       notification.error({
         title: t("Common.ERROR"),
         description: t("Errors.DELETE_FAILED"),
@@ -118,12 +119,8 @@ function Vehicles() {
       }
       setIsModalOpen(false);
     } catch (error: any) {
-      if (error.response?.status && [400, 409, 422].includes(error.response.status)) {
-        notification.error({
-          title: t("Common.ERROR"),
-          description: error.response?.data?.message || t("Errors.OPERATION_FAILED"),
-        });
-      }
+      const errMsg = error?.response?.data?.message || error?.message || t("Errors.OPERATION_FAILED");
+      notification.error({ title: t("Common.ERROR"), description: errMsg });
     }
   };
 

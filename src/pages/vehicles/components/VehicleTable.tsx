@@ -6,7 +6,7 @@ import { formatLicencePlate, getUniqueOptions } from "../../../utils";
 import { useMemo } from "react";
 import type { ColumnType } from "antd/es/table";
 import type { TableRowSelection } from "antd/es/table/interface";
-import { hasRole } from "../../../utils/auth.utils";
+import { useAuth } from "../../../hooks/useAuth";
 
 type Props = {
   vehicles: VehicleType[];
@@ -16,6 +16,10 @@ type Props = {
   rowSelection?: TableRowSelection<VehicleType>;
 };
 
+interface AuthenticatedColumnType extends ColumnType<VehicleType> {
+  visible?: boolean;
+}
+
 export default function VehicleTable({
   vehicles,
   isLoading,
@@ -24,6 +28,8 @@ export default function VehicleTable({
   rowSelection,
 }: Props) {
   const { t } = useTranslation();
+  const { user } = useAuth();
+  const canEdit = user?.role === USER_ROLES.ADMIN || user?.role === USER_ROLES.EDITOR;
 
   const filters = useMemo(() => {
     return {
@@ -35,10 +41,6 @@ export default function VehicleTable({
       type: getUniqueOptions(vehicles, (v) => v.vehicle_type),
     };
   }, [vehicles]);
-
-  interface AuthenticatedColumnType extends ColumnType<VehicleType> {
-    visible?: boolean;
-  }
 
   const columns = useMemo(() => {
     const allColumns: AuthenticatedColumnType[] = [
@@ -64,7 +66,7 @@ export default function VehicleTable({
         title: t("Table.CREATED_AT"),
         dataIndex: "createdAt",
         key: "createdAt",
-        visible: hasRole([USER_ROLES.ADMIN, USER_ROLES.EDITOR]),
+        visible: canEdit,
         render: (date: string) => new Date(date).toLocaleString("tr-TR"),
         sorter: (a, b) =>
           new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
@@ -83,7 +85,7 @@ export default function VehicleTable({
         title: t("Table.STATUS"),
         key: "deleted",
         dataIndex: "deleted",
-        visible: hasRole([USER_ROLES.ADMIN, USER_ROLES.EDITOR]),
+        visible: canEdit,
         render: (deleted: boolean) => (
           <Tag color={deleted ? "red" : "green"}>
             {deleted ? t("Common.PASSIVE") : t("Common.ACTIVE")}
@@ -98,7 +100,7 @@ export default function VehicleTable({
       {
         title: t("Table.ACTIONS"),
         key: "action",
-        visible: hasRole([USER_ROLES.ADMIN, USER_ROLES.EDITOR]),
+        visible: canEdit,
         render: (_: any, record: VehicleType) => (
           <Space>
             <Button
@@ -132,7 +134,7 @@ export default function VehicleTable({
     ];
 
     return allColumns.filter((col) => col.visible !== false);
-  }, []);
+  }, [t, filters, onEdit, onDelete, canEdit]);
 
   return (
     <Table

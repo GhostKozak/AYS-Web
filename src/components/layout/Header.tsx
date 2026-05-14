@@ -171,7 +171,7 @@ function Header() {
         ),
       },
     ],
-    [t, userObject, themeMode, toggleTheme]
+    [t, userObject, themeMode, toggleTheme, handleLogout]
   );
 
   return (

@@ -47,6 +47,8 @@
     "ERROR": "E-posta veya şifre hatalı!",
     "EMAIL_REQUIRED": "Lütfen e-postanızı girin!",
     "PASSWORD_REQUIRED": "Lütfen şifrenizi girin!",
+    "INVALID_CREDENTIALS": "Geçersiz e-posta veya şifre!",
+    "EMAIL_INVALID": "Geçerli bir e-posta adresi giriniz!",
     "BUTTON": "Giriş Yap"
   },
 
@@ -145,13 +147,19 @@
     "VIEW_DETAILS": "Detayları Gör",
     "BEFORE": "Önceki",
     "AFTER": "Sonraki",
-    "CHANGES": "Değişiklikler"
+    "CHANGES": "Değişiklikler",
+    "CREATED_RECORD": "Oluşturulan Kayıt",
+    "DELETED_RECORD": "Silinen Kayıt",
+    "SHOW_ONLY_CHANGES": "Sadece Değişimleri Göster"
   },
 
   "Profile": {
     "TITLE": "Profil",
     "EDIT_INFO": "Kişisel Bilgileri Düzenle",
     "CHANGE_PASSWORD": "Şifre Değiştir",
+    "NEW_PASSWORD": "Yeni Şifre",
+    "NEW_PASSWORD_CONFIRM": "Yeni Şifre (Tekrar)",
+    "UPDATE_PASSWORD_BTN": "Şifreyi Güncelle",
     "INFO_UPDATE_SUCCESS": "Kişisel bilgiler başarıyla güncellendi.",
     "PASSWORD_UPDATE_SUCCESS": "Şifre başarıyla güncellendi."
   },
@@ -167,7 +175,8 @@
     "EDIT_USER": "Kullanıcı Düzenle",
     "CREATE_SUCCESS": "Kullanıcı başarıyla oluşturuldu.",
     "UPDATE_SUCCESS": "Kullanıcı başarıyla güncellendi.",
-    "DELETE_SUCCESS": "Kullanıcı başarıyla silindi."
+    "DELETE_SUCCESS": "Kullanıcı başarıyla silindi.",
+    "LAST_LOGIN": "Son Giriş"
   },
 
   "Dashboard": {
@@ -203,7 +212,9 @@
     "CREATE_SUCCESS": "{{name}} firması başarıyla eklendi.",
     "UPDATE_SUCCESS": "{{name}} firması başarıyla güncellendi.",
     "DELETE_SUCCESS": "{{name}} firması başarıyla silindi.",
-    "TOTAL": "adet firma"
+    "TOTAL": "adet firma",
+    "NAME_TOO_SHORT": "Şirket adı en az 2 karakter olmalıdır",
+    "NAME_TOO_LONG": "Şirket adı en fazla 100 karakter olabilir"
   },
 
   "Drivers": {
@@ -222,7 +233,8 @@
     "CREATE_SUCCESS": "{{name}} sürücüsü başarıyla eklendi.",
     "UPDATE_SUCCESS": "{{name}} sürücüsü başarıyla güncellendi.",
     "DELETE_SUCCESS": "{{name}} sürücüsü silindi.",
-    "TOTAL": "adet sürücü"
+    "TOTAL": "adet sürücü",
+    "PHONE_FORMAT_ERROR": "Geçerli bir Türkiye numarası giriniz (05XXXXXXXXX)"
   },
 
   "Vehicles": {
@@ -243,7 +255,9 @@
     "TYPE_TRUCK": "Tır",
     "TYPE_VAN": "Minivan",
     "TYPE_LORRY": "Kamyonet",
-    "TYPE_TRAILER": "Dorse"
+    "TYPE_TRAILER": "Dorse",
+    "PLATE_TOO_SHORT": "Plaka en az 5 karakter olmalıdır",
+    "PLATE_TOO_LONG": "Plaka en fazla 10 karakter olabilir"
   },
 
   "Trips": {
@@ -282,7 +296,9 @@
     "STATUS_UNKNOWN": "Belirsiz",
     "CREATE_NEW_COMPANY": "Yeni firma oluştur: {{name}}",
     "CREATE_NEW_VEHICLE": "Yeni araç oluştur: {{plate}}",
-    "CREATE_NEW_DRIVER": "Yeni sürücü oluştur: {{name}}"
+    "CREATE_NEW_DRIVER": "Yeni sürücü oluştur: {{name}}",
+    "NEW_DRIVER": "Yeni Sürücü Ekle",
+    "TEMP_PARKING_SHORT": "Kesik"
   },
 
   "Other": {

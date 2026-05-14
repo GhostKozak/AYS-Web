@@ -20,7 +20,7 @@ import { useIsMobile } from "../../hooks/useIsMobile";
 import CompanyCardList from "./components/CompanyCardList";
 import { exportCompaniesToExcel } from "../../utils/excel.utils";
 import { RoleGuard } from "../../components/auth/RoleGuard";
-import { hasRole } from "../../utils/auth.utils";
+import { useAuth } from "../../hooks/useAuth";
 
 function Companies() {
   const { t } = useTranslation();
@@ -42,7 +42,8 @@ function Companies() {
   const { companies, isLoading, createCompany, updateCompany, deleteCompany } =
     useCompanies();
   const isMobile = useIsMobile();
-  const isAdmin = hasRole([USER_ROLES.ADMIN]);
+  const { user } = useAuth();
+  const isAdmin = user?.role === USER_ROLES.ADMIN;
 
   const handleExport = () => {
     exportCompaniesToExcel(filteredCompanies);
@@ -56,7 +57,7 @@ function Companies() {
         description: t("Companies.DELETE_SUCCESS", { name: record.name }),
       });
       setSelectedRowKeys(prev => prev.filter(key => key !== record._id));
-    } catch (error) {
+    } catch (error: any) {
       notification.error({
         title: t("Common.ERROR"),
         description: t("Errors.DELETE_FAILED"),
@@ -78,7 +79,7 @@ function Companies() {
         description: t("Common.BULK_DELETE_SUCCESS", { count: successCount }),
       });
       setSelectedRowKeys([]);
-    } catch (error) {
+    } catch (error: any) {
       notification.error({
         title: t("Common.ERROR"),
         description: t("Errors.DELETE_FAILED"),
@@ -93,7 +94,7 @@ function Companies() {
       if (selectedRecord) {
         await updateCompany({ id: selectedRecord._id, name: values.name });
         notification.info({
-          title: t("Audit.DETAILS"),
+          title: t("Common.INFO"),
           description: t("Companies.UPDATE_SUCCESS", { name: selectedRecord.name }),
         });
       } else {
@@ -105,12 +106,8 @@ function Companies() {
       }
       setIsModalOpen(false);
     } catch (error: any) {
-      if (error.response?.status && [400, 409, 422].includes(error.response.status)) {
-        notification.error({
-          title: t("Common.ERROR"),
-          description: error.response?.data?.message || t("Errors.OPERATION_FAILED"),
-        });
-      }
+      const errMsg = error?.response?.data?.message || error?.message || t("Errors.OPERATION_FAILED");
+      notification.error({ title: t("Common.ERROR"), description: errMsg });
     }
   };
 

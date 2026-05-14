@@ -32,7 +32,7 @@ export default function Profile() {
           lastName: data.lastName,
           email: data.email, // email is readonly usually
         });
-      } catch (err) {
+      } catch (err: any) {
         notification.error({
           title: t("Common.ERROR", "Hata"),
           description: t("Errors.GENERAL_ERROR", "Bir hata oluştu."),
@@ -80,7 +80,7 @@ export default function Profile() {
       });
       notification.success({
         title: t("Common.SUCCESS", "Başarılı"),
-        description: t("Users.UPDATE_SUCCESS", "Şifre başarıyla güncellendi."),
+        description: t("Profile.PASSWORD_UPDATE_SUCCESS", "Şifre başarıyla güncellendi."),
       });
       passwordForm.resetFields();
     } catch (err: any) {
@@ -162,7 +162,7 @@ export default function Profile() {
             >
               <Form.Item
                 name="password"
-                label={t("Login.PASSWORD_PLACEHOLDER", "Yeni Şifre")}
+                label={t("Profile.NEW_PASSWORD", "Yeni Şifre")}
                 rules={[
                   { required: true, message: t("Validation.REQUIRED") },
                   { min: 8, message: t("Validation.PASSWORD_MIN_LENGTH") },
@@ -177,7 +177,7 @@ export default function Profile() {
 
               <Form.Item
                 name="confirmPassword"
-                label={t("Login.PASSWORD_PLACEHOLDER", "Yeni Şifre (Tekrar)")}
+                label={t("Profile.NEW_PASSWORD_CONFIRM", "Yeni Şifre (Tekrar)")}
                 dependencies={['password']}
                 rules={[
                   { required: true, message: t("Validation.REQUIRED", "Bu alan zorunludur!") },
@@ -203,7 +203,7 @@ export default function Profile() {
                   block={isMobile}
                   danger
                 >
-                  {t("Common.SAVE", "Şifreyi Güncelle")}
+                  {t("Profile.UPDATE_PASSWORD_BTN", "Şifreyi Güncelle")}
                 </Button>
               </Form.Item>
             </Form>

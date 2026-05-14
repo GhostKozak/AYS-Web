@@ -3,6 +3,7 @@ import {
   useMutation,
   useQueryClient,
 } from "@tanstack/react-query";
+import { App } from "antd";
 
 interface CrudApi<T, CreatePayload> {
   getAll: () => Promise<T[]>;
@@ -23,6 +24,7 @@ export const useCrud = <T, CreatePayload>(
   options: UseCrudOptions
 ) => {
   const queryClient = useQueryClient();
+  const { message } = App.useApp();
   const { queryKey, staleTime = 1000 * 60 * 5, ...queryOpts } = options;
 
   const {
@@ -42,6 +44,9 @@ export const useCrud = <T, CreatePayload>(
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey });
     },
+    onError: (err: any) => {
+      message.error(err?.response?.data?.message || err.message || "İşlem sırasında bir hata oluştu");
+    },
   });
 
   const updateMutation = useMutation({
@@ -53,12 +58,18 @@ export const useCrud = <T, CreatePayload>(
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey });
     },
+    onError: (err: any) => {
+      message.error(err?.response?.data?.message || err.message || "Güncelleme sırasında bir hata oluştu");
+    },
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => api.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey });
+    },
+    onError: (err: any) => {
+      message.error(err?.response?.data?.message || err.message || "Silme işlemi sırasında bir hata oluştu");
     },
   });
 
