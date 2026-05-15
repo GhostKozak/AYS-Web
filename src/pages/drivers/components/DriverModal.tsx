@@ -1,20 +1,22 @@
-import { Modal, Form, Input, Button, Select, Row, Col } from "antd";
+import { Modal, Form, Input, Button, Select, Row, Col, Flex } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import { type CompanyType, type DriverType } from "../../../types";
 import { useTranslation } from "react-i18next";
 import { calculateDiffs } from "../../../utils";
 import DiffViewer from "../../common/DiffViewer";
+import { COUNTRY_CODES, DEFAULT_COUNTRY_CODE } from "../../../constants/countries";
 
 interface DriverFormValues {
   full_name: string;
   phone_number: string;
+  country_code: string;
   company: string;
 }
 
 interface DriverModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onFinish: (values: DriverFormValues) => void;
+  onFinish: (values: any) => void;
   selectedRecord?: DriverType;
   isLoading?: boolean;
   companies: CompanyType[];
@@ -47,7 +49,13 @@ const DriverModal = ({
       },
       {
         label: t("Drivers.PHONE_NUMBER"),
-        key: "phone_number",
+        getOldValue: (r) => r.phone_number,
+        getNewValue: (f) => {
+          if (!f.phone_number) return "";
+          const country = COUNTRY_CODES.find((c) => c.code === f.country_code);
+          const prefix = country?.value || DEFAULT_COUNTRY_CODE;
+          return `${prefix}${f.phone_number}`;
+        },
       },
     ]);
   }, [selectedRecord, currentValues, companies, t]);
@@ -57,16 +65,70 @@ const DriverModal = ({
   useEffect(() => {
     if (isOpen) {
       if (selectedRecord) {
+        // Find if the phone number starts with any of our country codes
+        let prefix = DEFAULT_COUNTRY_CODE;
+        let phone = selectedRecord.phone_number || "";
+
+        const sortedCodes = [...COUNTRY_CODES].sort((a, b) => b.value.length - a.value.length);
+        for (const c of sortedCodes) {
+          if (phone.startsWith(c.value)) {
+            prefix = c.value;
+            phone = phone.substring(c.value.length);
+            break;
+          }
+        }
+
+        // Handle legacy Turkish numbers starting with 05
+        if (phone.startsWith("05") && phone.length === 11 && prefix === DEFAULT_COUNTRY_CODE) {
+          phone = phone.substring(1); // Remove leading 0 if prefix is +90
+        }
+
         form.setFieldsValue({
           full_name: selectedRecord.full_name,
-          phone_number: selectedRecord.phone_number,
+          phone_number: phone,
+          country_code: COUNTRY_CODES.find(c => c.value === prefix)?.code || "TR",
           company: selectedRecord.company?._id,
         });
       } else {
         form.resetFields();
+        form.setFieldsValue({
+          country_code: "TR",
+        });
       }
     }
   }, [isOpen, selectedRecord, form]);
+
+  const prefixSelector = (
+    <Form.Item name="country_code" noStyle>
+      <Select
+        style={{ width: 90 }}
+        showSearch
+        optionFilterProp="title"
+        optionLabelProp="label"
+        dropdownStyle={{ minWidth: 200 }}
+      >
+        {COUNTRY_CODES.map((c) => {
+          const translatedName = t(`Countries.${c.name}`);
+          return (
+            <Select.Option
+              key={c.code}
+              value={c.code}
+              label={c.value}
+              title={`${translatedName} ${c.value} ${c.code}`}
+            >
+              <Flex justify="space-between" align="center">
+                <Flex vertical>
+                  <span style={{ fontWeight: 500 }}>{translatedName}</span>
+                  <span style={{ fontSize: '0.8em', color: '#999' }}>{c.code}</span>
+                </Flex>
+                <span style={{ fontWeight: 600, color: '#1677ff' }}>{c.value}</span>
+              </Flex>
+            </Select.Option>
+          );
+        })}
+      </Select>
+    </Form.Item>
+  );
 
   return (
     <Modal
@@ -90,10 +152,14 @@ const DriverModal = ({
             labelCol={{ span: 8 }}
             wrapperCol={{ span: 16 }}
             style={{ maxWidth: 600, paddingBlock: 32 }}
-            onFinish={async (values) => {
+            onFinish={async (values: DriverFormValues) => {
               setIsSubmitting(true);
               try {
-                await onFinish(values);
+                const { country_code, phone_number, ...rest } = values;
+                const country = COUNTRY_CODES.find(c => c.code === country_code);
+                const prefix = country?.value || DEFAULT_COUNTRY_CODE;
+                const full_phone = `${prefix}${phone_number}`;
+                await onFinish({ ...rest, phone_number: full_phone });
               } finally {
                 setIsSubmitting(false);
               }
@@ -133,15 +199,25 @@ const DriverModal = ({
               rules={[
                 { required: true, message: t("Drivers.PHONE_REQUIRED") },
                 {
-                  pattern: /^05\d{9}$/,
-                  message: t("Drivers.PHONE_FORMAT_ERROR", { defaultValue: "Geçerli bir Türkiye numarası giriniz (05XXXXXXXXX)" }),
+                  validator: (_, value) => {
+                    if (!value) return Promise.resolve();
+                    const countryCode = form.getFieldValue("country_code");
+                    const country = COUNTRY_CODES.find(c => c.code === countryCode);
+                    if (country?.value === "+90") {
+                      if (/^5\d{9}$/.test(value)) return Promise.resolve();
+                      return Promise.reject(t("Drivers.PHONE_FORMAT_ERROR", { defaultValue: "Geçerli bir numara giriniz (5XXXXXXXXX)" }));
+                    }
+                    if (/^\d{6,14}$/.test(value)) return Promise.resolve();
+                    return Promise.reject(t("Drivers.PHONE_FORMAT_ERROR", { defaultValue: "Geçerli bir numara giriniz" }));
+                  }
                 },
               ]}
             >
               <Input
-                placeholder="05XX XXX XX XX"
+                addonBefore={prefixSelector}
+                placeholder="5XX XXX XX XX"
                 autoComplete="new-password"
-                maxLength={11}
+                maxLength={15}
               />
             </Form.Item>
 

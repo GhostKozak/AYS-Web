@@ -1,26 +1,33 @@
 import type { DiffChange, DiffConfigItem } from "../types";
 
 export const formatPhoneNumber = (phone_number: string): string => {
-  const cleanNumber = String(phone_number).replace(/\D/g, "");
+  if (!phone_number) return "";
+  
+  const clean = phone_number.replace(/\D/g, "");
 
-  if (cleanNumber.length === 11 && cleanNumber.startsWith("0")) {
-    const [, countryCode, ...rest] = cleanNumber.split("");
-    const areaCode = rest.slice(0, 3).join("");
-    const prefix = rest.slice(3, 6).join("");
-    const suffix = rest.slice(6, 8).join("");
-    const lastTwo = rest.slice(8, 10).join("");
-
-    return `${countryCode}${areaCode} ${prefix} ${suffix} ${lastTwo}`;
+  // Turkish numbers (+90 or 90 or 05...)
+  if (clean.startsWith("90") || (clean.startsWith("5") && clean.length === 10)) {
+    const numberPart = clean.startsWith("90") ? clean.substring(2) : clean;
+    if (numberPart.length === 10) {
+      return `+90 ${numberPart.slice(0, 3)} ${numberPart.slice(3, 6)} ${numberPart.slice(6, 8)} ${numberPart.slice(8, 10)}`;
+    }
   }
 
-  if (cleanNumber.length === 10) {
-    const [, ...rest] = `0${cleanNumber}`.split("");
-    const areaCode = rest.slice(0, 3).join("");
-    const prefix = rest.slice(3, 6).join("");
-    const suffix = rest.slice(6, 8).join("");
-    const lastTwo = rest.slice(8, 10).join("");
+  // Handle numbers starting with 0 (e.g. 0532...)
+  if (clean.length === 11 && clean.startsWith("0")) {
+    return `${clean.slice(0, 4)} ${clean.slice(4, 7)} ${clean.slice(7, 9)} ${clean.slice(9, 11)}`;
+  }
 
-    return `0${areaCode} ${prefix} ${suffix} ${lastTwo}`;
+  // Generic international formatting for other countries
+  if (phone_number.startsWith("+")) {
+    // Keep the + and the first 2 or 3 digits as country code, then group the rest
+    // This is a heuristic but works well for most cases
+    if (clean.length > 10) {
+      const countryCodeLen = clean.length - 10;
+      return `+${clean.slice(0, countryCodeLen)} ${clean.slice(countryCodeLen, countryCodeLen + 3)} ${clean.slice(countryCodeLen + 3, countryCodeLen + 6)} ${clean.slice(countryCodeLen + 6, countryCodeLen + 8)} ${clean.slice(countryCodeLen + 8)}`;
+    }
+    // Very short or very long numbers, just add spaces every 3-4 digits
+    return phone_number.replace(/(\+\d+)(\d{3})(\d{3})/, "$1 $2 $3 ");
   }
 
   return phone_number;

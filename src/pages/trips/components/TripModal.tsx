@@ -1,4 +1,4 @@
-import { Modal, Form, Input, Button, Select, Switch, Row, Col, DatePicker, App } from "antd";
+import { Modal, Form, Input, Button, Select, Switch, Row, Col, DatePicker, App, Flex } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import dayjs from "dayjs";
 import { useCompanies } from "../../../hooks/useCompanies";
@@ -13,6 +13,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { calculateDiffs, formatLicencePlate, formatPhoneNumber } from "../../../utils/index";
 import DiffViewer from "../../common/DiffViewer";
+import { COUNTRY_CODES, DEFAULT_COUNTRY_CODE } from "../../../constants/countries";
 
 interface TripFormValues {
   driver_full_name: string;
@@ -140,6 +141,10 @@ const TripModal = ({
         formKey: "company",
         getOldValue: (r) => r.company?.name || "-",
         getNewValue: (f) => {
+          if (!isNewDriver) {
+            const selectedDriver = drivers.find((d) => d._id === f.driver);
+            return selectedDriver?.company?.name || "-";
+          }
           if (!f.company) return "-";
           const c = companies.find((c) => c._id === f.company);
           return c ? c.name : f.company;
@@ -192,7 +197,7 @@ const TripModal = ({
         getNewValue: (f) => f.notes || "-",
       },
     ]);
-  }, [selectedRecord, currentValues, companies, drivers, vehicles, t]);
+  }, [selectedRecord, currentValues, companies, drivers, vehicles, t, isNewDriver]);
 
   const companyOptions = useMemo(() => {
     const existing = companies.map((c) => ({ label: c.name, value: c._id }));
@@ -245,9 +250,29 @@ const TripModal = ({
           return d.isValid() ? d : undefined;
         };
 
+        // Split phone number into prefix and part
+        let prefix = DEFAULT_COUNTRY_CODE;
+        let phone = selectedRecord.driver?.phone_number ?? "";
+
+        if (phone) {
+          const sortedCodes = [...COUNTRY_CODES].sort((a, b) => b.value.length - a.value.length);
+          for (const c of sortedCodes) {
+            if (phone.startsWith(c.value)) {
+              prefix = c.value;
+              phone = phone.substring(c.value.length);
+              break;
+            }
+          }
+          // Legacy Turkish format check
+          if (phone.startsWith("05") && phone.length === 11 && prefix === DEFAULT_COUNTRY_CODE) {
+            phone = phone.substring(1);
+          }
+        }
+
         form.setFieldsValue({
           driver_full_name: selectedRecord.driver?.full_name ?? "",
-          driver_phone_number: selectedRecord.driver?.phone_number ?? "",
+          driver_phone_number: phone,
+          driver_country_code: COUNTRY_CODES.find(c => c.value === prefix)?.code || "TR",
           company: selectedRecord.company?._id,
           vehicle: selectedRecord.vehicle?._id,
           driver: selectedRecord.driver?._id,
@@ -266,6 +291,7 @@ const TripModal = ({
         form.resetFields();
         form.setFieldsValue({
           arrival_time: dayjs(),
+          driver_country_code: "TR",
         });
         setIsNewDriver(false);
       }
@@ -317,9 +343,11 @@ const TripModal = ({
 
       // Driver Creation
       if (isNewDriver) {
+        const country = COUNTRY_CODES.find(c => c.code === (values as any).driver_country_code);
+        const prefix = country?.value || DEFAULT_COUNTRY_CODE;
         const payload = {
           full_name: values.driver_full_name,
-          phone_number: values.driver_phone_number,
+          phone_number: `${prefix}${values.driver_phone_number}`,
           company: finalValues.company || values.company,
         };
         const res = await createDriver(payload);
@@ -440,12 +468,56 @@ const TripModal = ({
                   rules={[
                     { required: true, message: t("Drivers.PHONE_REQUIRED") },
                     {
-                      pattern: /^05\d{9}$/,
-                      message: t("Drivers.PHONE_FORMAT_ERROR"),
+                      validator: (_, value) => {
+                        if (!value) return Promise.resolve();
+                      const countryCode = form.getFieldValue("driver_country_code");
+                      const country = COUNTRY_CODES.find(c => c.code === countryCode);
+                      if (country?.value === "+90") {
+                        if (/^5\d{9}$/.test(value)) return Promise.resolve();
+                        return Promise.reject(t("Drivers.PHONE_FORMAT_ERROR", { defaultValue: "Geçerli bir numara giriniz (5XXXXXXXXX)" }));
+                      }
+                      if (/^\d{6,14}$/.test(value)) return Promise.resolve();
+                      return Promise.reject(t("Drivers.PHONE_FORMAT_ERROR", { defaultValue: "Geçerli bir numara giriniz" }));
+                      }
                     },
                   ]}
                 >
-                  <Input placeholder="05XX XXX XX XX" autoComplete="new-password" maxLength={11} />
+                  <Input 
+                    addonBefore={
+                      <Form.Item name="driver_country_code" noStyle>
+                        <Select
+                          style={{ width: 90 }}
+                          showSearch
+                          optionFilterProp="title"
+                          optionLabelProp="label"
+                          dropdownStyle={{ minWidth: 200 }}
+                        >
+                          {COUNTRY_CODES.map((c) => {
+                            const translatedName = t(`Countries.${c.name}`);
+                            return (
+                              <Select.Option
+                                key={c.code}
+                                value={c.code}
+                                label={c.value}
+                                title={`${translatedName} ${c.value} ${c.code}`}
+                              >
+                                <Flex justify="space-between" align="center">
+                                  <Flex vertical>
+                                    <span style={{ fontWeight: 500 }}>{translatedName}</span>
+                                    <span style={{ fontSize: '0.8em', color: '#999' }}>{c.code}</span>
+                                  </Flex>
+                                  <span style={{ fontWeight: 600, color: '#1677ff' }}>{c.value}</span>
+                                </Flex>
+                              </Select.Option>
+                            );
+                          })}
+                        </Select>
+                      </Form.Item>
+                    }
+                    placeholder="5XX XXX XX XX" 
+                    autoComplete="new-password" 
+                    maxLength={15} 
+                  />
                 </Form.Item>
               </>
             )}
