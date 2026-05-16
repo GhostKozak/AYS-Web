@@ -234,7 +234,7 @@
     "UPDATE_SUCCESS": "{{name}} updated successfully.",
     "DELETE_SUCCESS": "{{name}} deleted successfully.",
     "TOTAL": "total drivers",
-    "PHONE_FORMAT_ERROR": "Please enter a valid Turkish phone number (05XXXXXXXXX)"
+    "PHONE_FORMAT_ERROR": "Please enter a valid phone number"
   },
 
   "Vehicles": {

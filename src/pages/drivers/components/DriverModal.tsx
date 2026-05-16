@@ -203,10 +203,17 @@ const DriverModal = ({
                     if (!value) return Promise.resolve();
                     const countryCode = form.getFieldValue("country_code");
                     const country = COUNTRY_CODES.find(c => c.code === countryCode);
-                    if (country?.value === "+90") {
-                      if (/^5\d{9}$/.test(value)) return Promise.resolve();
-                      return Promise.reject(t("Drivers.PHONE_FORMAT_ERROR", { defaultValue: "Geçerli bir numara giriniz (5XXXXXXXXX)" }));
+                    const natPattern = (country as any)?.nationalPattern;
+                    if (natPattern) {
+                      try {
+                        const re = new RegExp(natPattern);
+                        if (re.test(value)) return Promise.resolve();
+                        return Promise.reject(t("Drivers.PHONE_FORMAT_ERROR", { defaultValue: "Geçerli bir numara giriniz" }));
+                      } catch (e) {
+                        // If pattern is invalid, fall back to generic
+                      }
                     }
+
                     if (/^\d{6,14}$/.test(value)) return Promise.resolve();
                     return Promise.reject(t("Drivers.PHONE_FORMAT_ERROR", { defaultValue: "Geçerli bir numara giriniz" }));
                   }

@@ -234,7 +234,7 @@
     "UPDATE_SUCCESS": "{{name}} sürücüsü başarıyla güncellendi.",
     "DELETE_SUCCESS": "{{name}} sürücüsü silindi.",
     "TOTAL": "adet sürücü",
-    "PHONE_FORMAT_ERROR": "Geçerli bir Türkiye numarası giriniz (05XXXXXXXXX)"
+    "PHONE_FORMAT_ERROR": "Geçerli bir numara giriniz"
   },
 
   "Vehicles": {
