@@ -1,12 +1,23 @@
 import { Table, Tag, Popconfirm, Button, Space } from "antd";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
-import { USER_ROLES, type DriverType } from "../../../types";
+import { USER_ROLES, type DriverType, type TableSettings } from "../../../types";
 import { Trans, useTranslation } from "react-i18next";
+import type { TFunction } from "i18next";
 import { formatPhoneNumber, getUniqueOptions } from "../../../utils";
 import { useMemo } from "react";
 import type { ColumnType } from "antd/es/table";
 import type { TableRowSelection } from "antd/es/table/interface";
 import { useAuth } from "../../../hooks/useAuth";
+
+export const getDriverTableSettingsOptions = (t: TFunction) => [
+  { key: "full_name", title: t("Drivers.FULL_NAME", "Full Name") },
+  { key: "phone_number", title: t("Drivers.PHONE_NUMBER", "Phone Number") },
+  { key: "company", title: t("Drivers.COMPANY_NAME", "Company Name") },
+  { key: "createdAt", title: t("Table.CREATED_AT", "Created At") },
+  { key: "updatedAt", title: t("Table.UPDATED_AT", "Updated At") },
+  { key: "deleted", title: t("Table.STATUS", "Status") },
+  { key: "action", title: t("Table.ACTIONS", "Actions") },
+];
 
 type Props = {
   drivers: DriverType[];
@@ -14,6 +25,7 @@ type Props = {
   onEdit: (c: DriverType) => void;
   onDelete: (c: DriverType) => void;
   rowSelection?: TableRowSelection<DriverType>;
+  settings?: TableSettings;
 };
 
 interface AuthenticatedColumnType extends ColumnType<DriverType> {
@@ -26,6 +38,7 @@ export default function DriverTable({
   onEdit,
   onDelete,
   rowSelection,
+  settings,
 }: Props) {
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -42,6 +55,14 @@ export default function DriverTable({
       company: getUniqueOptions(drivers, (driver) => driver.company?.name),
     };
   }, [drivers]);
+
+  const fontSize = settings?.fontSize ?? "normal";
+  const fontSizeMap: Record<string, string> = {
+    small: "12px",
+    normal: "14px",
+    large: "20px",
+  };
+  const tableFontSize = fontSizeMap[fontSize] ?? fontSizeMap.normal;
 
   const columns = useMemo(() => {
     const allColumns: AuthenticatedColumnType[] = [
@@ -140,23 +161,59 @@ export default function DriverTable({
         ),
       },
     ];
-    return allColumns.filter((col) => col.visible !== false);
-  }, [t, filters, onEdit, onDelete, canEdit]);
+    const filtered = allColumns.filter((col) => col.visible !== false);
+    if (settings?.visibleColumns && settings.visibleColumns.length > 0) {
+      return filtered.filter((col) => {
+        const key = typeof col.key === "string" ? col.key : String(col.key);
+        return settings.visibleColumns?.includes(key);
+      });
+    }
+    return filtered;
+  }, [t, filters, onEdit, onDelete, canEdit, settings]);
 
   return (
-    <Table
-      columns={columns}
-      dataSource={drivers}
-      loading={isLoading}
-      rowKey="_id"
-      rowSelection={rowSelection}
-      scroll={{ x: 1000 }}
-      pagination={{
-        showSizeChanger: true,
-        showQuickJumper: true,
-        showTotal: (total, range) =>
-          `${range[0]}-${range[1]} / ${total} ${t("Drivers.TOTAL")}`,
-      }}
-    />
+    <div style={{ fontSize: tableFontSize }}>
+      <Table
+        style={{ fontSize: tableFontSize, lineHeight: 1.5 }}
+        components={{
+          header: {
+            cell: (cellProps: any) => (
+              <th
+                {...cellProps}
+                style={{
+                  ...cellProps?.style,
+                  fontSize: tableFontSize,
+                  lineHeight: 1.5,
+                }}
+              />
+            ),
+          },
+          body: {
+            cell: (cellProps: any) => (
+              <td
+                {...cellProps}
+                style={{
+                  ...cellProps?.style,
+                  fontSize: tableFontSize,
+                  lineHeight: 1.5,
+                }}
+              />
+            ),
+          },
+        }}
+        columns={columns}
+        dataSource={drivers}
+        loading={isLoading}
+        rowKey="_id"
+        rowSelection={rowSelection}
+        scroll={{ x: 1000 }}
+        pagination={{
+          showSizeChanger: true,
+          showQuickJumper: true,
+          showTotal: (total, range) =>
+            `${range[0]}-${range[1]} / ${total} ${t("Drivers.TOTAL")}`,
+        }}
+      />
+    </div>
   );
 }

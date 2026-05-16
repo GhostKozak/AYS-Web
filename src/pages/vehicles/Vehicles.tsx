@@ -10,10 +10,13 @@ import {
   PlusOutlined,
   SearchOutlined,
   DeleteOutlined,
+  SettingOutlined,
 } from "@ant-design/icons";
 import { useVehicles } from "../../hooks/useVehicles";
 import { USER_ROLES, type VehicleType, type VehicleTypeEnum } from "../../types";
-import VehicleTable from "./components/VehicleTable";
+import VehicleTable, { getVehicleTableSettingsOptions } from "./components/VehicleTable";
+import { useTableSettings } from "../../hooks/useTableSettings";
+import TableSettingsModal from "../../components/TableSettingsModal";
 import { useIsMobile } from "../../hooks/useIsMobile";
 import VehicleCardList from "./components/VehicleCardList";
 import { exportVehiclesToExcel } from "../../utils/excel.utils";
@@ -23,6 +26,21 @@ import { useAuth } from "../../hooks/useAuth";
 function Vehicles() {
   const { t } = useTranslation();
   const { notification } = App.useApp();
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
+  const defaultVehicleTableSettings = React.useMemo(
+    () => ({
+      visibleColumns: getVehicleTableSettingsOptions(t).map((column) => String(column.key)),
+      fontSize: "normal" as const,
+    }),
+    [t],
+  );
+
+  const {
+    settings: vehicleTableSettings,
+    saveSettings: saveVehicleTableSettings,
+    resetSettings: resetVehicleTableSettings,
+  } = useTableSettings("vehicles", defaultVehicleTableSettings);
 
   const [searchParams, setSearchParams] = useSearchParams();
   const searchText = searchParams.get("q") ?? "";
@@ -149,16 +167,21 @@ function Vehicles() {
         style={{ marginTop: 0, marginBottom: 10 }}
       >
         <h1 style={{ margin: 0 }}>{t("Breadcrumbs.VEHICLES")}</h1>
-        <RoleGuard allowedRoles={[USER_ROLES.ADMIN]}>
-          <Button
-            type="primary"
-            icon={<FileExcelOutlined />}
-            style={{ backgroundColor: "#217346" }} // Excel yeşili :)
-            onClick={handleExport}
-          >
-            {t("Common.EXPORT_EXCEL")}
+        <Flex gap={12} align="center">
+          <Button icon={<SettingOutlined />} onClick={() => setIsSettingsOpen(true)}>
+            {t("TableSettings.TITLE", "Table Settings")}
           </Button>
-        </RoleGuard>
+          <RoleGuard allowedRoles={[USER_ROLES.ADMIN]}>
+            <Button
+              type="primary"
+              icon={<FileExcelOutlined />}
+              style={{ backgroundColor: "#217346" }} // Excel yeşili :)
+              onClick={handleExport}
+            >
+              {t("Common.EXPORT_EXCEL")}
+            </Button>
+          </RoleGuard>
+        </Flex>
       </Flex>
       <Flex gap={isMobile ? 10 : 25} style={{ marginBottom: 20 }}>
         <Search
@@ -214,8 +237,24 @@ function Vehicles() {
             selectedRowKeys,
             onChange: setSelectedRowKeys,
           } : undefined}
+          settings={vehicleTableSettings}
         />
       )}
+
+      <TableSettingsModal
+        open={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+        onSave={(nextSettings) => {
+          saveVehicleTableSettings(nextSettings);
+          setIsSettingsOpen(false);
+        }}
+        onReset={() => {
+          resetVehicleTableSettings();
+          setIsSettingsOpen(false);
+        }}
+        settings={vehicleTableSettings}
+        columns={getVehicleTableSettingsOptions(t)}
+      />
 
       <VehicleModal
         isOpen={isModalOpen}

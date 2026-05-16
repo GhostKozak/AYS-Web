@@ -101,6 +101,16 @@
     "RELOAD": "Yenile"
   },
 
+  "TableSettings": {
+    "TITLE": "Tablo Ayarları",
+    "SHOW_HIDE_COLUMNS": "Sütunları göster/gizle",
+    "FONT_SIZE": "Yazı Boyutu",
+    "FONT_SIZE_SMALL": "Küçük",
+    "FONT_SIZE_NORMAL": "Normal",
+    "FONT_SIZE_LARGE": "Büyük",
+    "RESET_DEFAULTS": "Varsayılanları Sıfırla"
+  },
+
   "Table": {
     "CREATED_AT": "Oluşturulma Tarihi",
     "UPDATED_AT": "Güncellenme Tarihi",

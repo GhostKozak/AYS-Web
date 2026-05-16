@@ -101,6 +101,16 @@
     "RELOAD": "Reload"
   },
 
+  "TableSettings": {
+    "TITLE": "Table Settings",
+    "SHOW_HIDE_COLUMNS": "Show / hide columns",
+    "FONT_SIZE": "Font size",
+    "FONT_SIZE_SMALL": "Small",
+    "FONT_SIZE_NORMAL": "Normal",
+    "FONT_SIZE_LARGE": "Large",
+    "RESET_DEFAULTS": "Reset defaults"
+  },
+
   "Table": {
     "CREATED_AT": "Created At",
     "UPDATED_AT": "Updated At",

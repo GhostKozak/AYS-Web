@@ -1,6 +1,7 @@
 import { Table, Tag, Popconfirm, Button, Space, Tooltip } from "antd";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
-import { USER_ROLES, type TripType } from "../../../types";
+import { USER_ROLES, type TripType, type TableSettings } from "../../../types";
+import type { TFunction } from "i18next";
 import { Trans, useTranslation } from "react-i18next";
 import {
   formatLicencePlate,
@@ -12,12 +13,29 @@ import type { ColumnType } from "antd/es/table";
 import type { TableRowSelection } from "antd/es/table/interface";
 import { useAuth } from "../../../hooks/useAuth";
 
+export const getTripTableSettingsOptions = (t: TFunction) => [
+  { key: "arrival_time", title: t("Trips.ARRIVAL_TIME", "Arrival Time") },
+  { key: "departure_time", title: t("Trips.DEPARTURE_TIME", "Departure Time") },
+  { key: "driver", title: t("Trips.FULL_NAME", "Full Name") },
+  { key: "driver_phone", title: t("Trips.PHONE_NUMBER", "Phone Number") },
+  { key: "company", title: t("Trips.COMPANY_NAME", "Company Name") },
+  { key: "vehicle", title: t("Trips.LICENSE_PLATE", "License Plate") },
+  { key: "unload_status", title: t("Trips.UNLOAD_STATUS", "Unload Status") },
+  { key: "has_gps_tracking", title: t("Trips.GPS_TRACKING", "GPS Tracking") },
+  { key: "is_in_temporary_parking_lot", title: t("Trips.TEMP_PARKING", "Temporary Parking") },
+  { key: "is_in_parking_lot", title: t("Trips.IN_PARKING_LOT", "In Parking Lot") },
+  { key: "parked_at", title: t("Trips.PARKED_AT", "Parked At") },
+  { key: "is_trip_canceled", title: t("Trips.TRIP_CANCELED", "Trip Canceled") },
+  { key: "action", title: t("Table.ACTIONS", "Actions") },
+];
+
 type Props = {
   trips: TripType[];
   isLoading: boolean;
   onEdit: (c: TripType) => void;
   onDelete: (c: TripType) => void;
   rowSelection?: TableRowSelection<TripType>;
+  settings?: TableSettings;
 };
 
 // Defined outside component to avoid re-creating type on every render
@@ -31,10 +49,18 @@ export default function TripTable({
   onEdit,
   onDelete,
   rowSelection,
+  settings,
 }: Props) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const canEdit = user?.role === USER_ROLES.ADMIN || user?.role === USER_ROLES.EDITOR;
+  const fontSize = settings?.fontSize ?? "normal";
+  const fontSizeMap: Record<string, string> = {
+    small: "12px",
+    normal: "14px",
+    large: "20px",
+  };
+  const tableFontSize = fontSizeMap[fontSize] ?? fontSizeMap.normal;
 
   const filters = useMemo(() => {
     return {
@@ -287,36 +313,72 @@ export default function TripTable({
       Table.EXPAND_COLUMN,
     ];
 
-    return allColumns.filter((col) => col.visible !== false);
-  }, [t, filters, onEdit, onDelete, canEdit]);
+    const filtered = allColumns.filter((col) => col.visible !== false);
+    if (settings?.visibleColumns && settings.visibleColumns.length > 0) {
+      return filtered.filter((col) => {
+        const key = typeof col.key === "string" ? col.key : String(col.key);
+        return settings.visibleColumns?.includes(key);
+      });
+    }
+    return filtered;
+  }, [t, filters, onEdit, onDelete, canEdit, settings]);
 
   return (
-    <Table
-      columns={columns}
-      dataSource={trips}
-      loading={isLoading}
-      rowKey="_id"
-      rowSelection={rowSelection}
-      scroll={{ x: 1500 }}
-      pagination={{
-        showSizeChanger: true,
-        showQuickJumper: true,
-        showTotal: (total, range) =>
-          `${range[0]}-${range[1]} / ${total} ${t("Trips.TOTAL")}`,
-      }}
-      expandable={{
-        showExpandColumn: true,
-        expandRowByClick: true,
-        expandedRowRender: (record) => (
-          <div style={{ margin: 0 }}>
-            <p><strong>{t("Trips.NOTES")}:</strong> {record.notes}</p>
-            {record.parked_at && (
-              <p><strong>{t("Trips.PARKED_AT")}:</strong> {new Date(record.parked_at).toLocaleString("tr-TR")}</p>
-            )}
-          </div>
-        ),
-        rowExpandable: (record) => !!record.notes || !!record.parked_at,
-      }}
-    />
+    <div style={{ fontSize: tableFontSize }}>
+      <Table
+        style={{ fontSize: tableFontSize, lineHeight: 1.5 }}
+        components={{
+          header: {
+            cell: (cellProps: any) => (
+              <th
+                {...cellProps}
+                style={{
+                  ...cellProps?.style,
+                  fontSize: tableFontSize,
+                  lineHeight: 1.5,
+                }}
+              />
+            ),
+          },
+          body: {
+            cell: (cellProps: any) => (
+              <td
+                {...cellProps}
+                style={{
+                  ...cellProps?.style,
+                  fontSize: tableFontSize,
+                  lineHeight: 1.5,
+                }}
+              />
+            ),
+          },
+        }}
+        columns={columns}
+        dataSource={trips}
+        loading={isLoading}
+        rowKey="_id"
+        rowSelection={rowSelection}
+        scroll={{ x: 1500 }}
+        pagination={{
+          showSizeChanger: true,
+          showQuickJumper: true,
+          showTotal: (total, range) =>
+            `${range[0]}-${range[1]} / ${total} ${t("Trips.TOTAL")}`,
+        }}
+        expandable={{
+          showExpandColumn: true,
+          expandRowByClick: true,
+          expandedRowRender: (record) => (
+            <div style={{ margin: 0 }}>
+              <p><strong>{t("Trips.NOTES")}:</strong> {record.notes}</p>
+              {record.parked_at && (
+                <p><strong>{t("Trips.PARKED_AT")}:</strong> {new Date(record.parked_at).toLocaleString("tr-TR")}</p>
+              )}
+            </div>
+          ),
+          rowExpandable: (record) => !!record.notes || !!record.parked_at,
+        }}
+      />
+    </div>
   );
 }

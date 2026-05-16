@@ -10,15 +10,18 @@ import {
   PlusOutlined,
   SearchOutlined,
   DeleteOutlined,
+  SettingOutlined,
 } from "@ant-design/icons";
 
 import { USER_ROLES, type TripType } from "../../types";
 import { useIsMobile } from "../../hooks/useIsMobile";
 import { useTrips } from "../../hooks/useTrips";
-import TripTable from "./components/TripTable";
+import TripTable, { getTripTableSettingsOptions } from "./components/TripTable";
 import Search from "antd/es/input/Search";
 import TripCardList from "./components/TripCardList";
 import TripModal from "./components/TripModal";
+import { useTableSettings } from "../../hooks/useTableSettings";
+import TableSettingsModal from "../../components/TableSettingsModal";
 
 import { useCompanies } from "../../hooks/useCompanies";
 import { useVehicles } from "../../hooks/useVehicles";
@@ -37,6 +40,18 @@ function Trips() {
     setSearchParams(val ? { q: val } : {}, { replace: true });
 
   usePageTitle(t("Breadcrumbs.TRIPS"));
+
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const defaultTripTableSettings = React.useMemo(
+    () => ({
+      visibleColumns: getTripTableSettingsOptions(t).map((column) => String(column.key)),
+      fontSize: "normal" as const,
+    }),
+    [t],
+  );
+
+  const { settings: tripTableSettings, saveSettings: saveTripTableSettings, resetSettings: resetTripTableSettings } =
+    useTableSettings("trips", defaultTripTableSettings);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState<TripType | undefined>(
@@ -182,16 +197,21 @@ function Trips() {
         style={{ marginTop: 0, marginBottom: 10 }}
       >
         <h1 style={{ margin: 0 }}>{t("Breadcrumbs.TRIPS")}</h1>
-        <RoleGuard allowedRoles={[USER_ROLES.ADMIN]}>
-          <Button
-            type="primary"
-            icon={<FileExcelOutlined />}
-            style={{ backgroundColor: "#217346" }} // Excel yeşili :)
-            onClick={handleExport}
-          >
-            {t("Common.EXPORT_EXCEL")}
+        <Flex gap={12} align="center">
+          <Button icon={<SettingOutlined />} onClick={() => setIsSettingsOpen(true)}>
+            {t("TableSettings.TITLE", "Table Settings")}
           </Button>
-        </RoleGuard>
+          <RoleGuard allowedRoles={[USER_ROLES.ADMIN]}>
+            <Button
+              type="primary"
+              icon={<FileExcelOutlined />}
+              style={{ backgroundColor: "#217346" }} // Excel yeşili :)
+              onClick={handleExport}
+            >
+              {t("Common.EXPORT_EXCEL")}
+            </Button>
+          </RoleGuard>
+        </Flex>
       </Flex>
       <Flex gap={isMobile ? 10 : 25} style={{ marginBottom: 20 }}>
         <Search
@@ -247,8 +267,23 @@ function Trips() {
             selectedRowKeys,
             onChange: setSelectedRowKeys,
           } : undefined}
+          settings={tripTableSettings}
         />
       )}
+      <TableSettingsModal
+        open={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+        onSave={(nextSettings) => {
+          saveTripTableSettings(nextSettings);
+          setIsSettingsOpen(false);
+        }}
+        onReset={() => {
+          resetTripTableSettings();
+          setIsSettingsOpen(false);
+        }}
+        settings={tripTableSettings}
+        columns={getTripTableSettingsOptions(t)}
+      />
       <TripModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

@@ -136,6 +136,13 @@ export type DailyStat = {
 
 export type UserRole = 'admin' | 'editor' | 'viewer' | 'user';
 
+export type TableFontSize = 'small' | 'normal' | 'large';
+
+export interface TableSettings {
+  visibleColumns?: string[];
+  fontSize?: TableFontSize;
+}
+
 export interface LoginPayload {
   email: string;
   password: string;

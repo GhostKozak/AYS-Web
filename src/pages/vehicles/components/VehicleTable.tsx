@@ -1,12 +1,22 @@
 import { Table, Tag, Popconfirm, Button, Space } from "antd";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
-import { USER_ROLES, type VehicleType } from "../../../types";
+import { USER_ROLES, type VehicleType, type TableSettings } from "../../../types";
 import { Trans, useTranslation } from "react-i18next";
+import type { TFunction } from "i18next";
 import { formatLicencePlate, getUniqueOptions } from "../../../utils";
 import { useMemo } from "react";
 import type { ColumnType } from "antd/es/table";
 import type { TableRowSelection } from "antd/es/table/interface";
 import { useAuth } from "../../../hooks/useAuth";
+
+export const getVehicleTableSettingsOptions = (t: TFunction) => [
+  { key: "licence_plate", title: t("Vehicles.LICENSE_PLATE", "License Plate") },
+  { key: "vehicle_type", title: t("Vehicles.VEHICLE_TYPE", "Vehicle Type") },
+  { key: "createdAt", title: t("Table.CREATED_AT", "Created At") },
+  { key: "updatedAt", title: t("Table.UPDATED_AT", "Updated At") },
+  { key: "deleted", title: t("Table.STATUS", "Status") },
+  { key: "action", title: t("Table.ACTIONS", "Actions") },
+];
 
 type Props = {
   vehicles: VehicleType[];
@@ -14,6 +24,7 @@ type Props = {
   onEdit: (c: VehicleType) => void;
   onDelete: (c: VehicleType) => void;
   rowSelection?: TableRowSelection<VehicleType>;
+  settings?: TableSettings;
 };
 
 interface AuthenticatedColumnType extends ColumnType<VehicleType> {
@@ -26,6 +37,7 @@ export default function VehicleTable({
   onEdit,
   onDelete,
   rowSelection,
+  settings,
 }: Props) {
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -41,6 +53,14 @@ export default function VehicleTable({
       type: getUniqueOptions(vehicles, (v) => v.vehicle_type),
     };
   }, [vehicles]);
+
+  const fontSize = settings?.fontSize ?? "normal";
+  const fontSizeMap: Record<string, string> = {
+    small: "12px",
+    normal: "14px",
+    large: "20px",
+  };
+  const tableFontSize = fontSizeMap[fontSize] ?? fontSizeMap.normal;
 
   const columns = useMemo(() => {
     const allColumns: AuthenticatedColumnType[] = [
@@ -133,22 +153,58 @@ export default function VehicleTable({
       },
     ];
 
-    return allColumns.filter((col) => col.visible !== false);
-  }, [t, filters, onEdit, onDelete, canEdit]);
+    const filtered = allColumns.filter((col) => col.visible !== false);
+    if (settings?.visibleColumns && settings.visibleColumns.length > 0) {
+      return filtered.filter((col) => {
+        const key = typeof col.key === "string" ? col.key : String(col.key);
+        return settings.visibleColumns?.includes(key);
+      });
+    }
+    return filtered;
+  }, [t, filters, onEdit, onDelete, canEdit, settings]);
 
   return (
-    <Table
-      columns={columns}
-      dataSource={vehicles}
-      loading={isLoading}
-      rowKey="_id"
-      rowSelection={rowSelection}
-      pagination={{
-        showSizeChanger: true,
-        showQuickJumper: true,
-        showTotal: (total, range) =>
-          `${range[0]}-${range[1]} / ${total} ${t("Vehicles.TOTAL")}`,
-      }}
-    />
+    <div style={{ fontSize: tableFontSize }}>
+      <Table
+        style={{ fontSize: tableFontSize, lineHeight: 1.5 }}
+        components={{
+          header: {
+            cell: (cellProps: any) => (
+              <th
+                {...cellProps}
+                style={{
+                  ...cellProps?.style,
+                  fontSize: tableFontSize,
+                  lineHeight: 1.5,
+                }}
+              />
+            ),
+          },
+          body: {
+            cell: (cellProps: any) => (
+              <td
+                {...cellProps}
+                style={{
+                  ...cellProps?.style,
+                  fontSize: tableFontSize,
+                  lineHeight: 1.5,
+                }}
+              />
+            ),
+          },
+        }}
+        columns={columns}
+        dataSource={vehicles}
+        loading={isLoading}
+        rowKey="_id"
+        rowSelection={rowSelection}
+        pagination={{
+          showSizeChanger: true,
+          showQuickJumper: true,
+          showTotal: (total, range) =>
+            `${range[0]}-${range[1]} / ${total} ${t("Vehicles.TOTAL")}`,
+        }}
+      />
+    </div>
   );
 }

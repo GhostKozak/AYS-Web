@@ -10,13 +10,16 @@ import {
   PlusOutlined,
   SearchOutlined,
   DeleteOutlined,
+  SettingOutlined,
 } from "@ant-design/icons";
 
 import { useCompanies } from "../../hooks/useCompanies";
 import { useDrivers } from "../../hooks/useDrivers";
 import DriverModal from "./components/DriverModal";
 import { USER_ROLES, type DriverType } from "../../types";
-import DriverTable from "./components/DriverTable";
+import DriverTable, { getDriverTableSettingsOptions } from "./components/DriverTable";
+import { useTableSettings } from "../../hooks/useTableSettings";
+import TableSettingsModal from "../../components/TableSettingsModal";
 import { useIsMobile } from "../../hooks/useIsMobile";
 import DriverCardList from "./components/DriverCardList";
 import { exportDriversToExcel } from "../../utils/excel.utils";
@@ -26,6 +29,18 @@ import { useAuth } from "../../hooks/useAuth";
 function Drivers() {
   const { t } = useTranslation();
   const { notification } = App.useApp();
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
+  const defaultDriverTableSettings = React.useMemo(
+    () => ({
+      visibleColumns: getDriverTableSettingsOptions(t).map((column) => String(column.key)),
+      fontSize: "normal" as const,
+    }),
+    [t],
+  );
+
+  const { settings: driverTableSettings, saveSettings: saveDriverTableSettings, resetSettings: resetDriverTableSettings } =
+    useTableSettings("drivers", defaultDriverTableSettings);
 
   const [searchParams, setSearchParams] = useSearchParams();
   const searchText = searchParams.get("q") ?? "";
@@ -150,16 +165,21 @@ function Drivers() {
         style={{ marginTop: 0, marginBottom: 10 }}
       >
         <h1 style={{ margin: 0 }}>{t("Breadcrumbs.DRIVERS")}</h1>
-        <RoleGuard allowedRoles={[USER_ROLES.ADMIN]}>
-          <Button
-            type="primary"
-            icon={<FileExcelOutlined />}
-            style={{ backgroundColor: "#217346" }} // Excel yeşili :)
-            onClick={handleExport}
-          >
-            {t("Common.EXPORT_EXCEL")}
+        <Flex gap={12} align="center">
+          <Button icon={<SettingOutlined />} onClick={() => setIsSettingsOpen(true)}>
+            {t("TableSettings.TITLE", "Table Settings")}
           </Button>
-        </RoleGuard>
+          <RoleGuard allowedRoles={[USER_ROLES.ADMIN]}>
+            <Button
+              type="primary"
+              icon={<FileExcelOutlined />}
+              style={{ backgroundColor: "#217346" }} // Excel yeşili :)
+              onClick={handleExport}
+            >
+              {t("Common.EXPORT_EXCEL")}
+            </Button>
+          </RoleGuard>
+        </Flex>
       </Flex>
       <Flex gap={isMobile ? 10 : 25} style={{ marginBottom: 20 }}>
         <Search
@@ -215,8 +235,23 @@ function Drivers() {
             selectedRowKeys,
             onChange: setSelectedRowKeys,
           } : undefined}
+          settings={driverTableSettings}
         />
       )}
+      <TableSettingsModal
+        open={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+        onSave={(nextSettings) => {
+          saveDriverTableSettings(nextSettings);
+          setIsSettingsOpen(false);
+        }}
+        onReset={() => {
+          resetDriverTableSettings();
+          setIsSettingsOpen(false);
+        }}
+        settings={driverTableSettings}
+        columns={getDriverTableSettingsOptions(t)}
+      />
       <DriverModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
