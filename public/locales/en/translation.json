@@ -108,7 +108,17 @@
     "FONT_SIZE_SMALL": "Small",
     "FONT_SIZE_NORMAL": "Normal",
     "FONT_SIZE_LARGE": "Large",
-    "RESET_DEFAULTS": "Reset defaults"
+    "RESET_DEFAULTS": "Reset defaults",
+    "PRESETS": "Saved Presets",
+    "PRESET_NAME": "Preset Name",
+    "PRESET_NAME_PLACEHOLDER": "Enter preset name...",
+    "SAVE_PRESET": "Save Preset",
+    "NO_PRESETS": "No custom presets saved yet.",
+    "APPLY_PRESET_SUCCESS": "Preset applied successfully",
+    "SAVE_PRESET_SUCCESS": "Preset \"{{name}}\" saved successfully",
+    "DELETE_PRESET_SUCCESS": "Preset \"{{name}}\" deleted successfully",
+    "PRESET_ALREADY_EXISTS": "A preset with this name already exists",
+    "PRESET_NAME_EMPTY": "Preset name cannot be empty"
   },
 
   "Table": {

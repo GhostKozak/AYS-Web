@@ -283,6 +283,7 @@ function Trips() {
         }}
         settings={tripTableSettings}
         columns={getTripTableSettingsOptions(t)}
+        tableId="trips"
       />
       <TripModal
         isOpen={isModalOpen}

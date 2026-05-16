@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
-import { Modal, Checkbox, Radio, Space, Typography, Divider, Button } from "antd";
+import { Modal, Checkbox, Radio, Space, Typography, Divider, Button, Input, Tag, message } from "antd";
 import { useTranslation } from "react-i18next";
-import type { TableSettings } from "../types";
+import type { TableSettings, TableFontSize } from "../types";
+import { useAuth } from "../hooks/useAuth";
 
 const { Text } = Typography;
 
@@ -18,6 +19,12 @@ interface Props {
   onReset: () => void;
   settings: TableSettings;
   columns: ColumnOption[];
+  tableId: string;
+}
+
+interface PresetItem {
+  name: string;
+  settings: TableSettings;
 }
 
 export default function TableSettingsModal({
@@ -27,17 +34,103 @@ export default function TableSettingsModal({
   onReset,
   settings,
   columns,
+  tableId,
 }: Props) {
   const { t } = useTranslation();
+  const { user } = useAuth();
+  const userId = user?._id ?? null;
+
   const [selectedColumns, setSelectedColumns] = useState<string[]>(
     settings.visibleColumns ?? columns.map((column) => column.key),
   );
-  const [fontSize, setFontSize] = useState(settings.fontSize ?? "normal");
+  const [fontSize, setFontSize] = useState<TableFontSize>(settings.fontSize ?? "normal");
+
+  const [presets, setPresets] = useState<PresetItem[]>([]);
+  const [newPresetName, setNewPresetName] = useState("");
+
+  const storageKey = useMemo(
+    () => `table_presets:${userId ?? "guest"}:${tableId}`,
+    [userId, tableId]
+  );
 
   useEffect(() => {
     setSelectedColumns(settings.visibleColumns ?? columns.map((column) => column.key));
     setFontSize(settings.fontSize ?? "normal");
   }, [settings, columns]);
+
+  // Load presets
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem(storageKey);
+      if (stored) {
+        try {
+          setPresets(JSON.parse(stored) as PresetItem[]);
+        } catch {
+          setPresets([]);
+        }
+      } else {
+        setPresets([]);
+      }
+    }
+  }, [storageKey]);
+
+  const savePreset = () => {
+    const trimmedName = newPresetName.trim();
+    if (!trimmedName) {
+      message.error(t("TableSettings.PRESET_NAME_EMPTY", "Preset name cannot be empty"));
+      return;
+    }
+
+    if (presets.some((p) => p.name.toLowerCase() === trimmedName.toLowerCase())) {
+      message.error(
+        t("TableSettings.PRESET_ALREADY_EXISTS", "A preset with this name already exists")
+      );
+      return;
+    }
+
+    const newPreset: PresetItem = {
+      name: trimmedName,
+      settings: {
+        visibleColumns: selectedColumns,
+        fontSize,
+      },
+    };
+
+    const updatedPresets = [...presets, newPreset];
+    setPresets(updatedPresets);
+    localStorage.setItem(storageKey, JSON.stringify(updatedPresets));
+    setNewPresetName("");
+    message.success(
+      t("TableSettings.SAVE_PRESET_SUCCESS", {
+        defaultValue: `Preset "${trimmedName}" saved successfully`,
+        name: trimmedName,
+      })
+    );
+  };
+
+  const deletePreset = (nameToDelete: string) => {
+    const updatedPresets = presets.filter((p) => p.name !== nameToDelete);
+    setPresets(updatedPresets);
+    localStorage.setItem(storageKey, JSON.stringify(updatedPresets));
+    message.success(
+      t("TableSettings.DELETE_PRESET_SUCCESS", {
+        defaultValue: `Preset "${nameToDelete}" deleted successfully`,
+        name: nameToDelete,
+      })
+    );
+  };
+
+  const applyPreset = (preset: PresetItem) => {
+    if (preset.settings.visibleColumns) {
+      setSelectedColumns(preset.settings.visibleColumns);
+    }
+    if (preset.settings.fontSize) {
+      setFontSize(preset.settings.fontSize);
+    }
+    message.success(
+      t("TableSettings.APPLY_PRESET_SUCCESS", "Preset applied successfully")
+    );
+  };
 
   const checkboxOptions = useMemo(
     () =>
@@ -60,6 +153,76 @@ export default function TableSettingsModal({
       width={520}
       bodyStyle={{ paddingBottom: 16 }}
     >
+      {/* Presets Section */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 16 }}>
+        <Text strong style={{ fontSize: "1.05rem" }}>
+          {t("TableSettings.PRESETS", "Saved Presets")}
+        </Text>
+
+        {presets.length === 0 ? (
+          <Text type="secondary" style={{ fontSize: "0.85rem", fontStyle: "italic" }}>
+            {t("TableSettings.NO_PRESETS", "No custom presets saved yet.")}
+          </Text>
+        ) : (
+          <Space size={[8, 8]} wrap style={{ width: "100%", minHeight: 32 }}>
+            {presets.map((preset) => (
+              <Tag
+                key={preset.name}
+                closable
+                onClose={(e) => {
+                  e.preventDefault();
+                  deletePreset(preset.name);
+                }}
+                onClick={() => applyPreset(preset)}
+                style={{
+                  cursor: "pointer",
+                  padding: "6px 12px",
+                  borderRadius: "6px",
+                  fontSize: "0.9rem",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                  fontWeight: 500,
+                  border: "1px solid rgba(22, 119, 255, 0.2)",
+                  backgroundColor: "rgba(22, 119, 255, 0.05)",
+                  color: "#1677ff",
+                  transition: "all 0.2s ease-in-out",
+                  userSelect: "none",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = "rgba(22, 119, 255, 0.12)";
+                  e.currentTarget.style.borderColor = "#1677ff";
+                  e.currentTarget.style.transform = "translateY(-1px)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = "rgba(22, 119, 255, 0.05)";
+                  e.currentTarget.style.borderColor = "rgba(22, 119, 255, 0.2)";
+                  e.currentTarget.style.transform = "none";
+                }}
+              >
+                {preset.name}
+              </Tag>
+            ))}
+          </Space>
+        )}
+
+        <div style={{ display: "flex", gap: 8, width: "100%", alignItems: "center", marginTop: 4 }}>
+          <Input
+            placeholder={t("TableSettings.PRESET_NAME_PLACEHOLDER", "Enter preset name...")}
+            value={newPresetName}
+            onChange={(e) => setNewPresetName(e.target.value)}
+            onPressEnter={savePreset}
+            maxLength={30}
+            style={{ flex: 1 }}
+          />
+          <Button type="primary" onClick={savePreset}>
+            {t("TableSettings.SAVE_PRESET", "Save")}
+          </Button>
+        </div>
+      </div>
+
+      <Divider style={{ margin: "16px 0" }} />
+
       <Space
         orientation="horizontal"
         size="large"
@@ -91,7 +254,7 @@ export default function TableSettingsModal({
         </div>
       </Space>
 
-      <Button type="default" block onClick={onReset} style={{ marginTop : '1rem' }}> 
+      <Button type="default" block onClick={onReset} style={{ marginTop: '1rem' }}>
         {t("TableSettings.RESET_DEFAULTS", "Reset Defaults")}
       </Button>
     </Modal>

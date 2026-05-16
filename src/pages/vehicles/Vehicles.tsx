@@ -254,6 +254,7 @@ function Vehicles() {
         }}
         settings={vehicleTableSettings}
         columns={getVehicleTableSettingsOptions(t)}
+        tableId="vehicles"
       />
 
       <VehicleModal

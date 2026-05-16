@@ -251,6 +251,7 @@ function Drivers() {
         }}
         settings={driverTableSettings}
         columns={getDriverTableSettingsOptions(t)}
+        tableId="drivers"
       />
       <DriverModal
         isOpen={isModalOpen}

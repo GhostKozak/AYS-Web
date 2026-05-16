@@ -108,7 +108,17 @@
     "FONT_SIZE_SMALL": "Küçük",
     "FONT_SIZE_NORMAL": "Normal",
     "FONT_SIZE_LARGE": "Büyük",
-    "RESET_DEFAULTS": "Varsayılanları Sıfırla"
+    "RESET_DEFAULTS": "Varsayılanları Sıfırla",
+    "PRESETS": "Hazır Ayarlar",
+    "PRESET_NAME": "Hazır Ayar Adı",
+    "PRESET_NAME_PLACEHOLDER": "Hazır ayar adı girin...",
+    "SAVE_PRESET": "Kaydet",
+    "NO_PRESETS": "Henüz kayıtlı hazır ayar yok.",
+    "APPLY_PRESET_SUCCESS": "Hazır ayar başarıyla uygulandı",
+    "SAVE_PRESET_SUCCESS": "\"{{name}}\" hazır ayarı başarıyla kaydedildi",
+    "DELETE_PRESET_SUCCESS": "\"{{name}}\" hazır ayarı başarıyla silindi",
+    "PRESET_ALREADY_EXISTS": "Bu isimde bir hazır ayar zaten mevcut",
+    "PRESET_NAME_EMPTY": "Hazır ayar adı boş olamaz"
   },
 
   "Table": {

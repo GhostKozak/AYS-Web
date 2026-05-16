@@ -235,6 +235,7 @@ function Companies() {
         }}
         settings={companyTableSettings}
         columns={getCompanyTableSettingsOptions(t)}
+        tableId="companies"
       />
       <CompanyModal
         isOpen={isModalOpen}
