@@ -314,11 +314,22 @@
     "STATUS_COMPLETED": "Tamamlandı",
     "STATUS_CANCELED": "İptal Edildi",
     "STATUS_UNKNOWN": "Belirsiz",
+    "STATUS_PENDING": "Onay Bekliyor",
+    "FIELD_VERIFIED": "Saha Doğrulaması Tamamlandı",
+    "SEAL_NUMBER": "Mühür Numarası",
+    "FIELD_PHOTO": "Saha Fotoğrafı",
+    "FIELD_PHOTO_TITLE": "Saha Doğrulama Fotoğrafı",
+    "VIEW_PHOTO": "Fotoğrafı Gör",
     "CREATE_NEW_COMPANY": "Yeni firma oluştur: {{name}}",
     "CREATE_NEW_VEHICLE": "Yeni araç oluştur: {{plate}}",
     "CREATE_NEW_DRIVER": "Yeni sürücü oluştur: {{name}}",
     "NEW_DRIVER": "Yeni Sürücü Ekle",
-    "TEMP_PARKING_SHORT": "Kesik"
+    "TEMP_PARKING_SHORT": "Kesik",
+    "VERIFICATION_STATUS": "Doğrulama Durumu",
+    "FIELD_VERIFIED_AT": "Doğrulama Zamanı",
+    "VERIFY_PENDING": "Onay Bekliyor",
+    "VERIFY_CONFIRMED": "Doğrulandı",
+    "VERIFY_CANCELED": "İptal Edildi"
   },
 
   "Other": {
@@ -399,7 +410,23 @@
     "TAG_PARK": "Parkta",
     "LABEL_RAMP": "📍 Rampa / Antrepo Önü",
     "LABEL_PARK": "🅿️ Geçici Park Alanında",
-    "REFRESH_SUCCESS": "Veriler başarıyla yenilendi."
+    "REFRESH_SUCCESS": "Veriler başarıyla yenilendi.",
+    "TAB_VERIFICATION": "Giriş Bekleyenler",
+    "DO_VERIFY": "Fiziksel Doğrulama Yap",
+    "MODAL_TITLE": "Fiziksel Saha Doğrulaması",
+    "SEAL_NUMBER": "Mühür Numarası",
+    "SEAL_PLACEHOLDER": "Mühür numarası girin (örn. M1234, M5678)",
+    "PHOTO_UPLOAD": "Araç / Plaka Fotoğrafı",
+    "TAKE_PHOTO": "Kamerayı Aç & Fotoğraf Çek",
+    "TAKE_PHOTO_SUB": "Yalnızca anlık kamera görüntüsü kabul edilir",
+    "PHOTO_REQUIRED": "Fiziksel doğrulama için araç fotoğrafı çekilmesi zorunludur!",
+    "VERIFY_SUCCESS": "Araç saha doğrulaması başarıyla gönderildi.",
+    "FILE_SIZE_ERROR": "Dosya boyutu 5MB'ı aşamaz!",
+    "VERIFYING": "Doğrulanıyor...",
+    "PENDING_EMPTY": "Giriş onayı bekleyen araç bulunmuyor.",
+    "VERIFY_SUBMIT": "Doğrulamayı Gönder",
+    "SEAL_OPTIONAL": "(İsteğe Bağlı)",
+    "ARRIVAL": "Geliş Zamanı"
   },
 
   "Periods": {

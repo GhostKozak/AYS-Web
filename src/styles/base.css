@@ -59,3 +59,69 @@ input:-webkit-autofill:active {
         display: none !important;
     }
 }
+
+/* PENDING status row - soft yellowish glow */
+.row-pending-glow td {
+    background-color: rgba(250, 173, 20, 0.08) !important;
+    animation: pendingPulse 2.5s infinite ease-in-out;
+}
+
+@keyframes pendingPulse {
+    0% {
+        background-color: rgba(250, 173, 20, 0.06) !important;
+    }
+    50% {
+        background-color: rgba(250, 173, 20, 0.16) !important;
+    }
+    100% {
+        background-color: rgba(250, 173, 20, 0.06) !important;
+    }
+}
+
+/* VERIFIED status transition - fade-out green glow */
+.row-verified-glow td {
+    animation: verifiedGlow 3.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+@keyframes verifiedGlow {
+    0% {
+        background-color: rgba(82, 196, 26, 0.6) !important;
+        box-shadow: inset 0 0 12px rgba(82, 196, 26, 0.8);
+    }
+    15% {
+        background-color: rgba(82, 196, 26, 0.7) !important;
+        box-shadow: inset 0 0 16px rgba(82, 196, 26, 1);
+    }
+    100% {
+        background-color: rgba(82, 196, 26, 0.0) !important;
+        box-shadow: none;
+    }
+}
+
+/* Premium button hover glow effect */
+.btn-glow {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+.btn-glow::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -50%;
+    width: 200%;
+    height: 100%;
+    background: linear-gradient(
+        to right,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.3) 50%,
+        rgba(255, 255, 255, 0) 100%
+    );
+    transform: skewX(-25deg);
+    transition: 0.75s;
+    opacity: 0;
+}
+.btn-glow:hover::after {
+    left: 125%;
+    opacity: 1;
+}

@@ -314,11 +314,22 @@
     "STATUS_COMPLETED": "Completed",
     "STATUS_CANCELED": "Canceled",
     "STATUS_UNKNOWN": "Unknown",
+    "STATUS_PENDING": "Pending Verification",
+    "FIELD_VERIFIED": "Saha Doğrulaması Tamamlandı",
+    "SEAL_NUMBER": "Seal Number",
+    "FIELD_PHOTO": "Field Photo",
+    "FIELD_PHOTO_TITLE": "Field Verification Photo",
+    "VIEW_PHOTO": "View Photo",
     "CREATE_NEW_COMPANY": "Create new company: {{name}}",
     "CREATE_NEW_VEHICLE": "Create new vehicle: {{plate}}",
     "CREATE_NEW_DRIVER": "Create new driver: {{name}}",
     "NEW_DRIVER": "Add New Driver",
-    "TEMP_PARKING_SHORT": "Temp"
+    "TEMP_PARKING_SHORT": "Temp",
+    "VERIFICATION_STATUS": "Verification Status",
+    "FIELD_VERIFIED_AT": "Verified At",
+    "VERIFY_PENDING": "Pending",
+    "VERIFY_CONFIRMED": "Verified",
+    "VERIFY_CANCELED": "Canceled"
   },
 
   "Other": {
@@ -399,7 +410,23 @@
     "TAG_PARK": "Parked",
     "LABEL_RAMP": "📍 Ramp / Warehouse Front",
     "LABEL_PARK": "🅿️ Temporary Parking Area",
-    "REFRESH_SUCCESS": "Data refreshed successfully."
+    "REFRESH_SUCCESS": "Data refreshed successfully.",
+    "TAB_VERIFICATION": "Pending Verification",
+    "DO_VERIFY": "Verify Physical Entrance",
+    "MODAL_TITLE": "Physical Field Verification",
+    "SEAL_NUMBER": "Seal Number",
+    "SEAL_PLACEHOLDER": "Enter seal number (e.g. M1234, M5678)",
+    "PHOTO_UPLOAD": "Vehicle / License Plate Photo",
+    "TAKE_PHOTO": "Open Camera & Take Photo",
+    "TAKE_PHOTO_SUB": "Only live camera capture is accepted",
+    "PHOTO_REQUIRED": "Taking a vehicle photo is mandatory for verification!",
+    "VERIFY_SUCCESS": "Physical verification completed successfully.",
+    "FILE_SIZE_ERROR": "File size cannot exceed 5MB!",
+    "VERIFYING": "Verifying...",
+    "PENDING_EMPTY": "No vehicles waiting for entrance verification.",
+    "VERIFY_SUBMIT": "Submit Verification",
+    "SEAL_OPTIONAL": "(Optional)",
+    "ARRIVAL": "Arrival Time"
   },
 
   "Periods": {

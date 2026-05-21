@@ -1,5 +1,5 @@
-import { Table, Tag, Popconfirm, Button, Space, Tooltip } from "antd";
-import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import { Table, Tag, Popconfirm, Button, Space, Tooltip, Modal, Image } from "antd";
+import { DeleteOutlined, EditOutlined, CameraOutlined } from "@ant-design/icons";
 import { USER_ROLES, type TripType, type TableSettings } from "../../../types";
 import type { TFunction } from "i18next";
 import { Trans, useTranslation } from "react-i18next";
@@ -8,24 +8,25 @@ import {
   formatPhoneNumber,
   getUniqueOptions,
 } from "../../../utils";
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import type { ColumnType } from "antd/es/table";
 import type { TableRowSelection } from "antd/es/table/interface";
 import { useAuth } from "../../../hooks/useAuth";
 
 export const getTripTableSettingsOptions = (t: TFunction) => [
-  { key: "arrival_time", title: t("Trips.ARRIVAL_TIME", "Arrival Time") },
-  { key: "departure_time", title: t("Trips.DEPARTURE_TIME", "Departure Time") },
+  { key: "time_range", title: t("Trips.ARRIVAL_TIME", "Arrival Time") },
   { key: "driver", title: t("Trips.FULL_NAME", "Full Name") },
-  { key: "driver_phone", title: t("Trips.PHONE_NUMBER", "Phone Number") },
   { key: "company", title: t("Trips.COMPANY_NAME", "Company Name") },
   { key: "vehicle", title: t("Trips.LICENSE_PLATE", "License Plate") },
   { key: "unload_status", title: t("Trips.UNLOAD_STATUS", "Unload Status") },
   { key: "has_gps_tracking", title: t("Trips.GPS_TRACKING", "GPS Tracking") },
-  { key: "is_in_temporary_parking_lot", title: t("Trips.TEMP_PARKING", "Temporary Parking") },
-  { key: "is_in_parking_lot", title: t("Trips.IN_PARKING_LOT", "In Parking Lot") },
-  { key: "parked_at", title: t("Trips.PARKED_AT", "Parked At") },
-  { key: "is_trip_canceled", title: t("Trips.TRIP_CANCELED", "Trip Canceled") },
+  { key: "location", title: t("Trips.IN_PARKING_LOT", "Location") },
+  { key: "status", title: t("Trips.VERIFICATION_STATUS", "Verification Status") },
+  { key: "seal_number", title: t("Trips.SEAL_NUMBER", "Seal Number") },
+  { key: "field_photo_path", title: t("Trips.FIELD_PHOTO", "Field Photo") },
+  { key: "field_verified_at", title: t("Trips.FIELD_VERIFIED_AT", "Verified At") },
+  { key: "createdAt", title: t("Table.CREATED_AT", "Created At") },
+  { key: "updatedAt", title: t("Table.UPDATED_AT", "Updated At") },
   { key: "action", title: t("Table.ACTIONS", "Actions") },
 ];
 
@@ -38,7 +39,6 @@ type Props = {
   settings?: TableSettings;
 };
 
-// Defined outside component to avoid re-creating type on every render
 interface AuthenticatedColumnType extends ColumnType<TripType> {
   visible?: boolean;
 }
@@ -61,6 +61,45 @@ export default function TripTable({
     large: "20px",
   };
   const tableFontSize = fontSizeMap[fontSize] ?? fontSizeMap.normal;
+
+  const [photoModalOpen, setPhotoModalOpen] = useState(false);
+  const [selectedPhoto, setSelectedPhoto] = useState<string>("");
+  const [glowingRowIds, setGlowingRowIds] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    const handleTripVerified = (event: Event) => {
+      const tripId = (event as CustomEvent<string>).detail;
+      if (tripId) {
+        setGlowingRowIds((prev) => new Set(prev).add(tripId));
+        setTimeout(() => {
+          setGlowingRowIds((prev) => {
+            const next = new Set(prev);
+            next.delete(tripId);
+            return next;
+          });
+        }, 3500);
+      }
+    };
+
+    window.addEventListener("trip-verified", handleTripVerified);
+    return () => window.removeEventListener("trip-verified", handleTripVerified);
+  }, []);
+
+  const getRowClassName = (record: TripType) => {
+    const classes: string[] = [];
+    if (record.status === "PENDING") {
+      classes.push("row-pending-glow");
+    }
+    if (glowingRowIds.has(record._id)) {
+      classes.push("row-verified-glow");
+    }
+    return classes.join(" ");
+  };
+
+  const openPhotoModal = (photoUrl: string) => {
+    setSelectedPhoto(photoUrl);
+    setPhotoModalOpen(true);
+  };
 
   const filters = useMemo(() => {
     return {
@@ -94,60 +133,61 @@ export default function TripTable({
     const allColumns: AuthenticatedColumnType[] = [
       {
         title: t("Trips.ARRIVAL_TIME"),
-        dataIndex: "arrival_time",
-        key: "arrival_time",
-        render: (date: string) =>
-          date
-            ? new Date(date).toLocaleString("tr-TR", {
-                year: "numeric",
-                month: "2-digit",
-                day: "2-digit",
-                hour: "2-digit",
-                minute: "2-digit",
-              })
-            : "-",
+        key: "time_range",
+        render: (_: unknown, record) => (
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+              <span style={{ fontSize: "0.75em", color: "#52c41a" }}>▼</span>
+              <span>
+                {record.arrival_time
+                  ? new Date(record.arrival_time).toLocaleString("tr-TR", {
+                      month: "2-digit",
+                      day: "2-digit",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })
+                  : "-"}
+              </span>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 2 }}>
+              <span style={{ fontSize: "0.75em", color: "#ff4d4f" }}>▲</span>
+              <span style={{ color: record.departure_time ? "inherit" : "#888" }}>
+                {record.departure_time
+                  ? new Date(record.departure_time).toLocaleString("tr-TR", {
+                      month: "2-digit",
+                      day: "2-digit",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })
+                  : "-"}
+              </span>
+            </div>
+          </div>
+        ),
         filters: filters.arrivalDate,
         onFilter: (value, record) => {
           if (!record.arrival_time) return false;
-          return (
-            new Date(record.arrival_time).toLocaleDateString("tr-TR") === value
-          );
+          return new Date(record.arrival_time).toLocaleDateString("tr-TR") === value;
         },
         filterSearch: true,
-        width: 150,
-      },
-      {
-        title: t("Trips.DEPARTURE_TIME"),
-        dataIndex: "departure_time",
-        key: "departure_time",
-        render: (date: string) =>
-          date
-            ? new Date(date).toLocaleString("tr-TR", {
-                year: "numeric",
-                month: "2-digit",
-                day: "2-digit",
-                hour: "2-digit",
-                minute: "2-digit",
-              })
-            : "-",
-        width: 150,
+        width: 140,
       },
       {
         title: t("Trips.FULL_NAME"),
         dataIndex: ["driver", "full_name"],
         key: "driver",
+        render: (_: string, record) => (
+          <div>
+            <div style={{ fontWeight: 500 }}>{record.driver?.full_name || "-"}</div>
+            <div style={{ fontSize: "0.85em", color: "#888" }}>
+              {formatPhoneNumber(record.driver?.phone_number ?? "") || ""}
+            </div>
+          </div>
+        ),
         filters: filters.driverName,
         onFilter: (value, record) => record.driver?.full_name === value,
         filterSearch: true,
-      },
-      {
-        title: t("Trips.PHONE_NUMBER"),
-        dataIndex: ["driver", "phone_number"],
-        key: "driver_phone",
-        render: (phoneNumber: string) => formatPhoneNumber(phoneNumber) || "-",
-        filters: filters.driverPhone,
-        onFilter: (value, record) => record.driver?.phone_number === value,
-        filterSearch: true,
+        width: 180,
       },
       {
         title: t("Trips.COMPANY_NAME"),
@@ -180,6 +220,7 @@ export default function TripTable({
             UNLOADED: "success",
             COMPLETED: "success",
             CANCELED: "error",
+            PENDING: "warning",
           };
 
           return (
@@ -195,6 +236,7 @@ export default function TripTable({
           { text: t("Trips.STATUS_UNLOADED"), value: "UNLOADED" },
           { text: t("Trips.STATUS_COMPLETED"), value: "COMPLETED" },
           { text: t("Trips.STATUS_CANCELED"), value: "CANCELED" },
+          { text: t("Trips.STATUS_PENDING"), value: "PENDING" },
         ],
         onFilter: (value, record) => record.unload_status === value,
       },
@@ -214,67 +256,145 @@ export default function TripTable({
         onFilter: (value, record) => record.has_gps_tracking === value,
       },
       {
-        title: (
-          <Tooltip title={t("Trips.TEMP_PARKING")}>
-            <span>KK</span>
-          </Tooltip>
-        ),
-        dataIndex: "is_in_temporary_parking_lot",
-        key: "is_in_temporary_parking_lot",
-        render: (val: boolean) => (val ? <Tag color="green">{t("Trips.TEMP_PARKING_SHORT", { defaultValue: "Kesik" })}</Tag> : null),
+        title: t("Trips.IN_PARKING_LOT"),
+        key: "location",
+        render: (_: unknown, record) => {
+          if (record.is_trip_canceled) {
+            return <Tag color="red">{t("Common.CANCEL")}</Tag>;
+          }
+          if (record.is_in_temporary_parking_lot) {
+            return (
+              <div>
+                <Tag color="green">{t("Trips.TEMP_PARKING_SHORT", { defaultValue: "Kesik" })}</Tag>
+                {record.parked_at && (
+                  <div style={{ fontSize: "0.8em", color: "#888" }}>
+                    {new Date(record.parked_at).toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" })}
+                  </div>
+                )}
+              </div>
+            );
+          }
+          if (record.is_in_parking_lot) {
+            return <Tag color="blue">{t("FieldOps.TAG_PARK")}</Tag>;
+          }
+          return "-";
+        },
         filters: [
-          { text: t("Trips.TEMP_PARKING_SHORT", { defaultValue: "Kesik" }), value: true },
-          { text: t("Common.NO"), value: false },
+          { text: t("Trips.TEMP_PARKING_SHORT", { defaultValue: "Kesik" }), value: "temp" },
+          { text: t("FieldOps.TAG_PARK"), value: "park" },
+          { text: t("Common.CANCEL"), value: "canceled" },
         ],
-        onFilter: (value, record) =>
-          record.is_in_temporary_parking_lot === value,
+        onFilter: (value, record) => {
+          if (value === "temp") return record.is_in_temporary_parking_lot;
+          if (value === "park") return record.is_in_parking_lot && !record.is_in_temporary_parking_lot;
+          if (value === "canceled") return record.is_trip_canceled;
+          return true;
+        },
+        width: 120,
       },
       {
-        title: (
-          <Tooltip title={t("Trips.IN_PARKING_LOT")}>
-            <span>P</span>
-          </Tooltip>
-        ),
-        dataIndex: "is_in_parking_lot",
-        key: "is_in_parking_lot",
-        render: (val: boolean) => (val ? <Tag color="blue">{t("FieldOps.TAG_PARK")}</Tag> : null),
-        filters: [
-          { text: t("FieldOps.TAG_PARK"), value: true },
-          { text: t("Common.NO"), value: false },
-        ],
-        onFilter: (value, record) => record.is_in_parking_lot === value,
+        title: t("Trips.SEAL_NUMBER"),
+        dataIndex: "seal_number",
+        key: "seal_number",
+        render: (val: string) => val || "-",
+        width: 140,
       },
       {
-        title: t("Trips.PARKED_AT"),
-        dataIndex: "parked_at",
-        key: "parked_at",
+        title: t("Trips.VERIFICATION_STATUS"),
+        dataIndex: "status",
+        key: "status",
+        render: (val: string) => {
+          if (!val) return "-";
+          const colorMap: Record<string, string> = {
+            PENDING: "orange",
+            CONFIRMED: "green",
+            CANCELED: "red",
+          };
+          return (
+            <Tag color={colorMap[val] || "default"}>
+              {t(`Trips.VERIFY_${val}`)}
+            </Tag>
+          );
+        },
+        filters: [
+          { text: t("Trips.VERIFY_PENDING"), value: "PENDING" },
+          { text: t("Trips.VERIFY_CONFIRMED"), value: "CONFIRMED" },
+          { text: t("Trips.VERIFY_CANCELED"), value: "CANCELED" },
+        ],
+        onFilter: (value, record) => record.status === value,
+        width: 130,
+      },
+      {
+        title: t("Trips.FIELD_PHOTO"),
+        dataIndex: "field_photo_path",
+        key: "field_photo_path",
+        render: (val: string) =>
+          val ? (
+            <Tooltip title={t("Trips.VIEW_PHOTO")}>
+              <Button
+                type="text"
+                icon={<CameraOutlined style={{ color: "#1890ff" }} />}
+                onClick={() => openPhotoModal(val)}
+              />
+            </Tooltip>
+          ) : (
+            "-"
+          ),
+        width: 100,
+      },
+      {
+        title: t("Trips.FIELD_VERIFIED_AT"),
+        dataIndex: "field_verified_at",
+        key: "field_verified_at",
         render: (date: string) =>
           date
             ? new Date(date).toLocaleString("tr-TR", {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
                 hour: "2-digit",
                 minute: "2-digit",
               })
             : "-",
-        width: 100,
+        width: 150,
       },
       {
-        title: t("Trips.TRIP_CANCELED"),
-        dataIndex: "is_trip_canceled",
-        key: "is_trip_canceled",
-        render: (val: boolean) =>
-          val ? <Tag color="red">{t("Common.CANCEL")}</Tag> : null,
-        filters: [
-          { text: t("Common.CANCEL"), value: true },
-          { text: t("Common.NO"), value: false },
-        ],
-        onFilter: (value, record) => record.is_trip_canceled === value,
+        title: t("Table.CREATED_AT"),
+        dataIndex: "createdAt",
+        key: "createdAt",
+        render: (date: string) =>
+          date
+            ? new Date(date).toLocaleString("tr-TR", {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit",
+              })
+            : "-",
+        width: 150,
+      },
+      {
+        title: t("Table.UPDATED_AT"),
+        dataIndex: "updatedAt",
+        key: "updatedAt",
+        render: (date: string) =>
+          date
+            ? new Date(date).toLocaleString("tr-TR", {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit",
+              })
+            : "-",
+        width: 150,
       },
       {
         title: t("Table.ACTIONS"),
         key: "action",
         fixed: "right",
         width: 200,
-        // Only show action column for users who can edit
         visible: canEdit,
         render: (_: any, record: TripType) => (
           <Space>
@@ -358,6 +478,7 @@ export default function TripTable({
         loading={isLoading}
         rowKey="_id"
         rowSelection={rowSelection}
+        rowClassName={getRowClassName}
         scroll={{ x: 1500 }}
         pagination={{
           showSizeChanger: true,
@@ -374,11 +495,32 @@ export default function TripTable({
               {record.parked_at && (
                 <p><strong>{t("Trips.PARKED_AT")}:</strong> {new Date(record.parked_at).toLocaleString("tr-TR")}</p>
               )}
+              {record.seal_number && (
+                <p><strong>{t("Trips.SEAL_NUMBER")}:</strong> {record.seal_number}</p>
+              )}
+              {record.field_verified_at && (
+                <p><strong>{t("Trips.FIELD_VERIFIED_AT")}:</strong> {new Date(record.field_verified_at).toLocaleString("tr-TR")}</p>
+              )}
             </div>
           ),
-          rowExpandable: (record) => !!record.notes || !!record.parked_at,
+          rowExpandable: (record) => !!record.notes || !!record.parked_at || !!record.seal_number || !!record.field_verified_at,
         }}
       />
+
+      <Modal
+        title={t("Trips.FIELD_PHOTO_TITLE")}
+        open={photoModalOpen}
+        onCancel={() => setPhotoModalOpen(false)}
+        footer={null}
+        width="auto"
+      >
+        <Image
+          src={selectedPhoto}
+          alt={t("Trips.FIELD_PHOTO")}
+          style={{ width: "100%", maxHeight: "80vh", objectFit: "contain" }}
+          preview={false}
+        />
+      </Modal>
     </div>
   );
 }

@@ -38,11 +38,11 @@ export const VehicleValues: VehicleTypeEnum[] = [
 ];
 
 
-export type TripStatus = 'WAITING' | 'UNLOADING' | 'UNLOADED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELED';
+export type TripStatus = 'WAITING' | 'UNLOADING' | 'UNLOADED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELED' | 'PENDING';
 
 export interface TripType {
   _id: string;
-  driver: Pick<DriverType, '_id' | 'full_name' | 'phone_number'>;
+  driver: Pick<DriverType, '_id' | 'full_name' | 'phone_number'> | null;
   company: Pick<CompanyType, '_id' | 'name'>;
   vehicle: Pick<VehicleType, '_id' | 'licence_plate'>;
   departure_time: string;
@@ -58,6 +58,12 @@ export interface TripType {
   createdAt: string;
   updatedAt: string;
   __v: number;
+  seal_number?: string;
+  field_photo_path?: string;
+  status?: 'PENDING' | 'CONFIRMED' | 'CANCELED';
+  field_verified_at?: string;
+  driver_full_name?: string;
+  driver_phone_number?: string;
 }
 
 export interface CreateTripPayload {

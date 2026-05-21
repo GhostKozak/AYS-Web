@@ -21,5 +21,28 @@ export const tripApi = {
   delete: async (id: string) => {
     const response = await apiClient.delete(`${API_ENDPOINTS.TRIPS}/${id}`);
     return response.data;
+  },
+
+  getPendingVerification: async () => {
+    const response = await apiClient.get(`${API_ENDPOINTS.TRIPS}/pending-verification`);
+    return response.data.data ?? response.data;
+  },
+
+  fieldVerify: async (id: string, photo: File, sealNumber?: string) => {
+    const formData = new FormData();
+    formData.append("photo", photo);
+    if (sealNumber) {
+      formData.append("seal_number", sealNumber);
+    }
+    const response = await apiClient.post(
+      `${API_ENDPOINTS.TRIPS}/${id}/field-verify`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    return response.data;
   }
 };

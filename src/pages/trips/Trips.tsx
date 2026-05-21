@@ -44,10 +44,19 @@ function Trips() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const defaultTripTableSettings = React.useMemo(
     () => ({
-      visibleColumns: getTripTableSettingsOptions(t).map((column) => String(column.key)),
+      visibleColumns: [
+        "time_range",
+        "driver",
+        "company",
+        "vehicle",
+        "unload_status",
+        "location",
+        "status",
+        "action",
+      ],
       fontSize: "normal" as const,
     }),
-    [t],
+    [],
   );
 
   const { settings: tripTableSettings, saveSettings: saveTripTableSettings, resetSettings: resetTripTableSettings } =

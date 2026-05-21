@@ -1,19 +1,19 @@
 import { useState, useEffect } from "react";
-import { useCrud } from "./useCrud";
+import { useQuery } from "@tanstack/react-query";
 import { tripApi } from "../api/tripApi";
-import { type CreateTripPayload, type TripType } from "../types";
+import { type TripType } from "../types";
 import { socket } from "../utils/socket";
 
-export const useTrips = () => {
+export const usePendingTrips = () => {
   const [pollingInterval, setPollingInterval] = useState<number>(30000);
 
   useEffect(() => {
     const updateInterval = () => {
       if (socket.connected) {
-        console.log("[useTrips] WebSocket active: set polling to 30s");
+        console.log("[usePendingTrips] WebSocket active: set polling to 30s");
         setPollingInterval(30000);
       } else {
-        console.log("[useTrips] WebSocket inactive: active polling fallback at 12s");
+        console.log("[usePendingTrips] WebSocket inactive: active polling fallback at 12s");
         setPollingInterval(12000); // 12 seconds active polling
       }
     };
@@ -28,22 +28,17 @@ export const useTrips = () => {
     };
   }, []);
 
-  const { data, isLoading, isError, refetch, create, update, remove } = useCrud<
-    TripType,
-    CreateTripPayload
-  >(tripApi, {
-    queryKey: ["trips"],
+  const { data = [], isLoading, isError, refetch } = useQuery<TripType[]>({
+    queryKey: ["pending-trips"],
+    queryFn: tripApi.getPendingVerification,
     refetchInterval: pollingInterval,
     refetchIntervalInBackground: true,
   });
 
   return {
-    trips: data,
+    pendingTrips: data,
     isLoading,
     isError,
     refetch,
-    createTrip: create,
-    updateTrip: update,
-    deleteTrip: remove,
   };
 };
