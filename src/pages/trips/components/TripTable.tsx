@@ -16,6 +16,7 @@ import { useAuth } from "../../../hooks/useAuth";
 export const getTripTableSettingsOptions = (t: TFunction) => [
   { key: "time_range", title: t("Trips.ARRIVAL_TIME", "Arrival Time") },
   { key: "driver", title: t("Trips.FULL_NAME", "Full Name") },
+  { key: "driver_phone", title: t("Trips.PHONE_NUMBER", "Phone Number") },
   { key: "company", title: t("Trips.COMPANY_NAME", "Company Name") },
   { key: "vehicle", title: t("Trips.LICENSE_PLATE", "License Plate") },
   { key: "unload_status", title: t("Trips.UNLOAD_STATUS", "Unload Status") },
@@ -171,6 +172,7 @@ export default function TripTable({
         },
         filterSearch: true,
         width: 140,
+        sorter: (a, b) => new Date(a.arrival_time || 0).getTime() - new Date(b.arrival_time || 0).getTime(),
       },
       {
         title: t("Trips.FULL_NAME"),
@@ -188,6 +190,17 @@ export default function TripTable({
         onFilter: (value, record) => record.driver?.full_name === value,
         filterSearch: true,
         width: 180,
+        sorter: (a, b) => (a.driver?.full_name || "").localeCompare(b.driver?.full_name || ""),
+      },
+      {
+        title: t("Trips.PHONE_NUMBER"),
+        dataIndex: ["driver", "phone_number"],
+        key: "driver_phone",
+        render: (phoneNumber: string) => formatPhoneNumber(phoneNumber) || "-",
+        filters: filters.driverPhone,
+        onFilter: (value, record) => record.driver?.phone_number === value,
+        filterSearch: true,
+        width: 150,
       },
       {
         title: t("Trips.COMPANY_NAME"),
@@ -254,6 +267,7 @@ export default function TripTable({
           { text: t("Common.NO"), value: false },
         ],
         onFilter: (value, record) => record.has_gps_tracking === value,
+        sorter: (a, b) => Number(a.has_gps_tracking) - Number(b.has_gps_tracking),
       },
       {
         title: t("Trips.IN_PARKING_LOT"),
@@ -291,6 +305,15 @@ export default function TripTable({
           return true;
         },
         width: 120,
+        sorter: (a, b) => {
+          const getOrder = (r: TripType) => {
+            if (r.is_trip_canceled) return 0;
+            if (r.is_in_temporary_parking_lot) return 1;
+            if (r.is_in_parking_lot) return 2;
+            return 3;
+          };
+          return getOrder(a) - getOrder(b);
+        },
       },
       {
         title: t("Trips.SEAL_NUMBER"),
@@ -298,6 +321,13 @@ export default function TripTable({
         key: "seal_number",
         render: (val: string) => val || "-",
         width: 140,
+        filters: trips
+          .filter((t) => t.seal_number)
+          .map((t) => ({ text: t.seal_number as string, value: t.seal_number as string }))
+          .filter((v, i, arr) => arr.findIndex((x) => x.value === v.value) === i),
+        onFilter: (value, record) => record.seal_number === value,
+        filterSearch: true,
+        sorter: (a, b) => (a.seal_number || "").localeCompare(b.seal_number || ""),
       },
       {
         title: t("Trips.VERIFICATION_STATUS"),
@@ -323,6 +353,7 @@ export default function TripTable({
         ],
         onFilter: (value, record) => record.status === value,
         width: 130,
+        sorter: (a, b) => (a.status || "").localeCompare(b.status || ""),
       },
       {
         title: t("Trips.FIELD_PHOTO"),
@@ -341,6 +372,12 @@ export default function TripTable({
             "-"
           ),
         width: 100,
+        filters: [
+          { text: t("Common.YES"), value: true },
+          { text: t("Common.NO"), value: false },
+        ],
+        onFilter: (value, record) =>
+          value ? !!record.field_photo_path : !record.field_photo_path,
       },
       {
         title: t("Trips.FIELD_VERIFIED_AT"),
@@ -357,6 +394,13 @@ export default function TripTable({
               })
             : "-",
         width: 150,
+        filters: [
+          { text: t("Common.YES"), value: true },
+          { text: t("Common.NO"), value: false },
+        ],
+        onFilter: (value, record) =>
+          value ? !!record.field_verified_at : !record.field_verified_at,
+        sorter: (a, b) => new Date(a.field_verified_at || 0).getTime() - new Date(b.field_verified_at || 0).getTime(),
       },
       {
         title: t("Table.CREATED_AT"),
@@ -373,6 +417,8 @@ export default function TripTable({
               })
             : "-",
         width: 150,
+        visible: user?.role === USER_ROLES.ADMIN,
+        sorter: (a, b) => new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime(),
       },
       {
         title: t("Table.UPDATED_AT"),
@@ -389,6 +435,8 @@ export default function TripTable({
               })
             : "-",
         width: 150,
+        visible: user?.role === USER_ROLES.ADMIN,
+        sorter: (a, b) => new Date(a.updatedAt || 0).getTime() - new Date(b.updatedAt || 0).getTime(),
       },
       {
         title: t("Table.ACTIONS"),
@@ -441,7 +489,7 @@ export default function TripTable({
       });
     }
     return filtered;
-  }, [t, filters, onEdit, onDelete, canEdit, settings]);
+  }, [t, filters, onEdit, onDelete, canEdit, settings, user]);
 
   return (
     <div style={{ fontSize: tableFontSize }}>
