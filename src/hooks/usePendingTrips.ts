@@ -5,16 +5,16 @@ import { type TripType } from "../types";
 import { socket } from "../utils/socket";
 
 export const usePendingTrips = () => {
-  const [pollingInterval, setPollingInterval] = useState<number>(30000);
+  const [pollingInterval, setPollingInterval] = useState<number | false>(30000);
 
   useEffect(() => {
     const updateInterval = () => {
       if (socket.connected) {
-        console.log("[usePendingTrips] WebSocket active: set polling to 30s");
-        setPollingInterval(30000);
+        console.log("[usePendingTrips] WebSocket active: polling disabled");
+        setPollingInterval(false);
       } else {
-        console.log("[usePendingTrips] WebSocket inactive: active polling fallback at 12s");
-        setPollingInterval(12000); // 12 seconds active polling
+        console.log("[usePendingTrips] WebSocket inactive: polling fallback at 30s");
+        setPollingInterval(30000);
       }
     };
 
@@ -32,7 +32,6 @@ export const usePendingTrips = () => {
     queryKey: ["pending-trips"],
     queryFn: tripApi.getPendingVerification,
     refetchInterval: pollingInterval,
-    refetchIntervalInBackground: true,
   });
 
   return {

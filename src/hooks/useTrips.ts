@@ -5,13 +5,13 @@ import { type CreateTripPayload, type TripType } from "../types";
 import { socket } from "../utils/socket";
 
 export const useTrips = () => {
-  const [pollingInterval, setPollingInterval] = useState<number>(30000);
+  const [pollingInterval, setPollingInterval] = useState<number | false>(30000);
 
   useEffect(() => {
     const updateInterval = () => {
       if (socket.connected) {
         console.log("[useTrips] WebSocket active: polling disabled");
-        setPollingInterval(0);
+        setPollingInterval(false);
       } else {
         console.log("[useTrips] WebSocket inactive: polling fallback at 30s");
         setPollingInterval(30000);
@@ -34,7 +34,6 @@ export const useTrips = () => {
   >(tripApi, {
     queryKey: ["trips"],
     refetchInterval: pollingInterval,
-    refetchIntervalInBackground: true,
   });
 
   return {

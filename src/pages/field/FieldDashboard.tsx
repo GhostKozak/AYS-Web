@@ -2,30 +2,12 @@ import { useEffect, useState, useRef, useMemo, useCallback } from "react";
 import { usePageTitle } from "../../hooks/usePageTitle";
 import { useTrips } from "../../hooks/useTrips";
 import { usePendingTrips } from "../../hooks/usePendingTrips";
+import { useSocketSync } from "../../hooks/useSocketSync";
+import { Badge, Button, Card, Col, Row, Tag, Typography, App, Modal, Input, InputRef, Segmented } from "antd";
 import {
-  Badge,
-  Button,
-  Card,
-  Col,
-  Row,
-  Tag,
-  Typography,
-  App,
-  Segmented,
-  Empty,
-  Modal,
-  Input,
-  Space,
-} from "antd";
-import {
-  CarOutlined,
-  ReloadOutlined,
-  CheckCircleOutlined,
-  ThunderboltOutlined,
-  StopOutlined,
-  CameraOutlined,
-  DeleteOutlined,
-  UserOutlined,
+  CarOutlined, ReloadOutlined, CheckCircleOutlined, CloseCircleOutlined,
+  ExclamationCircleOutlined, CameraOutlined, DeleteOutlined, SwapOutlined,
+  MoonOutlined, SunOutlined, SearchOutlined, ClockCircleOutlined,
 } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import type { TripType } from "../../types";
@@ -33,19 +15,24 @@ import { useQueryClient } from "@tanstack/react-query";
 import { tripApi } from "../../api/tripApi";
 import ErrorState from "../../components/common/ErrorState";
 import { formatDateTime, formatTime } from "../../utils";
+import { useAppConfig } from "../../utils/AppConfigProvider";
 
 const { Title, Text } = Typography;
-
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
 function FieldDashboard() {
   const { t } = useTranslation();
+  const { themeMode, toggleTheme } = useAppConfig();
   usePageTitle(t("FieldOps.TITLE"));
   const { trips, isLoading, isError: isTripsError, refetch: refetchTrips } = useTrips();
   const { pendingTrips, isLoading: isPendingLoading, isError: isPendingError, refetch: refetchPending } = usePendingTrips();
-  const [activeTab, setActiveTab] = useState<"URGENT" | "RAMP" | "PARK" | "PENDING">("URGENT");
+  const [activeTab, setActiveTab] = useState<"PENDING" | "PARK">("PENDING");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
 
   const prevUrgentCountRef = useRef(0);
+  const searchTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const searchInputRef = useRef<InputRef>(null);
 
   const { message } = App.useApp();
   const queryClient = useQueryClient();
@@ -56,11 +43,29 @@ function FieldDashboard() {
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [sealNumber, setSealNumber] = useState("");
   const [verifying, setVerifying] = useState(false);
+  const [rejecting, setRejecting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [lastSyncAt, setLastSyncAt] = useState(Date.now());
+  const [now, setNow] = useState(Date.now());
+
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  useSocketSync(() => setLastSyncAt(Date.now()));
+
+  useEffect(() => {
+    if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
+    searchTimerRef.current = setTimeout(() => setDebouncedSearch(searchQuery), 250);
+    return () => { if (searchTimerRef.current) clearTimeout(searchTimerRef.current); };
+  }, [searchQuery]);
 
   const handleRefresh = () => {
     queryClient.invalidateQueries({ queryKey: ["trips"] });
     queryClient.invalidateQueries({ queryKey: ["pending-trips"] });
+    setLastSyncAt(Date.now());
     message.success(t("FieldOps.REFRESH_SUCCESS"));
   };
 
@@ -75,35 +80,32 @@ function FieldDashboard() {
   const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
     if (file.size > MAX_FILE_SIZE) {
       message.error(t("FieldOps.FILE_SIZE_ERROR"));
       e.target.value = "";
       return;
     }
-
     setPhotoFile(file);
-    const url = URL.createObjectURL(file);
-    setPhotoPreview(url);
+    setPhotoPreview(URL.createObjectURL(file));
   }, [message, t]);
 
   const clearPhoto = useCallback(() => {
     setPhotoFile(null);
-    if (photoPreview) {
-      URL.revokeObjectURL(photoPreview);
-      setPhotoPreview(null);
-    }
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
+    if (photoPreview) URL.revokeObjectURL(photoPreview);
+    setPhotoPreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
   }, [photoPreview]);
 
   const handleVerifySubmit = async () => {
-    if (!selectedTrip || !photoFile) {
+    if (!selectedTrip) return;
+    if (!sealNumber.trim()) {
+      message.error("Lütfen mühür numarasını giriniz!");
+      return;
+    }
+    if (!photoFile) {
       message.error(t("FieldOps.PHOTO_REQUIRED"));
       return;
     }
-
     setVerifying(true);
     try {
       await tripApi.fieldVerify(selectedTrip._id, photoFile, sealNumber || undefined);
@@ -120,415 +122,500 @@ function FieldDashboard() {
     }
   };
 
+  const handleReject = async (trip: TripType) => {
+    setRejecting(true);
+    try {
+      await tripApi.update(trip._id, { is_trip_canceled: true });
+      message.success("Araç reddedildi");
+      queryClient.invalidateQueries({ queryKey: ["trips"] });
+      queryClient.invalidateQueries({ queryKey: ["pending-trips"] });
+    } catch {
+      message.error(t("Errors.OPERATION_FAILED"));
+    } finally {
+      setRejecting(false);
+    }
+  };
+
+  const handleMoveToPark = async (trip: TripType) => {
+    try {
+      await tripApi.update(trip._id, { is_in_temporary_parking_lot: true, unload_status: "WAITING" });
+      message.success("Araç parka alındı");
+      queryClient.invalidateQueries({ queryKey: ["trips"] });
+    } catch {
+      message.error(t("Errors.OPERATION_FAILED"));
+    }
+  };
+
+  ;
   useEffect(() => {
-    return () => {
-      if (photoPreview) {
-        URL.revokeObjectURL(photoPreview);
-      }
-    };
+    return () => { if (photoPreview) URL.revokeObjectURL(photoPreview); };
   }, [photoPreview]);
 
-  const activeTrips = useMemo(() => {
-    return trips.filter((trip) => !trip.is_trip_canceled);
-  }, [trips]);
+  const activeTrips = useMemo(() => trips.filter((t) => !t.is_trip_canceled), [trips]);
 
-  const urgentTrips = useMemo(() => {
-    return activeTrips.filter((trip) => trip.unload_status === "UNLOADED");
-  }, [activeTrips]);
+  const urgentTrips = useMemo(() => activeTrips.filter((t) => t.unload_status === "UNLOADED"), [activeTrips]);
 
-  const rampTrips = useMemo(() => {
-    return activeTrips.filter(
-      (trip) =>
-        (trip.unload_status === "WAITING" || trip.unload_status === "IN_PROGRESS") &&
-        trip.is_in_temporary_parking_lot === false,
-    );
-  }, [activeTrips]);
+  const parkTrips = useMemo(() =>
+    activeTrips.filter((t) => t.unload_status === "WAITING"),
+  [activeTrips]);
 
-  const parkTrips = useMemo(() => {
-    return activeTrips.filter(
-      (trip) => trip.unload_status === "WAITING" && trip.is_in_temporary_parking_lot === true,
-    );
-  }, [activeTrips]);
+  const searchFilter = (list: TripType[]) => {
+    if (!debouncedSearch) return list;
+    const q = debouncedSearch.toLowerCase();
+    return list.filter((t) => t.vehicle?.licence_plate?.toLowerCase().includes(q));
+  };
+
+  const filteredPending = useMemo(() => searchFilter(pendingTrips), [pendingTrips, debouncedSearch]);
+  const filteredPark = useMemo(() => searchFilter(parkTrips), [parkTrips, debouncedSearch]);
+
+  const newArrivals = useMemo(() => {
+    const cutoff = Date.now() - 60 * 60 * 1000;
+    return filteredPending.filter((t) => new Date(t.arrival_time).getTime() > cutoff);
+  }, [filteredPending]);
+
+  const awaitingApproval = useMemo(() => {
+    const cutoff = Date.now() - 60 * 60 * 1000;
+    return filteredPending.filter((t) => new Date(t.arrival_time).getTime() <= cutoff);
+  }, [filteredPending]);
 
   useEffect(() => {
     if (urgentTrips.length > prevUrgentCountRef.current) {
       const audio = new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
-      audio.play().catch((error) => {
-        console.warn("Sound playback failed (Browser policy):", error);
-      });
-      message.warning(t("FieldOps.URGENT_ACTION"));
+      audio.play().catch(() => {});
+      message.warning("Boşalan araç var — rampadan çekin!");
     }
     prevUrgentCountRef.current = urgentTrips.length;
-  }, [urgentTrips.length, t, message]);
+  }, [urgentTrips.length, message]);
 
-  const VehicleCard = ({ trip, type }: { trip: TripType; type: "URGENT" | "RAMP" | "PARK" }) => {
-    let borderColor = "#faad14";
-    if (type === "URGENT") borderColor = "#52c41a";
-    if (type === "RAMP") borderColor = "#1890ff";
-    if (type === "PARK") borderColor = "#8c8c8c";
+  function syncAge(): string {
+    const secs = Math.floor((now - lastSyncAt) / 1000);
+    if (secs < 3) return "az önce";
+    if (secs < 60) return `${secs}sn`;
+    const mins = Math.floor(secs / 60);
+    return `${mins}dk`;
+  }
 
-    return (
-      <Card
-        style={{
-          marginBottom: 16,
-          borderLeft: `6px solid ${borderColor}`,
-          boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
-        }}
-        styles={{ body: { padding: "12px 16px" } }}
-      >
-        <Row justify="space-between" align="middle">
-          <Col span={16}>
-            <Text style={{ fontSize: "1.5rem", fontWeight: "bold", display: "block" }}>
-              {trip.vehicle?.licence_plate || "34 XXX 00"}
-            </Text>
-            <Text type="secondary" style={{ fontSize: "1rem" }}>
-              <CarOutlined /> {trip.company?.name}
-            </Text>
-            <div style={{ marginTop: 8 }}>
-              <Text strong>{t("FieldOps.DRIVER")}: </Text> {trip.driver?.full_name}
-            </div>
-          </Col>
-          <Col span={8} style={{ textAlign: "right" }}>
-            {type === "URGENT" && (
-              <Tag color="success" style={{ fontSize: "14px", padding: "4px" }}>
-                {t("Trips.STATUS_UNLOADED")}
-              </Tag>
-            )}
-            {type === "RAMP" && (
-              <Tag color="processing" style={{ fontSize: "14px", padding: "4px" }}>
-                {t("FieldOps.TAG_RAMP")}
-              </Tag>
-            )}
-            {type === "PARK" && (
-              <Tag color="default" style={{ fontSize: "14px", padding: "4px" }}>
-                {t("FieldOps.TAG_PARK")}
-              </Tag>
-            )}
-          </Col>
-        </Row>
-
-        {type === "URGENT" && (
-          <div style={{ marginTop: 12, borderTop: "1px solid #eee", paddingTop: 12 }}>
-            <Text type="danger" strong>
-              ⚠️ {t("FieldOps.ACTION_MOVE_TO_PARK")}
-            </Text>
-          </div>
-        )}
-
-        {type === "RAMP" && (
-          <div style={{ marginTop: 12 }}>
-            <Text type="secondary">{t("FieldOps.LABEL_RAMP")}</Text>
-          </div>
-        )}
-
-        {type === "PARK" && (
-          <div style={{ marginTop: 12 }}>
-            <Text type="secondary">{t("FieldOps.LABEL_PARK")}</Text>
-          </div>
-        )}
-      </Card>
-    );
-  };
-
-  const PendingVehicleCard = ({ trip }: { trip: TripType }) => {
-    return (
-      <Card
-        style={{
-          marginBottom: 16,
-          borderLeft: "6px solid #faad14",
-          boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
-        }}
-        styles={{ body: { padding: "12px 16px" } }}
-      >
-        <Row justify="space-between" align="middle">
-          <Col span={16}>
-            <Text style={{ fontSize: "1.5rem", fontWeight: "bold", display: "block" }}>
-              {trip.vehicle?.licence_plate || "34 XXX 00"}
-            </Text>
-            <Text type="secondary" style={{ fontSize: "1rem" }}>
-              <CarOutlined /> {trip.company?.name}
-            </Text>
-            <div style={{ marginTop: 8 }}>
-              <Text strong>{t("FieldOps.DRIVER")}: </Text> {trip.driver?.full_name}
-            </div>
-            {trip.arrival_time && (
-              <div>
-                <Text type="secondary">
-                  {t("FieldOps.ARRIVAL")}:{" "}
-                  {formatTime(trip.arrival_time, {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </Text>
-              </div>
-            )}
-          </Col>
-          <Col span={8} style={{ textAlign: "right" }}>
-            <Tag color="warning" style={{ fontSize: "14px", padding: "4px" }}>
-              {t("Trips.STATUS_PENDING")}
-            </Tag>
-          </Col>
-        </Row>
-
-        <div style={{ marginTop: 12, borderTop: "1px solid #eee", paddingTop: 12 }}>
-          <Button
-            type="primary"
-            icon={<CameraOutlined />}
-            size="large"
-            block
-            onClick={() => openVerificationModal(trip)}
-          >
-            {t("FieldOps.DO_VERIFY")}
-          </Button>
-        </div>
-      </Card>
-    );
-  };
+  function formatDuration(parkedAt: string): string {
+    const diff = Date.now() - new Date(parkedAt).getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 60) return `${mins}dk`;
+    const hrs = Math.floor(mins / 60);
+    return `${hrs}s ${mins % 60}dk`;
+  }
 
   if (isTripsError || isPendingError) {
     return (
-      <div style={{ padding: "16px", maxWidth: "800px", margin: "0 auto", minHeight: "100vh" }}>
-        <ErrorState onRetry={() => { refetchTrips(); refetchPending(); }} />
+      <div className="field-page">
+        <div className="field-inner">
+          <ErrorState onRetry={() => { refetchTrips(); refetchPending(); }} />
+        </div>
       </div>
     );
   }
 
-  return (
-    <div style={{ padding: "16px", maxWidth: "800px", margin: "0 auto", minHeight: "100vh" }}>
-      <Row justify="space-between" align="middle" style={{ marginBottom: 20 }}>
-        <Col>
-          <Title level={3} style={{ margin: 0 }}>
-            {t("FieldOps.TITLE")}
-          </Title>
-          <Text type="secondary">
-            {formatTime(new Date(), { hour: "2-digit", minute: "2-digit" })}
-          </Text>
-        </Col>
-        <Col>
-          <Button
-            type="primary"
-            shape="circle"
-            icon={<ReloadOutlined />}
-            size="large"
-            onClick={handleRefresh}
-          />
-        </Col>
-      </Row>
-
-      <Segmented
-        block
-        size="large"
-        options={[
-          {
-            label: (
-              <div style={{ padding: 4 }}>
-                <div>{t("FieldOps.TAB_URGENT")}</div>
-                <Badge count={urgentTrips.length} color="green" />
-              </div>
-            ),
-            value: "URGENT",
-            icon: <CheckCircleOutlined />,
-          },
-          {
-            label: (
-              <div style={{ padding: 4 }}>
-                <div>{t("FieldOps.TAB_RAMP")}</div>
-                <Badge count={rampTrips.length} color="blue" />
-              </div>
-            ),
-            value: "RAMP",
-            icon: <ThunderboltOutlined />,
-          },
-          {
-            label: (
-              <div style={{ padding: 4 }}>
-                <div>{t("FieldOps.TAB_PARK")}</div>
-                <Badge count={parkTrips.length} showZero color="gray" />
-              </div>
-            ),
-            value: "PARK",
-            icon: <StopOutlined />,
-          },
-          {
-            label: (
-              <div style={{ padding: 4 }}>
-                <div>{t("FieldOps.TAB_VERIFICATION")}</div>
-                <Badge count={pendingTrips.length} showZero color="orange" />
-              </div>
-            ),
-            value: "PENDING",
-            icon: <UserOutlined />,
-          },
-        ]}
-        value={activeTab}
-        onChange={(val) => setActiveTab(val as "URGENT" | "RAMP" | "PARK" | "PENDING")}
-        style={{ marginBottom: 20 }}
-      />
-
-      {isLoading || isPendingLoading ? (
-        <div style={{ textAlign: "center", padding: 50 }}>{t("Common.LOADING")}...</div>
-      ) : (
-        <>
-          {activeTab === "URGENT" && (
+  const renderPendingCard = (trip: TripType) => {
+    const waitingLong = Date.now() - new Date(trip.arrival_time).getTime() > 60 * 60 * 1000;
+    return (
+      <div key={trip._id} className="op-card">
+        <div className="op-card-body">
+          <div className="op-plate">{trip.vehicle?.licence_plate || "---"}</div>
+          <div className="op-meta">
+            <CarOutlined /> {trip.company?.name || "-"}
+            {!!trip.has_gps_tracking && <Tag color="green" style={{ marginLeft: 8, fontSize: 10, borderRadius: 6, lineHeight: "18px" }}>🛰️ ATS</Tag>}
+          </div>
+          <div className="op-card-row">
             <div>
-              {urgentTrips.length === 0 ? (
-                <Empty description={t("FieldOps.NO_VEHICLES")} />
-              ) : (
-                urgentTrips.map((trip) => <VehicleCard key={trip._id} trip={trip} type="URGENT" />)
+              <div className="op-meta">
+                <ClockCircleOutlined style={{ fontSize: 12 }} />
+                {trip.arrival_time ? formatTime(trip.arrival_time, { hour: "2-digit", minute: "2-digit" }) : "-"}
+              </div>
+              {trip.driver?.full_name && (
+                <div className="op-meta" style={{ marginTop: 2 }}>{trip.driver.full_name}</div>
               )}
             </div>
-          )}
-
-          {activeTab === "RAMP" && (
-            <div>
-              {rampTrips.length === 0 ? (
-                <Empty description={t("FieldOps.NO_VEHICLES")} />
-              ) : (
-                rampTrips.map((trip) => <VehicleCard key={trip._id} trip={trip} type="RAMP" />)
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
+              {(trip.is_in_parking_lot || trip.is_in_temporary_parking_lot) && (
+                <Tag color={trip.is_in_temporary_parking_lot ? "orange" : "blue"} style={{ fontSize: 10, borderRadius: 6, lineHeight: "18px" }}>
+                  🅿️ {trip.is_in_temporary_parking_lot ? "Koridor Kesik (KK)" : "Parkta"}
+                </Tag>
               )}
-            </div>
-          )}
-
-          {activeTab === "PARK" && (
-            <div>
-              {parkTrips.length === 0 ? (
-                <Empty description={t("FieldOps.NO_VEHICLES")} />
-              ) : (
-                parkTrips.map((trip) => <VehicleCard key={trip._id} trip={trip} type="PARK" />)
-              )}
-            </div>
-          )}
-
-          {activeTab === "PENDING" && (
-            <div>
-              {pendingTrips.length === 0 ? (
-                <Empty description={t("FieldOps.PENDING_EMPTY")} />
-              ) : (
-                pendingTrips.map((trip) => <PendingVehicleCard key={trip._id} trip={trip} />)
-              )}
-            </div>
-          )}
-        </>
-      )}
-
-      <Modal
-        title={t("FieldOps.MODAL_TITLE")}
-        open={verificationModalOpen}
-        onCancel={() => {
-          setVerificationModalOpen(false);
-          clearPhoto();
-          setSelectedTrip(null);
-        }}
-        footer={
-          <Space>
-            <Button
-              onClick={() => {
-                setVerificationModalOpen(false);
-                clearPhoto();
-                setSelectedTrip(null);
-              }}
-            >
-              {t("Common.CANCEL")}
-            </Button>
-            <Button
-              type="primary"
-              icon={<CameraOutlined />}
-              loading={verifying}
-              disabled={!photoFile}
-              onClick={handleVerifySubmit}
-            >
-              {verifying ? t("FieldOps.VERIFYING") : t("FieldOps.VERIFY_SUBMIT")}
-            </Button>
-          </Space>
-        }
-      >
-        {selectedTrip && (
-          <div>
-            <Card size="small" style={{ marginBottom: 16, background: "#fafafa" }}>
-              <Row>
-                <Col span={12}>
-                  <Text strong>{t("Trips.LICENSE_PLATE")}:</Text>{" "}
-                  {selectedTrip.vehicle?.licence_plate}
-                </Col>
-                <Col span={12}>
-                  <Text strong>{t("FieldOps.DRIVER")}:</Text> {selectedTrip.driver?.full_name}
-                </Col>
-              </Row>
-              <Row style={{ marginTop: 8 }}>
-                <Col span={12}>
-                  <Text strong>{t("Trips.COMPANY_NAME")}:</Text> {selectedTrip.company?.name}
-                </Col>
-                {selectedTrip.arrival_time && (
-                  <Col span={12}>
-                    <Text strong>{t("FieldOps.ARRIVAL")}:</Text>{" "}
-                    {formatDateTime(selectedTrip.arrival_time)}
-                  </Col>
-                )}
-              </Row>
-            </Card>
-
-            <div style={{ marginBottom: 16 }}>
-              <Text strong style={{ display: "block", marginBottom: 8 }}>
-                {t("FieldOps.SEAL_NUMBER")}{" "}
-                <Text type="secondary">{t("FieldOps.SEAL_OPTIONAL")}</Text>
-              </Text>
-              <Input
-                placeholder={t("FieldOps.SEAL_PLACEHOLDER")}
-                value={sealNumber}
-                onChange={(e) => setSealNumber(e.target.value)}
-                maxLength={50}
-              />
-            </div>
-
-            <div style={{ marginBottom: 16 }}>
-              <Text strong style={{ display: "block", marginBottom: 8 }}>
-                {t("FieldOps.PHOTO_UPLOAD")}
-              </Text>
-              <Text type="secondary" style={{ display: "block", marginBottom: 12, fontSize: 12 }}>
-                {t("FieldOps.TAKE_PHOTO_SUB")}
-              </Text>
-
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/jpeg, image/png"
-                capture="environment"
-                onChange={handleFileSelect}
-                style={{ display: "none" }}
-              />
-
-              {!photoPreview ? (
-                <Button
-                  icon={<CameraOutlined />}
-                  size="large"
-                  block
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  {t("FieldOps.TAKE_PHOTO")}
-                </Button>
-              ) : (
-                <div style={{ textAlign: "center" }}>
-                  <img
-                    src={photoPreview}
-                    alt="Preview"
-                    style={{
-                      maxWidth: "100%",
-                      maxHeight: 200,
-                      borderRadius: 8,
-                      marginBottom: 12,
-                    }}
-                  />
-                  <br />
-                  <Button danger icon={<DeleteOutlined />} onClick={clearPhoto}>
-                    {t("Common.DELETE")}
-                  </Button>
-                </div>
+              {trip.field_photo_path && (
+                <img
+                  src={trip.field_photo_path}
+                  alt=""
+                  className="op-thumb"
+                  onClick={() => {
+                    if (trip.field_photo_path) {
+                      Modal.info({
+                        title: "Araç Fotoğrafı",
+                        content: <img src={trip.field_photo_path} alt="" style={{ width: "100%", borderRadius: 8 }} />,
+                      });
+                    }
+                  }}
+                />
               )}
             </div>
           </div>
-        )}
-      </Modal>
+        </div>
+        <div className="op-card-actions">
+          <button className="op-btn op-btn-primary" onClick={() => openVerificationModal(trip)}>
+            <CheckCircleOutlined /> Onayla
+          </button>
+          {waitingLong && (
+            <button className="op-btn op-btn-danger" onClick={() => handleReject(trip)}>
+              <CloseCircleOutlined /> Reddet
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  const renderUrgentCard = (trip: TripType) => (
+    <div key={trip._id} className="op-urgent-card">
+      <div className="op-urgent-body">
+        <ExclamationCircleOutlined className="op-urgent-icon" />
+        <div className="op-urgent-info">
+          <div className="op-plate-sm">{trip.vehicle?.licence_plate || "---"}</div>
+          <div className="op-urgent-label">Boşaltma Tamamlandı — Rampayı Boşaltın</div>
+          <div className="op-meta">{trip.company?.name} {!!trip.has_gps_tracking && <Tag color="green" style={{ fontSize: 10, borderRadius: 6, lineHeight: "18px", marginLeft: 4 }}>🛰️ ATS</Tag>}</div>
+        </div>
+        <div className="op-urgent-time">
+          {trip.arrival_time ? formatTime(trip.arrival_time, { hour: "2-digit", minute: "2-digit" }) : ""}
+        </div>
+      </div>
+      <div className="op-urgent-action">
+        <button className="op-btn op-btn-warning op-btn-lg" onClick={() => handleMoveToPark(trip)}>
+          <SwapOutlined /> Parka Çek
+        </button>
+        <div style={{ textAlign: "center", marginTop: 6 }}>
+          <button className="op-text-btn" onClick={() => openVerificationModal(trip)}>
+            Mühür/Fotoğraf Güncelle
+          </button>
+        </div>
+      </div>
     </div>
+  );
+
+  const renderParkCard = (trip: TripType) => {
+    const parked = trip.is_in_temporary_parking_lot || trip.is_in_parking_lot;
+    return (
+      <div key={trip._id} className="op-card">
+        <div className="op-card-body">
+          <div className="op-card-row" style={{ alignItems: "flex-start" }}>
+            <div className="op-plate-sm">{trip.vehicle?.licence_plate || "---"}</div>
+            {parked && trip.parked_at && (
+              <Tag className="op-duration-tag">
+                {formatDuration(trip.parked_at)}
+              </Tag>
+            )}
+          </div>
+          <div className="op-meta" style={{ marginTop: 2 }}>
+            <ClockCircleOutlined style={{ fontSize: 12 }} />
+            {trip.arrival_time ? formatDateTime(trip.arrival_time) : "-"}
+          </div>
+          <div className="op-meta" style={{ marginTop: 2 }}>
+            <CarOutlined /> {trip.company?.name || "-"}
+            {!!trip.has_gps_tracking && (
+              <Tag color="green" style={{ marginLeft: 8, fontSize: 10, borderRadius: 6, lineHeight: "18px" }}>
+                🛰️ ATS
+              </Tag>
+            )}
+            {parked && (
+              <Tag color={trip.is_in_temporary_parking_lot ? "orange" : "blue"} style={{ marginLeft: 4, fontSize: 10, borderRadius: 6, lineHeight: "18px" }}>
+                🅿️ {trip.is_in_temporary_parking_lot ? "Koridor Kesik (KK)" : "Parkta"}
+              </Tag>
+            )}
+          </div>
+          {trip.driver?.full_name && (
+            <div className="op-meta" style={{ fontSize: 11, marginTop: 2 }}>
+              {trip.driver.full_name}
+            </div>
+          )}
+        </div>
+        <div className="op-card-footer">
+          <button className="op-text-btn" style={{ width: "100%" }} onClick={() => openVerificationModal(trip)}>
+            Mühür/Fotoğraf Güncelle
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <>
+      <style>{`
+        :root {
+          --bg: ${themeMode === "dark" ? "#0d1117" : "#f0f2f5"};
+          --bg-card: ${themeMode === "dark" ? "#161b22" : "#ffffff"};
+          --text: ${themeMode === "dark" ? "#e6edf3" : "#172b4d"};
+          --text-secondary: ${themeMode === "dark" ? "#8b949e" : "#5e6c84"};
+          --border: ${themeMode === "dark" ? "#30363d" : "#e0e4e8"};
+          --green: #22c55e;
+          --red: #ef4444;
+          --amber: #f59e0b;
+          --blue: "#1677ff";
+        }
+        body { background: var(--bg) !important; margin: 0; }
+        .field-page { max-width: 600px; margin: 0 auto; min-height: 100vh; padding: 0 8px 80px; }
+        .field-inner { padding: 16px; }
+
+        /* Header */
+        .op-header { position: sticky; top: 0; z-index: 100; background: var(--bg); padding: 8px 0; }
+        .op-header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+        .op-title { font-size: 22px; font-weight: 700; margin: 0; color: var(--text); }
+        .op-live { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; color: var(--text-secondary); }
+        .op-live-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); animation: pulse-dot 2s infinite; }
+        .op-header-actions { display: flex; gap: 6px; }
+        .op-icon-btn { width: 44px; height: 44px; border-radius: 12px; border: 1px solid var(--border); background: var(--bg-card); color: var(--text); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .op-icon-btn:active { transform: scale(0.95); }
+
+        /* Search */
+        .op-search { margin-bottom: 8px; }
+        .op-search-wrap { position: relative; }
+        .op-search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); font-size: 16px; pointer-events: none; }
+        .op-search-input { width: 100%; height: 44px; border-radius: 12px; border: 1px solid var(--border); background: var(--bg-card); color: var(--text); padding: 0 36px 0 38px; font-size: 15px; outline: none; box-sizing: border-box; }
+        .op-search-input::placeholder { color: var(--text-secondary); opacity: 0.6; }
+        .op-search-clear { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 16px; padding: 4px; }
+
+        /* Tabs */
+        .op-tabs { margin-bottom: 12px; }
+        .op-tabs .ant-segmented { background: var(--bg-card); border-radius: 12px; overflow: hidden; }
+        .op-tabs .ant-segmented-item { flex: 1 1 0 !important; min-width: 0 !important; border-radius: 10px !important; }
+        .op-tabs .ant-segmented-item-selected { font-weight: 600 !important; }
+        .tab-label { display: flex !important; align-items: center !important; justify-content: center !important; gap: 4px !important; overflow: hidden !important; }
+        .tab-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 13px; }
+        @media (max-width: 380px) { .tab-text { font-size: 11px; } }
+
+        /* Section headers */
+        .op-section { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+
+        /* Cards */
+        .op-card { background: var(--bg-card); border-radius: 14px; margin-bottom: 10px; border: 1px solid var(--border); overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
+        .op-card-body { padding: 14px; }
+        .op-card-actions { display: flex; gap: 8px; padding: 0 14px 14px; }
+        .op-card-footer { border-top: 1px solid var(--border); padding: 10px; text-align: center; }
+        .op-card-row { display: flex; justify-content: space-between; align-items: center; }
+        .op-card-header { display: flex; align-items: center; gap: 8px; }
+
+        /* Typography */
+        .op-plate { font-size: 26px; font-weight: 800; letter-spacing: 1.5px; line-height: 1.2; color: var(--text); font-family: "SF Mono", "Roboto Mono", "Fira Code", monospace; }
+        .op-plate-sm { font-size: 22px; font-weight: 700; letter-spacing: 1px; color: var(--text); font-family: "SF Mono", "Roboto Mono", "Fira Code", monospace; }
+        .op-meta { display: flex; align-items: center; gap: 4px; font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+
+        /* Buttons */
+        .op-btn { display: flex; align-items: center; justify-content: center; gap: 6px; height: 50px; border-radius: 12px; font-size: 15px; font-weight: 600; border: none; cursor: pointer; flex: 1; padding: 0 16px; transition: transform 0.1s; }
+        .op-btn:active { transform: scale(0.97); }
+        .op-btn-primary { background: linear-gradient(135deg, #22c55e, #16a34a); color: #fff; }
+        .op-btn-danger { background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; }
+        .op-btn-warning { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; }
+        .op-btn-lg { height: 52px; border-radius: 14px; font-size: 17px; font-weight: 700; width: 100%; }
+
+        /* Urgent card */
+        .op-urgent-card { border-radius: 14px; margin-bottom: 10px; border: 2px solid var(--red); background: var(--bg-card); overflow: hidden; animation: urgent-flash 1.5s ease-in-out infinite; }
+        .op-urgent-body { padding: 12px; display: flex; align-items: center; gap: 10px; }
+        .op-urgent-icon { font-size: 28px; color: var(--red); flex-shrink: 0; }
+        .op-urgent-info { flex: 1; min-width: 0; }
+        .op-urgent-label { font-size: 12px; color: var(--red); font-weight: 600; margin-top: 2px; }
+        .op-urgent-time { flex-shrink: 0; font-size: 11px; color: var(--text-secondary); }
+        .op-urgent-action { padding: 0 12px 12px; }
+
+        /* Progress */
+        .op-progress-wrapper { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+        .op-progress-track { flex: 1; height: 6px; border-radius: 3px; background: var(--border); overflow: hidden; }
+        .op-progress-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, #1677ff, var(--green)); }
+        .op-progress-label { font-size: 11px; color: var(--text-secondary); flex-shrink: 0; }
+
+        /* Park */
+        .op-duration-tag { font-size: 12px !important; border-radius: 8px !important; flex-shrink: 0; }
+        .op-thumb { width: 64px; height: 64px; border-radius: 10px; object-fit: cover; border: 2px solid var(--border); cursor: pointer; flex-shrink: 0; }
+
+        /* Text button */
+        .op-text-btn { background: none; border: none; color: var(--text-secondary); font-size: 13px; cursor: pointer; padding: 4px 12px; }
+        .op-text-btn:hover { color: #1677ff; }
+
+        /* Empty state */
+        .op-empty { text-align: center; padding: 60px 16px; color: var(--text-secondary); }
+
+        /* Animations */
+        @keyframes urgent-flash {
+          0%, 100% { border-color: var(--red); box-shadow: 0 0 0 0 rgba(239,68,68,0.3); }
+          50% { border-color: #fca5a5; box-shadow: 0 0 0 8px rgba(239,68,68,0.08); }
+        }
+        @keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+      `}</style>
+
+      <div className="field-page">
+        {/* Sticky Header */}
+        <div className="op-header">
+          <div className="op-header-top">
+            <div>
+              <div className="op-title">Saha Operasyonu</div>
+              <div className="op-live">
+                <span className="op-live-dot" />
+                Canlı · {syncAge()}
+              </div>
+            </div>
+            <div className="op-header-actions">
+              <button className="op-icon-btn" onClick={toggleTheme} aria-label="Theme">
+                {themeMode === "dark" ? <SunOutlined /> : <MoonOutlined />}
+              </button>
+              <button className="op-icon-btn" onClick={handleRefresh} aria-label="Refresh">
+                <ReloadOutlined />
+              </button>
+            </div>
+          </div>
+
+          <div className="op-search">
+            <div className="op-search-wrap">
+              <SearchOutlined className="op-search-icon" />
+              <input
+                ref={searchInputRef as React.Ref<HTMLInputElement>}
+                type="text"
+                className="op-search-input"
+                placeholder="Plaka ara..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              {searchQuery && (
+                <button className="op-search-clear" onClick={() => { setSearchQuery(""); setDebouncedSearch(""); }}>✕</button>
+              )}
+            </div>
+          </div>
+
+          <div className="op-tabs">
+            <Segmented
+              block
+              size="large"
+              options={[
+                { label: <span className="tab-label"><span className="tab-text">Gelenler (Onay)</span><Badge count={pendingTrips.length} size="small" color="orange" /></span>, value: "PENDING" },
+                { label: <span className="tab-label"><span className="tab-text">Beklemede</span><Badge count={parkTrips.length} size="small" color="default" /></span>, value: "PARK" },
+              ]}
+              value={activeTab}
+              onChange={(val) => setActiveTab(val as "PENDING" | "PARK")}
+            />
+          </div>
+        </div>
+
+        {/* Content */}
+        {isLoading || isPendingLoading ? (
+          <div style={{ textAlign: "center", padding: 60, color: "var(--text-secondary)", fontSize: 14 }}>Yükleniyor...</div>
+        ) : (
+          <>
+            {activeTab === "PENDING" && (
+              <div>
+                {filteredPending.length === 0 ? (
+                  <div className="op-empty">
+                    <CheckCircleOutlined style={{ fontSize: 48, color: "var(--green)", marginBottom: 12 }} />
+                    <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 4 }}>Giriş Bekleyen Araç Yok</div>
+                  </div>
+                ) : (
+                  <>
+                    {newArrivals.length > 0 && (
+                      <div style={{ marginBottom: 12 }}>
+                        <div className="op-section">🆕 Yeni Gelenler — {newArrivals.length} araç</div>
+                        {newArrivals.map(renderPendingCard)}
+                      </div>
+                    )}
+                    {awaitingApproval.length > 0 && (
+                      <div>
+                        <div className="op-section">⏳ Onay Bekleyenler — {awaitingApproval.length} araç</div>
+                        {awaitingApproval.map(renderPendingCard)}
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            )}
+
+            {activeTab === "PARK" && (
+              <div>
+                {filteredPark.length === 0 ? (
+                  <div className="op-empty">
+                    <CarOutlined style={{ fontSize: 48, color: "var(--text-secondary)", marginBottom: 12 }} />
+                    <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 4 }}>Bekleyen Araç Yok</div>
+                  </div>
+                ) : (
+                  filteredPark.map(renderParkCard)
+                )}
+              </div>
+            )}
+          </>
+        )}
+
+        {/* Verification Modal */}
+        <Modal
+          title="Antrepo Araç Kabul / Mühür Doğrulama"
+          open={verificationModalOpen}
+          onCancel={() => { setVerificationModalOpen(false); clearPhoto(); setSelectedTrip(null); }}
+          width={400}
+          footer={
+            <div style={{ display: "flex", gap: 8 }}>
+              <Button block onClick={() => { setVerificationModalOpen(false); clearPhoto(); setSelectedTrip(null); }}>
+                {t("Common.CANCEL")}
+              </Button>
+              <Button block type="primary" icon={<CameraOutlined />} loading={verifying} disabled={!photoFile || !sealNumber.trim()} onClick={handleVerifySubmit} size="large">
+                {verifying ? t("FieldOps.VERIFYING") : "Mühür ve Fotoğrafı Kaydet"}
+              </Button>
+            </div>
+          }
+        >
+          {selectedTrip && (
+            <div>
+              <Card size="small" style={{ marginBottom: 16 }}>
+                <Row>
+                  <Col span={12}>
+                    <div style={{ fontSize: 12, color: "var(--text-secondary)" }}>{t("Trips.LICENSE_PLATE")}</div>
+                    <div style={{ fontWeight: 700, fontSize: 18, color: "var(--text)" }}>{selectedTrip.vehicle?.licence_plate}</div>
+                  </Col>
+                  <Col span={12}>
+                    <div style={{ fontSize: 12, color: "var(--text-secondary)" }}>{t("FieldOps.DRIVER")}</div>
+                    <div style={{ color: "var(--text)" }}>{selectedTrip.driver?.full_name || "-"}</div>
+                  </Col>
+                </Row>
+                <Row style={{ marginTop: 8 }}>
+                  <Col span={12}>
+                    <div style={{ fontSize: 12, color: "var(--text-secondary)" }}>{t("Trips.COMPANY_NAME")}</div>
+                    <div style={{ color: "var(--text)" }}>{selectedTrip.company?.name}</div>
+                  </Col>
+                  {selectedTrip.arrival_time && (
+                    <Col span={12}>
+                      <div style={{ fontSize: 12, color: "var(--text-secondary)" }}>{t("FieldOps.ARRIVAL")}</div>
+                      <div style={{ color: "var(--text)" }}>{formatDateTime(selectedTrip.arrival_time)}</div>
+                    </Col>
+                  )}
+                </Row>
+              </Card>
+
+              <div style={{ marginBottom: 16 }}>
+                <div style={{ fontWeight: 600, marginBottom: 4, color: "var(--text)" }}>
+                  Mühür Numarası <span style={{ color: "var(--red)" }}>*</span>
+                </div>
+                <Input placeholder={t("FieldOps.SEAL_PLACEHOLDER")} value={sealNumber} onChange={(e) => setSealNumber(e.target.value)} maxLength={50} size="large" />
+              </div>
+
+              <div style={{ marginBottom: 16 }}>
+                <div style={{ fontWeight: 600, marginBottom: 4, color: "var(--text)" }}>
+                  {t("FieldOps.PHOTO_UPLOAD")} <span style={{ color: "var(--red)" }}>*</span>
+                </div>
+                <div style={{ fontSize: 12, color: "var(--text-secondary)", marginBottom: 12 }}>{t("FieldOps.TAKE_PHOTO_SUB")}</div>
+                <input ref={fileInputRef} type="file" accept="image/jpeg, image/png" capture="environment" onChange={handleFileSelect} style={{ display: "none" }} />
+                {!photoPreview ? (
+                  <Button icon={<CameraOutlined />} size="large" block onClick={() => fileInputRef.current?.click()} style={{ height: 52, borderRadius: 12 }}>
+                    {t("FieldOps.TAKE_PHOTO")}
+                  </Button>
+                ) : (
+                  <div style={{ textAlign: "center" }}>
+                    <img src={photoPreview} alt="" style={{ maxWidth: "100%", maxHeight: 200, borderRadius: 12, marginBottom: 12, border: "2px solid var(--border)" }} />
+                    <Button danger icon={<DeleteOutlined />} onClick={clearPhoto}>{t("Common.DELETE")}</Button>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </Modal>
+      </div>
+    </>
   );
 }
 
