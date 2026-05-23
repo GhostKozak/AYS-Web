@@ -3,7 +3,7 @@ import { companyApi } from "../api/companyApi";
 import { type CompanyType, type CreateCompanyPayload } from "../types";
 
 export const useCompanies = () => {
-  const { data, isLoading, isError, create, update, remove } = useCrud<
+  const { data, isLoading, isError, refetch, create, update, remove } = useCrud<
     CompanyType,
     CreateCompanyPayload
   >(companyApi, {
@@ -15,6 +15,7 @@ export const useCompanies = () => {
     companies: data,
     isLoading,
     isError,
+    refetch,
     createCompany: create,
     updateCompany: update,
     deleteCompany: remove,

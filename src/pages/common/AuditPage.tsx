@@ -8,6 +8,7 @@ import dayjs from "dayjs";
 import { usePageTitle } from "../../hooks/usePageTitle";
 import AuditDetailViewer from "./components/AuditDetailViewer";
 import { useIsMobile } from "../../hooks/useIsMobile";
+import ErrorState from "../../components/common/ErrorState";
 
 import type { AuditType } from "../../types";
 
@@ -45,7 +46,7 @@ function AuditPage() {
     setSearchParams(next, { replace: true });
   };
 
-  const { data, isLoading } = useQuery<AuditType[]>({
+  const { data, isLoading, isError, refetch } = useQuery<AuditType[]>({
     queryKey: ["audit", filters],
     queryFn: () => auditApi.getAll(filters),
   });
@@ -107,6 +108,14 @@ function AuditPage() {
       ),
     },
   ];
+
+  if (isError) {
+    return (
+      <Layout style={{ padding: isMobile ? "0 12px" : "0 20px" }}>
+        <ErrorState onRetry={() => refetch()} />
+      </Layout>
+    );
+  }
 
   return (
     <Layout style={{ padding: isMobile ? "0 12px" : "0 20px" }}>

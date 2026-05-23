@@ -24,6 +24,7 @@ import CompanyCardList from "./components/CompanyCardList";
 import { exportCompaniesToExcel } from "../../utils/excel.utils";
 import { RoleGuard } from "../../components/auth/RoleGuard";
 import { useAuth } from "../../hooks/useAuth";
+import ErrorState from "../../components/common/ErrorState";
 
 function Companies() {
   const { t } = useTranslation();
@@ -54,7 +55,7 @@ function Companies() {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [isBulkDeleting, setIsBulkDeleting] = useState(false);
 
-  const { companies, isLoading, createCompany, updateCompany, deleteCompany } =
+  const { companies, isLoading, isError, refetch, createCompany, updateCompany, deleteCompany } =
     useCompanies();
   const isMobile = useIsMobile();
   const { user } = useAuth();
@@ -140,6 +141,14 @@ function Companies() {
     if (!searchText) return true;
     return company.name.toLowerCase().includes(searchText.toLowerCase());
   });
+
+  if (isError) {
+    return (
+      <Layout style={{ padding: isMobile ? "0 12px" : "0 20px" }}>
+        <ErrorState onRetry={() => refetch()} />
+      </Layout>
+    );
+  }
 
   return (
     <Layout style={{ padding: isMobile ? "0 12px" : "0 20px" }}>

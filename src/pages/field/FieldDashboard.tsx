@@ -31,6 +31,7 @@ import { useTranslation } from "react-i18next";
 import type { TripType } from "../../types";
 import { useQueryClient } from "@tanstack/react-query";
 import { tripApi } from "../../api/tripApi";
+import ErrorState from "../../components/common/ErrorState";
 
 const { Title, Text } = Typography;
 
@@ -39,8 +40,8 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024;
 function FieldDashboard() {
   const { t } = useTranslation();
   usePageTitle(t("FieldOps.TITLE"));
-  const { trips, isLoading } = useTrips();
-  const { pendingTrips, isLoading: isPendingLoading } = usePendingTrips();
+  const { trips, isLoading, isError: isTripsError, refetch: refetchTrips } = useTrips();
+  const { pendingTrips, isLoading: isPendingLoading, isError: isPendingError, refetch: refetchPending } = usePendingTrips();
   const [activeTab, setActiveTab] = useState<"URGENT" | "RAMP" | "PARK" | "PENDING">("URGENT");
 
   const prevUrgentCountRef = useRef(0);
@@ -282,6 +283,14 @@ function FieldDashboard() {
       </Card>
     );
   };
+
+  if (isTripsError || isPendingError) {
+    return (
+      <div style={{ padding: "16px", maxWidth: "800px", margin: "0 auto", minHeight: "100vh" }}>
+        <ErrorState onRetry={() => { refetchTrips(); refetchPending(); }} />
+      </div>
+    );
+  }
 
   return (
     <div style={{ padding: "16px", maxWidth: "800px", margin: "0 auto", minHeight: "100vh" }}>

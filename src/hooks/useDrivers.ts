@@ -3,7 +3,7 @@ import { driverApi } from "../api/driverApi";
 import { type CreateDriverPayload, type DriverType } from "../types";
 
 export const useDrivers = () => {
-  const { data, isLoading, isError, create, update, remove } = useCrud<
+  const { data, isLoading, isError, refetch, create, update, remove } = useCrud<
     DriverType,
     CreateDriverPayload
   >(driverApi, {
@@ -15,6 +15,7 @@ export const useDrivers = () => {
     drivers: data,
     isLoading,
     isError,
+    refetch,
     createDriver: create,
     updateDriver: update,
     deleteDriver: remove,

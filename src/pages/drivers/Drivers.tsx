@@ -25,6 +25,7 @@ import DriverCardList from "./components/DriverCardList";
 import { exportDriversToExcel } from "../../utils/excel.utils";
 import { RoleGuard } from "../../components/auth/RoleGuard";
 import { useAuth } from "../../hooks/useAuth";
+import ErrorState from "../../components/common/ErrorState";
 
 function Drivers() {
   const { t } = useTranslation();
@@ -55,7 +56,7 @@ function Drivers() {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [isBulkDeleting, setIsBulkDeleting] = useState(false);
 
-  const { drivers, isLoading, createDriver, updateDriver, deleteDriver } =
+  const { drivers, isLoading, isError, refetch, createDriver, updateDriver, deleteDriver } =
     useDrivers();
   const { companies } = useCompanies();
   const isMobile = useIsMobile();
@@ -156,6 +157,14 @@ function Drivers() {
       driver.phone_number.includes(searchText)
     );
   });
+
+  if (isError) {
+    return (
+      <Layout style={{ padding: isMobile ? "0 12px" : "0 20px" }}>
+        <ErrorState onRetry={() => refetch()} />
+      </Layout>
+    );
+  }
 
   return (
     <Layout style={{ padding: isMobile ? "0 12px" : "0 20px" }}>

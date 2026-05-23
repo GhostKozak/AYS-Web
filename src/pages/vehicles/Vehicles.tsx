@@ -22,6 +22,7 @@ import VehicleCardList from "./components/VehicleCardList";
 import { exportVehiclesToExcel } from "../../utils/excel.utils";
 import { RoleGuard } from "../../components/auth/RoleGuard";
 import { useAuth } from "../../hooks/useAuth";
+import ErrorState from "../../components/common/ErrorState";
 
 function Vehicles() {
   const { t } = useTranslation();
@@ -56,7 +57,7 @@ function Vehicles() {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [isBulkDeleting, setIsBulkDeleting] = useState(false);
 
-  const { vehicles, isLoading, createVehicle, updateVehicle, deleteVehicle } =
+  const { vehicles, isLoading, isError, refetch, createVehicle, updateVehicle, deleteVehicle } =
     useVehicles();
   const isMobile = useIsMobile();
   const { user } = useAuth();
@@ -158,6 +159,14 @@ function Vehicles() {
       .toLowerCase()
       .includes(searchText.toLowerCase());
   });
+
+  if (isError) {
+    return (
+      <Layout style={{ padding: isMobile ? "0 12px" : "0 20px" }}>
+        <ErrorState onRetry={() => refetch()} />
+      </Layout>
+    );
+  }
 
   return (
     <Layout style={{ padding: isMobile ? "0 12px" : "0 20px" }}>

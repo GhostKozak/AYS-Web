@@ -29,6 +29,7 @@ import { useDrivers } from "../../hooks/useDrivers";
 import { exportTripsToExcel } from "../../utils/excel.utils";
 import { RoleGuard } from "../../components/auth/RoleGuard";
 import { useAuth } from "../../hooks/useAuth";
+import ErrorState from "../../components/common/ErrorState";
 
 function Trips() {
   const { t } = useTranslation();
@@ -69,7 +70,7 @@ function Trips() {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [isBulkDeleting, setIsBulkDeleting] = useState(false);
 
-  const { trips, isLoading, createTrip, updateTrip, deleteTrip } = useTrips();
+  const { trips, isLoading, isError, refetch, createTrip, updateTrip, deleteTrip } = useTrips();
   const isMobile = useIsMobile(1024);
   const { companies } = useCompanies();
   const { drivers } = useDrivers();
@@ -197,6 +198,14 @@ function Trips() {
       );
     });
   }, [trips, searchText]);
+
+  if (isError) {
+    return (
+      <Layout style={{ padding: isMobile ? "0 12px" : "0 20px" }}>
+        <ErrorState onRetry={() => refetch()} />
+      </Layout>
+    );
+  }
 
   return (
     <Layout style={{ padding: isMobile ? "0 12px" : "0 20px" }}>

@@ -3,6 +3,7 @@ import { Layout } from "antd";
 import Header from "./components/layout/Header";
 import Breadcrumb from "./components/common/Breadcrumb";
 import AxiosInterceptor from "./api/AxiosInterceptor";
+import ErrorBoundary from "./components/common/ErrorBoundary";
 import { useSocketSync } from "./hooks/useSocketSync";
 
 function App() {
@@ -15,7 +16,9 @@ function App() {
       <Header />
       <Layout.Content>
         <Breadcrumb />
-        <Outlet />
+        <ErrorBoundary>
+          <Outlet />
+        </ErrorBoundary>
       </Layout.Content>
     </Layout>
   );

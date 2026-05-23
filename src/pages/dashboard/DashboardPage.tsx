@@ -30,6 +30,7 @@ import { FileExcelOutlined, FilePdfOutlined, SettingOutlined } from "@ant-design
 import { useTranslation } from "react-i18next";
 import { reportApi } from "../../api/reportApi";
 import { Select } from "antd";
+import ErrorBoundary from "../../components/common/ErrorBoundary";
 
 const YearlyActivityMapContainer = ({ onClose }: { onClose: () => void }) => {
   const { t } = useTranslation();
@@ -148,7 +149,18 @@ function DashboardPage() {
           </Button>
         </Space>
       </Flex>
-      <StatsOverview />
+      <ErrorBoundary
+        fallback={
+          <Result
+            status="500"
+            title={t("Errors.UNEXPECTED_ERROR")}
+            subTitle={t("Errors.GENERAL_ERROR")}
+            style={{ padding: 20 }}
+          />
+        }
+      >
+        <StatsOverview />
+      </ErrorBoundary>
       <ResponsiveGridLayout
         className="layout"
         layouts={layouts}
@@ -165,7 +177,9 @@ function DashboardPage() {
               title={t("Dashboard.TOP_COMPANIES")}
               onClose={() => toggleWidget("company", false)}
             >
-              <CompanyDistribution />
+              <ErrorBoundary fallback={<Result status="500" subTitle={t("Errors.WIDGET_LOAD_ERROR", "Widget could not be loaded")} style={{ padding: 0 }} />}>
+                <CompanyDistribution />
+              </ErrorBoundary>
             </DashboardWidget>
           </div>
         )}
@@ -176,7 +190,9 @@ function DashboardPage() {
               title={t("Dashboard.PARKING_LOT_TITLE")}
               onClose={() => toggleWidget("parkingLot", false)}
             >
-              <ParkingLotDistribution />
+              <ErrorBoundary fallback={<Result status="500" subTitle={t("Errors.WIDGET_LOAD_ERROR", "Widget could not be loaded")} style={{ padding: 0 }} />}>
+                <ParkingLotDistribution />
+              </ErrorBoundary>
             </DashboardWidget>
           </div>
         )}
@@ -187,7 +203,9 @@ function DashboardPage() {
               title={t("Dashboard.TODAY_UNLOAD_STATUS")}
               onClose={() => toggleWidget("unloaded", false)}
             >
-              <UnloadedStatus />
+              <ErrorBoundary fallback={<Result status="500" subTitle={t("Errors.WIDGET_LOAD_ERROR", "Widget could not be loaded")} style={{ padding: 0 }} />}>
+                <UnloadedStatus />
+              </ErrorBoundary>
             </DashboardWidget>
           </div>
         )}
@@ -205,7 +223,9 @@ function DashboardPage() {
               }
               onClose={() => toggleWidget("live", false)}
             >
-              <LiveOperationsList />
+              <ErrorBoundary fallback={<Result status="500" subTitle={t("Errors.WIDGET_LOAD_ERROR", "Widget could not be loaded")} style={{ padding: 0 }} />}>
+                <LiveOperationsList />
+              </ErrorBoundary>
             </DashboardWidget>
           </div>
         )}
@@ -216,16 +236,20 @@ function DashboardPage() {
               title={t("Dashboard.WEEKLY_ACTIVITY")}
               onClose={() => toggleWidget("weekly", false)}
             >
-              <WeeklyActivityChart />
+              <ErrorBoundary fallback={<Result status="500" subTitle={t("Errors.WIDGET_LOAD_ERROR", "Widget could not be loaded")} style={{ padding: 0 }} />}>
+                <WeeklyActivityChart />
+              </ErrorBoundary>
             </DashboardWidget>
           </div>
         )}
 
         {visibleWidgets.yearly && (
           <div key="yearly">
-            <YearlyActivityMapContainer 
-              onClose={() => toggleWidget("yearly", false)} 
-            />
+            <ErrorBoundary fallback={<Result status="500" subTitle={t("Errors.WIDGET_LOAD_ERROR", "Widget could not be loaded")} style={{ padding: 0 }} />}>
+              <YearlyActivityMapContainer 
+                onClose={() => toggleWidget("yearly", false)} 
+              />
+            </ErrorBoundary>
           </div>
         )}
       </ResponsiveGridLayout>
