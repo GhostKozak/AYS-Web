@@ -59,7 +59,7 @@ export default function DiffViewer({ diffs }: Props) {
                 {oldValue ? (
                   String(oldValue)
                 ) : (
-                  <em style={{ opacity: 0.5 }}>(Boş)</em>
+                  <em style={{ opacity: 0.5 }}>{t("Common.EMPTY", "(Empty)")}</em>
                 )}
               </Text>
 
@@ -69,7 +69,7 @@ export default function DiffViewer({ diffs }: Props) {
                 {newValue ? (
                   String(newValue)
                 ) : (
-                  <em style={{ opacity: 0.5 }}>(Boş)</em>
+                  <em style={{ opacity: 0.5 }}>{t("Common.EMPTY", "(Empty)")}</em>
                 )}
               </Text>
             </div>

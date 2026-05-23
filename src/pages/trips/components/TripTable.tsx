@@ -6,6 +6,9 @@ import { Trans, useTranslation } from "react-i18next";
 import {
   formatLicencePlate,
   formatPhoneNumber,
+  formatDate,
+  formatDateTime,
+  formatTime,
   getUniqueOptions,
 } from "../../../utils";
 import { useMemo, useState, useEffect, useCallback } from "react";
@@ -148,7 +151,7 @@ export default function TripTable({
           trips
             .map((t) =>
               t.arrival_time
-                ? new Date(t.arrival_time).toLocaleDateString("tr-TR")
+                ? formatDate(t.arrival_time)
                 : null,
             )
             .filter((date): date is string => date !== null),
@@ -168,7 +171,7 @@ export default function TripTable({
               <span style={{ fontSize: "0.75em", color: "#52c41a" }}>▼</span>
               <span>
                 {record.arrival_time
-                  ? new Date(record.arrival_time).toLocaleString("tr-TR", {
+                  ? formatDateTime(record.arrival_time, {
                       month: "2-digit",
                       day: "2-digit",
                       hour: "2-digit",
@@ -181,7 +184,7 @@ export default function TripTable({
               <span style={{ fontSize: "0.75em", color: "#ff4d4f" }}>▲</span>
               <span style={{ color: record.departure_time ? "inherit" : "#888" }}>
                 {record.departure_time
-                  ? new Date(record.departure_time).toLocaleString("tr-TR", {
+                  ? formatDateTime(record.departure_time, {
                       month: "2-digit",
                       day: "2-digit",
                       hour: "2-digit",
@@ -195,7 +198,7 @@ export default function TripTable({
         filters: filters.arrivalDate,
         onFilter: (value, record) => {
           if (!record.arrival_time) return false;
-          return new Date(record.arrival_time).toLocaleDateString("tr-TR") === value;
+          return formatDate(record.arrival_time) === value;
         },
         filterSearch: true,
         width: 140,
@@ -306,10 +309,11 @@ export default function TripTable({
           if (record.is_in_temporary_parking_lot) {
             return (
               <div>
-                <Tag color="green">{t("Trips.TEMP_PARKING_SHORT", { defaultValue: "Kesik" })}</Tag>
+                <Tag color="green">{t("Trips.TEMP_PARKING_SHORT", { defaultValue: "Interrupted" })}</Tag>
                 {record.parked_at && (
                   <div style={{ fontSize: "0.8em", color: "#888" }}>
-                    {new Date(record.parked_at).toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" })}
+                    {formatTime(record.parked_at, { hour: "2-digit", minute: "2-digit" })}
+
                   </div>
                 )}
               </div>
@@ -321,7 +325,7 @@ export default function TripTable({
           return "-";
         },
         filters: [
-          { text: t("Trips.TEMP_PARKING_SHORT", { defaultValue: "Kesik" }), value: "temp" },
+          { text: t("Trips.TEMP_PARKING_SHORT", { defaultValue: "Interrupted" }), value: "temp" },
           { text: t("FieldOps.TAG_PARK"), value: "park" },
           { text: t("Common.CANCEL"), value: "canceled" },
         ],
@@ -412,7 +416,7 @@ export default function TripTable({
         key: "field_verified_at",
         render: (date: string) =>
           date
-            ? new Date(date).toLocaleString("tr-TR", {
+            ? formatDateTime(date, {
                 year: "numeric",
                 month: "2-digit",
                 day: "2-digit",
@@ -435,7 +439,7 @@ export default function TripTable({
         key: "createdAt",
         render: (date: string) =>
           date
-            ? new Date(date).toLocaleString("tr-TR", {
+            ? formatDateTime(date, {
                 year: "numeric",
                 month: "2-digit",
                 day: "2-digit",
@@ -453,7 +457,7 @@ export default function TripTable({
         key: "updatedAt",
         render: (date: string) =>
           date
-            ? new Date(date).toLocaleString("tr-TR", {
+            ? formatDateTime(date, {
                 year: "numeric",
                 month: "2-digit",
                 day: "2-digit",
@@ -543,13 +547,13 @@ export default function TripTable({
             <div style={{ margin: 0 }}>
               <p><strong>{t("Trips.NOTES")}:</strong> {record.notes}</p>
               {record.parked_at && (
-                <p><strong>{t("Trips.PARKED_AT")}:</strong> {new Date(record.parked_at).toLocaleString("tr-TR")}</p>
+                <p><strong>{t("Trips.PARKED_AT")}:</strong> {formatDateTime(record.parked_at)}</p>
               )}
               {record.seal_number && (
                 <p><strong>{t("Trips.SEAL_NUMBER")}:</strong> {record.seal_number}</p>
               )}
               {record.field_verified_at && (
-                <p><strong>{t("Trips.FIELD_VERIFIED_AT")}:</strong> {new Date(record.field_verified_at).toLocaleString("tr-TR")}</p>
+                <p><strong>{t("Trips.FIELD_VERIFIED_AT")}:</strong> {formatDateTime(record.field_verified_at)}</p>
               )}
             </div>
           ),

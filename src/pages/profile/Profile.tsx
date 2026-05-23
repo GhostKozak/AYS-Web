@@ -11,7 +11,7 @@ const { Title } = Typography;
 
 export default function Profile() {
   const { t } = useTranslation();
-  usePageTitle(t("Header.ACCOUNT_SETTINGS", "Hesap Ayarları"));
+  usePageTitle(t("Header.ACCOUNT_SETTINGS", "Account Settings"));
   const { notification } = App.useApp();
   const isMobile = useIsMobile();
   const { updateCurrentUser } = useAuth();
@@ -34,8 +34,8 @@ export default function Profile() {
         });
       } catch (err: any) {
         notification.error({
-          title: t("Common.ERROR", "Hata"),
-          description: t("Errors.GENERAL_ERROR", "Bir hata oluştu."),
+          title: t("Common.ERROR", "Error"),
+          description: t("Errors.GENERAL_ERROR", "An error occurred."),
         });
       } finally {
         setLoadingConfig(prev => ({ ...prev, fetch: false }));
@@ -59,13 +59,13 @@ export default function Profile() {
       });
 
       notification.success({
-        title: t("Common.SUCCESS", "Başarılı"),
-        description: t("Users.UPDATE_SUCCESS", "Kullanıcı başarıyla güncellendi."),
+        title: t("Common.SUCCESS", "Success"),
+        description: t("Users.UPDATE_SUCCESS", "User updated successfully."),
       });
     } catch (err: any) {
       notification.error({
-        title: t("Common.ERROR", "Hata"),
-        description: err?.response?.data?.message || t("Errors.OPERATION_FAILED", "İşlem Başarısız"),
+        title: t("Common.ERROR", "Error"),
+        description: err?.response?.data?.message || t("Errors.OPERATION_FAILED", "Operation Failed"),
       });
     } finally {
       setLoadingConfig(prev => ({ ...prev, personal: false }));
@@ -79,14 +79,14 @@ export default function Profile() {
         password: values.password,
       });
       notification.success({
-        title: t("Common.SUCCESS", "Başarılı"),
-        description: t("Profile.PASSWORD_UPDATE_SUCCESS", "Şifre başarıyla güncellendi."),
+        title: t("Common.SUCCESS", "Success"),
+        description: t("Profile.PASSWORD_UPDATE_SUCCESS", "Password updated successfully."),
       });
       passwordForm.resetFields();
     } catch (err: any) {
       notification.error({
-        title: t("Common.ERROR", "Hata"),
-        description: err?.message || t("Errors.OPERATION_FAILED", "İşlem Başarısız"),
+        title: t("Common.ERROR", "Error"),
+        description: err?.message || t("Errors.OPERATION_FAILED", "Operation Failed"),
       });
     } finally {
       setLoadingConfig(prev => ({ ...prev, password: false }));
@@ -96,13 +96,13 @@ export default function Profile() {
   return (
     <Layout style={{ padding: isMobile ? "0 12px" : "0 20px" }}>
       <Title level={2} style={{ marginTop: 0, marginBottom: 20 }}>
-        {t("Header.ACCOUNT_SETTINGS", "Hesap Ayarları")}
+        {t("Header.ACCOUNT_SETTINGS", "Account Settings")}
       </Title>
 
       <Row gutter={[24, 24]}>
         <Col xs={24} md={12}>
           <Card
-            title={<><UserOutlined style={{ marginRight: 8 }} />{t("Users.EDIT_USER", "Kullanıcı Düzenle")}</>}
+            title={<><UserOutlined style={{ marginRight: 8 }} />{t("Users.EDIT_USER", "Edit User")}</>}
             style={{ height: '100%' }}
           >
             <Form
@@ -113,23 +113,23 @@ export default function Profile() {
               <Spin spinning={loadingConfig.fetch}>
                 <Form.Item
                   name="email"
-                  label={t("Users.EMAIL", "E-posta")}
+                  label={t("Users.EMAIL", "Email")}
                 >
                   <Input disabled />
                 </Form.Item>
 
                 <Form.Item
                   name="firstName"
-                  label={t("Users.FIRST_NAME", "Ad")}
-                  rules={[{ required: true, message: t("Validation.REQUIRED", "Bu alan zorunludur!") }]}
+                  label={t("Users.FIRST_NAME", "First Name")}
+                  rules={[{ required: true, message: t("Validation.REQUIRED", "This field is required!") }]}
                 >
                   <Input />
                 </Form.Item>
 
                 <Form.Item
                   name="lastName"
-                  label={t("Users.LAST_NAME", "Soyad")}
-                  rules={[{ required: true, message: t("Validation.REQUIRED", "Bu alan zorunludur!") }]}
+                  label={t("Users.LAST_NAME", "Last Name")}
+                  rules={[{ required: true, message: t("Validation.REQUIRED", "This field is required!") }]}
                 >
                   <Input />
                 </Form.Item>
@@ -142,7 +142,7 @@ export default function Profile() {
                     loading={loadingConfig.personal}
                     block={isMobile}
                   >
-                    {t("Common.SAVE", "Kaydet")}
+                    {t("Common.SAVE", "Save")}
                   </Button>
                 </Form.Item>
               </Spin>
@@ -152,7 +152,7 @@ export default function Profile() {
 
         <Col xs={24} md={12}>
           <Card
-            title={<><LockOutlined style={{ marginRight: 8 }} />{t("Login.PASSWORD_PLACEHOLDER", "Şifre")}</>}
+            title={<><LockOutlined style={{ marginRight: 8 }} />{t("Login.PASSWORD_PLACEHOLDER", "Password")}</>}
             style={{ height: '100%' }}
           >
             <Form
@@ -162,7 +162,7 @@ export default function Profile() {
             >
               <Form.Item
                 name="password"
-                label={t("Profile.NEW_PASSWORD", "Yeni Şifre")}
+                label={t("Profile.NEW_PASSWORD", "New Password")}
                 rules={[
                   { required: true, message: t("Validation.REQUIRED") },
                   { min: 8, message: t("Validation.PASSWORD_MIN_LENGTH") },
@@ -177,10 +177,10 @@ export default function Profile() {
 
               <Form.Item
                 name="confirmPassword"
-                label={t("Profile.NEW_PASSWORD_CONFIRM", "Yeni Şifre (Tekrar)")}
+                label={t("Profile.NEW_PASSWORD_CONFIRM", "Confirm New Password")}
                 dependencies={['password']}
                 rules={[
-                  { required: true, message: t("Validation.REQUIRED", "Bu alan zorunludur!") },
+                  { required: true, message: t("Validation.REQUIRED", "This field is required!") },
                   ({ getFieldValue }) => ({
                     validator(_, value) {
                       if (!value || getFieldValue('password') === value) {
@@ -203,7 +203,7 @@ export default function Profile() {
                   block={isMobile}
                   danger
                 >
-                  {t("Profile.UPDATE_PASSWORD_BTN", "Şifreyi Güncelle")}
+                  {t("Profile.UPDATE_PASSWORD_BTN", "Update Password")}
                 </Button>
               </Form.Item>
             </Form>

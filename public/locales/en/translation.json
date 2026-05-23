@@ -98,7 +98,9 @@
     "WARNING": "Warning",
     "LOADING": "Loading...",
     "ACTIONS": "Actions",
-    "RELOAD": "Reload"
+    "RELOAD": "Reload",
+    "RETRY": "Try Again",
+    "EMPTY": "(Empty)"
   },
 
   "TableSettings": {
@@ -143,7 +145,8 @@
     "SERVER_ERROR_DESC": "A server error occurred. Please try again later.",
     "NETWORK_ERROR": "Connection Error",
     "NETWORK_ERROR_DESC": "Please check your internet connection.",
-    "CONNECTION_RESTORED": "Internet connection restored."
+    "CONNECTION_RESTORED": "Internet connection restored.",
+    "WIDGET_LOAD_ERROR": "Widget could not be loaded"
   },
 
   "Validation": {
@@ -315,7 +318,7 @@
     "STATUS_CANCELED": "Canceled",
     "STATUS_UNKNOWN": "Unknown",
     "STATUS_PENDING": "Pending Verification",
-    "FIELD_VERIFIED": "Saha Doğrulaması Tamamlandı",
+    "FIELD_VERIFIED": "Field Verification Completed",
     "SEAL_NUMBER": "Seal Number",
     "FIELD_PHOTO": "Field Photo",
     "FIELD_PHOTO_TITLE": "Field Verification Photo",

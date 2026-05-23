@@ -1,4 +1,5 @@
 import type { DiffChange, DiffConfigItem } from "../types";
+export { formatDate, formatDateTime, formatTime } from "./date.utils";
 
 export const formatPhoneNumber = (phone_number: string): string => {
   if (!phone_number) return "";

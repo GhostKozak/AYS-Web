@@ -1,7 +1,7 @@
 import { Flex, Divider, Typography, Space } from "antd";
 import EntityCardList from "../../../components/common/EntityCardList";
 import { useTranslation } from "react-i18next";
-import { formatLicencePlate } from "../../../utils";
+import { formatLicencePlate, formatDate } from "../../../utils";
 import type { VehicleType } from "../../../types";
 
 type Props = {
@@ -31,11 +31,11 @@ export default function VehicleCardList({ items, isLoading, onEdit, onDelete }: 
           <Divider size="small" style={{ margin: "8px 0" }} />
           <Flex justify="space-between">
             <Text type="secondary">{t("Table.CREATED_AT")}:</Text>
-            <Text>{new Date(item.createdAt).toLocaleDateString("tr-TR")}</Text>
+            <Text>{formatDate(item.createdAt)}</Text>
           </Flex>
           <Flex justify="space-between">
             <Text type="secondary">{t("Table.UPDATED_AT")}:</Text>
-            <Text>{new Date(item.updatedAt).toLocaleDateString("tr-TR")}</Text>
+            <Text>{formatDate(item.updatedAt)}</Text>
           </Flex>
         </Space>
       )}

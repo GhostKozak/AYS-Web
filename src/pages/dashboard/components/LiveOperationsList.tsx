@@ -3,7 +3,7 @@ import { Flex, Avatar, Tag, Typography, Space, theme } from "antd";
 import { TruckOutlined, ClockCircleOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import { useTrips } from "../../../hooks/useTrips";
-import { formatLicencePlate } from "../../../utils";
+import { formatLicencePlate, formatTime } from "../../../utils";
 
 const { Text } = Typography;
 const { useToken } = theme;
@@ -82,7 +82,7 @@ export default function LiveOperationsList() {
         ) : (
           latestTrips.map((trip) => {
             const timeString = trip.arrival_time
-              ? new Date(trip.arrival_time).toLocaleTimeString("tr-TR", {
+              ? formatTime(trip.arrival_time, {
                   hour: "2-digit",
                   minute: "2-digit",
                 })

@@ -98,7 +98,9 @@
     "WARNING": "Uyarı",
     "LOADING": "Yükleniyor...",
     "ACTIONS": "İşlemler",
-    "RELOAD": "Yenile"
+    "RELOAD": "Yenile",
+    "RETRY": "Tekrar Dene",
+    "EMPTY": "(Boş)"
   },
 
   "TableSettings": {
@@ -143,7 +145,8 @@
     "SERVER_ERROR_DESC": "Sunucuda bir hata oluştu. Lütfen daha sonra tekrar deneyiniz.",
     "NETWORK_ERROR": "Bağlantı Hatası",
     "NETWORK_ERROR_DESC": "İnternet bağlantınızı kontrol ediniz.",
-    "CONNECTION_RESTORED": "İnternet bağlantısı sağlandı."
+    "CONNECTION_RESTORED": "İnternet bağlantısı sağlandı.",
+    "WIDGET_LOAD_ERROR": "Widget yüklenemedi"
   },
 
   "Validation": {

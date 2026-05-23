@@ -85,8 +85,8 @@ const CompanyModal = ({
               name="name"
               rules={[
                 { required: true, message: t("Companies.NAME_REQUIRED") },
-                { min: 2, message: t("Companies.NAME_TOO_SHORT", { defaultValue: "Şirket adı en az 2 karakter olmalıdır" }) },
-                { max: 100, message: t("Companies.NAME_TOO_LONG", { defaultValue: "Şirket adı en fazla 100 karakter olabilir" }) },
+                { min: 2, message: t("Companies.NAME_TOO_SHORT", { defaultValue: "Company name must be at least 2 characters" }) },
+                { max: 100, message: t("Companies.NAME_TOO_LONG", { defaultValue: "Company name must be at most 100 characters" }) },
               ]}
             >
               <Input

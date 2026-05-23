@@ -3,6 +3,7 @@ import { useReportTrend } from "../../../hooks/useReports";
 import { useTranslation } from "react-i18next";
 import { Skeleton, theme } from "antd";
 import { useIsMobile } from "../../../hooks/useIsMobile";
+import { formatDate } from "../../../utils";
 
 const WeeklyActivityChart = () => {
   const { t, i18n } = useTranslation();
@@ -20,7 +21,7 @@ const WeeklyActivityChart = () => {
     if (rawDate && rawDate.length === 10) {
       const dateObj = new Date(rawDate);
       if (!isNaN(dateObj.getTime())) {
-        shortDate = dateObj.toLocaleDateString(i18n.language || "tr-TR", { day: "numeric", month: "short" });
+        shortDate = formatDate(dateObj, { day: "numeric", month: "short" });
       }
     }
 

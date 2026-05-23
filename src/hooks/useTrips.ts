@@ -10,11 +10,11 @@ export const useTrips = () => {
   useEffect(() => {
     const updateInterval = () => {
       if (socket.connected) {
-        console.log("[useTrips] WebSocket active: set polling to 30s");
-        setPollingInterval(30000);
+        console.log("[useTrips] WebSocket active: polling disabled");
+        setPollingInterval(0);
       } else {
-        console.log("[useTrips] WebSocket inactive: active polling fallback at 12s");
-        setPollingInterval(12000); // 12 seconds active polling
+        console.log("[useTrips] WebSocket inactive: polling fallback at 30s");
+        setPollingInterval(30000);
       }
     };
 

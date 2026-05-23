@@ -3,7 +3,7 @@ import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { USER_ROLES, type VehicleType, type TableSettings } from "../../../types";
 import { Trans, useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
-import { formatLicencePlate, getUniqueOptions } from "../../../utils";
+import { formatLicencePlate, getUniqueOptions, formatDateTime } from "../../../utils";
 import { useMemo } from "react";
 import type { ColumnType } from "antd/es/table";
 import type { TableRowSelection } from "antd/es/table/interface";
@@ -114,7 +114,7 @@ export default function VehicleTable({
         dataIndex: "createdAt",
         key: "createdAt",
         visible: canEdit,
-        render: (date: string) => new Date(date).toLocaleString("tr-TR"),
+        render: (date: string) => formatDateTime(date),
         sorter: (a, b) =>
           new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
         responsive: ["lg"],
@@ -123,7 +123,7 @@ export default function VehicleTable({
         title: t("Table.UPDATED_AT"),
         dataIndex: "updatedAt",
         key: "updatedAt",
-        render: (date: string) => new Date(date).toLocaleString("tr-TR"),
+        render: (date: string) => formatDateTime(date),
         sorter: (a, b) =>
           new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime(),
         responsive: ["lg"],

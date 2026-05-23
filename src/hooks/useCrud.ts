@@ -45,7 +45,7 @@ export const useCrud = <T, CreatePayload>(
       queryClient.invalidateQueries({ queryKey });
     },
     onError: (err: any) => {
-      message.error(err?.response?.data?.message || err.message || "İşlem sırasında bir hata oluştu");
+      message.error(err?.response?.data?.message || err.message || "An error occurred during the operation");
     },
   });
 
@@ -59,7 +59,7 @@ export const useCrud = <T, CreatePayload>(
       queryClient.invalidateQueries({ queryKey });
     },
     onError: (err: any) => {
-      message.error(err?.response?.data?.message || err.message || "Güncelleme sırasında bir hata oluştu");
+      message.error(err?.response?.data?.message || err.message || "An error occurred during update");
     },
   });
 
@@ -69,7 +69,7 @@ export const useCrud = <T, CreatePayload>(
       queryClient.invalidateQueries({ queryKey });
     },
     onError: (err: any) => {
-      message.error(err?.response?.data?.message || err.message || "Silme işlemi sırasında bir hata oluştu");
+      message.error(err?.response?.data?.message || err.message || "An error occurred during delete");
     },
   });
 

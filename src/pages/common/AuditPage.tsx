@@ -103,7 +103,7 @@ function AuditPage() {
       key: "details",
       render: (_: any, record: AuditType) => (
         <Button size="small" type="dashed" onClick={() => handleViewDetails(record)}>
-          {t("Audit.VIEW_DETAILS", "Detayları Gör")}
+          {t("Audit.VIEW_DETAILS", "View Details")}
         </Button>
       ),
     },

@@ -1,7 +1,7 @@
 export const getTopResultsWithOthers = (
   data: { id: string; value: number }[],
   topCount: number = 5,
-  othersLabel: string = "Diğerleri"
+  othersLabel: string = "Others"
 ) => {
   const sorted = [...data].sort((a, b) => b.value - a.value);
   

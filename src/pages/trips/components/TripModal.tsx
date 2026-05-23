@@ -409,7 +409,7 @@ const TripModal = ({
               unload_status: "WAITING",
             }}
           >
-            <Form.Item label={t("Trips.NEW_DRIVER", { defaultValue: "Yeni Sürücü Ekle" })} labelCol={{ span: 10 }} wrapperCol={{ span: 14 }}>
+            <Form.Item label={t("Trips.NEW_DRIVER", { defaultValue: "Add New Driver" })} labelCol={{ span: 10 }} wrapperCol={{ span: 14 }}>
               <Switch checked={isNewDriver} onChange={(checked) => setIsNewDriver(checked)} />
             </Form.Item>
 
@@ -474,10 +474,10 @@ const TripModal = ({
                       const country = COUNTRY_CODES.find(c => c.code === countryCode);
                       if (country?.value === "+90") {
                         if (/^5\d{9}$/.test(value)) return Promise.resolve();
-                        return Promise.reject(t("Drivers.PHONE_FORMAT_ERROR", { defaultValue: "Geçerli bir numara giriniz (5XXXXXXXXX)" }));
+                        return Promise.reject(t("Drivers.PHONE_FORMAT_ERROR", { defaultValue: "Enter a valid number (5XXXXXXXXX)" }));
                       }
                       if (/^\d{6,14}$/.test(value)) return Promise.resolve();
-                      return Promise.reject(t("Drivers.PHONE_FORMAT_ERROR", { defaultValue: "Geçerli bir numara giriniz" }));
+                      return Promise.reject(t("Drivers.PHONE_FORMAT_ERROR", { defaultValue: "Enter a valid number" }));
                       }
                     },
                   ]}
@@ -525,7 +525,7 @@ const TripModal = ({
             <Form.Item
               label={t("Trips.LICENSE_PLATE")}
               name="vehicle"
-              rules={[{ required: true, message: t("Trips.VEHICLE_REQUIRED", { defaultValue: "Araç seçimi zorunludur" }) }]}
+              rules={[{ required: true, message: t("Trips.VEHICLE_REQUIRED", { defaultValue: "Vehicle selection is required" }) }]}
             >
               <Select
                 placeholder={t("Trips.VEHICLE_REQUIRED")}

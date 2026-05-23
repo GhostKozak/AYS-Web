@@ -3,7 +3,7 @@ import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { USER_ROLES, type CompanyType, type TableSettings } from "../../../types";
 import { Trans, useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
-import { getUniqueOptions } from "../../../utils";
+import { getUniqueOptions, formatDateTime } from "../../../utils";
 import { useMemo } from "react";
 import { useAuth } from "../../../hooks/useAuth";
 import type { ColumnType } from "antd/es/table";
@@ -98,7 +98,7 @@ export default function CompaniesTable({
         dataIndex: "createdAt",
         key: "createdAt",
         visible: canEdit,
-        render: (d: string) => new Date(d).toLocaleString("tr-TR"),
+        render: (d: string) => formatDateTime(d),
         sorter: (a, b) =>
           new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
         responsive: ["lg"],
@@ -107,7 +107,7 @@ export default function CompaniesTable({
         title: t("Table.UPDATED_AT"),
         dataIndex: "updatedAt",
         key: "updatedAt",
-        render: (d: string) => new Date(d).toLocaleString("tr-TR"),
+        render: (d: string) => formatDateTime(d),
         sorter: (a, b) =>
           new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime(),
         responsive: ["lg"],

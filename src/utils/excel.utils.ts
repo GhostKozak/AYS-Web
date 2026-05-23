@@ -1,4 +1,3 @@
-import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 import i18next from 'i18next';
 import type { TripType, CompanyType, DriverType, VehicleType } from '../types';
@@ -6,6 +5,7 @@ import { isSameDay } from './date.utils';
 
 // Ortak Kaydetme Fonksiyonu
 const saveAsExcel = async (data: any[], fileNameKey: string, sheetName: string, colWidths: { width: number }[]) => {
+  const ExcelJS = (await import('exceljs')).default;
   const workbook = new ExcelJS.Workbook();
   const worksheet = workbook.addWorksheet(sheetName);
 

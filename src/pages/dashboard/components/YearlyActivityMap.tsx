@@ -3,6 +3,7 @@ import { useReportTrend } from "../../../hooks/useReports";
 import { Skeleton, theme } from "antd";
 import { useTranslation } from "react-i18next";
 import { useIsMobile } from "../../../hooks/useIsMobile";
+import { formatDate } from "../../../utils";
 
 const YearlyActivityMap = ({ year }: { year?: number }) => {
   const currentYear = year || new Date().getFullYear();
@@ -59,7 +60,7 @@ const YearlyActivityMap = ({ year }: { year?: number }) => {
           tooltip={({ day, value, color }) => {
             const dateObj = new Date(day);
             const dateStr = !isNaN(dateObj.getTime())
-              ? dateObj.toLocaleDateString(i18n.language || "tr-TR", { day: "numeric", month: "long", weekday: "long" })
+              ? formatDate(dateObj, { day: "numeric", month: "long", weekday: "long" })
               : day;
             return (
               <div style={{

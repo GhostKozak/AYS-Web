@@ -117,11 +117,11 @@ const VehicleModal = ({
                 { required: true, message: t("Vehicles.PLATE_REQUIRED") },
                 {
                   min: 5,
-                  message: t("Vehicles.PLATE_TOO_SHORT", { defaultValue: "Plaka en az 5 karakter olmalıdır" }),
+                  message: t("Vehicles.PLATE_TOO_SHORT", { defaultValue: "Plate must be at least 5 characters" }),
                 },
                 {
                   max: 10,
-                  message: t("Vehicles.PLATE_TOO_LONG", { defaultValue: "Plaka en fazla 10 karakter olabilir" }),
+                  message: t("Vehicles.PLATE_TOO_LONG", { defaultValue: "Plate must be at most 10 characters" }),
                 },
               ]}
             >

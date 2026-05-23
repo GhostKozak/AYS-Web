@@ -25,7 +25,7 @@ export const useAppConfig = (): AppConfigContext => {
   const context = useContext(AppConfigContext);
   if (!context) {
     throw new Error(
-      "useAppConfig, AppConfigProvider içerisinde kullanılmalıdır"
+      "useAppConfig must be used within AppConfigProvider"
     );
   }
   return context;

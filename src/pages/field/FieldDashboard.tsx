@@ -32,6 +32,7 @@ import type { TripType } from "../../types";
 import { useQueryClient } from "@tanstack/react-query";
 import { tripApi } from "../../api/tripApi";
 import ErrorState from "../../components/common/ErrorState";
+import { formatDateTime, formatTime } from "../../utils";
 
 const { Title, Text } = Typography;
 
@@ -153,7 +154,7 @@ function FieldDashboard() {
     if (urgentTrips.length > prevUrgentCountRef.current) {
       const audio = new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
       audio.play().catch((error) => {
-        console.warn("Ses çalınamadı (Tarayıcı politikası):", error);
+        console.warn("Sound playback failed (Browser policy):", error);
       });
       message.warning(t("FieldOps.URGENT_ACTION"));
     }
@@ -254,7 +255,7 @@ function FieldDashboard() {
               <div>
                 <Text type="secondary">
                   {t("FieldOps.ARRIVAL")}:{" "}
-                  {new Date(trip.arrival_time).toLocaleTimeString("tr-TR", {
+                  {formatTime(trip.arrival_time, {
                     hour: "2-digit",
                     minute: "2-digit",
                   })}
@@ -300,7 +301,7 @@ function FieldDashboard() {
             {t("FieldOps.TITLE")}
           </Title>
           <Text type="secondary">
-            {new Date().toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" })}
+            {formatTime(new Date(), { hour: "2-digit", minute: "2-digit" })}
           </Text>
         </Col>
         <Col>
@@ -460,7 +461,7 @@ function FieldDashboard() {
                 {selectedTrip.arrival_time && (
                   <Col span={12}>
                     <Text strong>{t("FieldOps.ARRIVAL")}:</Text>{" "}
-                    {new Date(selectedTrip.arrival_time).toLocaleString("tr-TR")}
+                    {formatDateTime(selectedTrip.arrival_time)}
                   </Col>
                 )}
               </Row>

@@ -1,7 +1,7 @@
 import { Tag, Flex, Divider, Typography, Space } from "antd";
 import EntityCardList from "../../../components/common/EntityCardList";
 import { useTranslation } from "react-i18next";
-import { formatLicencePlate } from "../../../utils";
+import { formatLicencePlate, formatDate } from "../../../utils";
 import type { TripType } from "../../../types";
 
 type Props = {
@@ -47,7 +47,7 @@ export default function TripCardList({ items, isLoading, onEdit, onDelete }: Pro
             <Text type="secondary">{t("Trips.ARRIVAL_TIME")}:</Text>
             <Text>
               {item.arrival_time
-                ? new Date(item.arrival_time).toLocaleDateString("tr-TR")
+                ? formatDate(item.arrival_time)
                 : "-"}
             </Text>
           </Flex>

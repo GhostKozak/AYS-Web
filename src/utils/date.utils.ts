@@ -1,6 +1,7 @@
 import i18next from "i18next";
 
-// Statik değerler yerine fonksiyon kullanıyoruz
+export const getLocale = () => i18next.language === "en" ? "en-US" : "tr-TR";
+
 export const getNow = () => new Date();
 
 export const getDayName = (
@@ -64,4 +65,19 @@ export const getEndOfWeek = (date: Date) => {
   const endOfWeek = new Date(startOfWeek);
   endOfWeek.setDate(startOfWeek.getDate() + 6);
   return endOfWeek;
+};
+
+export const formatDate = (date: string | Date, options?: Intl.DateTimeFormatOptions): string => {
+  const d = typeof date === "string" ? new Date(date) : date;
+  return d.toLocaleDateString(getLocale(), options);
+};
+
+export const formatDateTime = (date: string | Date, options?: Intl.DateTimeFormatOptions): string => {
+  const d = typeof date === "string" ? new Date(date) : date;
+  return d.toLocaleString(getLocale(), options);
+};
+
+export const formatTime = (date: string | Date, options?: Intl.DateTimeFormatOptions): string => {
+  const d = typeof date === "string" ? new Date(date) : date;
+  return d.toLocaleTimeString(getLocale(), options);
 };

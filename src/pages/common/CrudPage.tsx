@@ -1,6 +1,7 @@
 import { App, Button, Flex, Layout, Space, Popconfirm } from "antd";
 import Search from "antd/es/input/Search";
 import React, { useState, useMemo } from "react";
+import { useDebounce } from "../../hooks/useDebounce";
 import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router";
 import { USER_ROLES, type TableSettings } from "../../types";
@@ -104,6 +105,7 @@ function CrudPage<T extends { _id: string }>({
 
   const [searchParams, setSearchParams] = useSearchParams();
   const searchText = searchParams.get("q") ?? "";
+  const debouncedSearch = useDebounce(searchText, 300);
   const setSearchText = (val: string) =>
     setSearchParams(val ? { q: val } : {}, { replace: true });
 
@@ -211,10 +213,10 @@ function CrudPage<T extends { _id: string }>({
   };
 
   const filtered = useMemo(() => {
-    if (!searchText) return data;
-    const lowerSearch = searchText.toLowerCase();
+    if (!debouncedSearch) return data;
+    const lowerSearch = debouncedSearch.toLowerCase();
     return data.filter((item) => filterFn(item, lowerSearch));
-  }, [data, searchText, filterFn]);
+  }, [data, debouncedSearch, filterFn]);
 
   if (isError) {
     return (
