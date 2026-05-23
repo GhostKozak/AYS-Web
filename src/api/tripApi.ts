@@ -3,8 +3,8 @@ import { API_ENDPOINTS } from "../constants";
 import type { CreateTripPayload } from "../types";
 
 export const tripApi = {
-  getAll: async () => {
-    const response = await apiClient.get(API_ENDPOINTS.TRIPS, { params: { limit: 10000 } });
+  getAll: async (params?: Record<string, unknown>) => {
+    const response = await apiClient.get(API_ENDPOINTS.TRIPS, { params });
     return response.data.data ?? response.data;
   },
 

@@ -3,8 +3,8 @@ import { API_ENDPOINTS } from "../constants";
 import type { CreateCompanyPayload } from "../types";
 
 export const companyApi = {
-  getAll: async () => {
-    const response = await apiClient.get(API_ENDPOINTS.COMPANIES, { params: { limit: 10000 } });
+  getAll: async (params?: Record<string, unknown>) => {
+    const response = await apiClient.get(API_ENDPOINTS.COMPANIES, { params });
     return response.data.data ?? response.data;
   },
 

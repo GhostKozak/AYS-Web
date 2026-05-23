@@ -3,8 +3,8 @@ import { API_ENDPOINTS } from "../constants";
 import type { CreateDriverPayload } from "../types";
 
 export const driverApi = {
-  getAll: async () => {
-    const response = await apiClient.get(API_ENDPOINTS.DRIVERS, { params: { limit: 10000 } });
+  getAll: async (params?: Record<string, unknown>) => {
+    const response = await apiClient.get(API_ENDPOINTS.DRIVERS, { params });
     return response.data.data ?? response.data;
   },
 

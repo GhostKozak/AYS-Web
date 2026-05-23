@@ -1,6 +1,6 @@
 import { App, Button, Flex, Layout, Space, Popconfirm } from "antd";
 import Search from "antd/es/input/Search";
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useSearchParams } from "react-router";
 import { usePageTitle } from "../../hooks/usePageTitle";
 import { useTranslation } from "react-i18next";
@@ -150,13 +150,16 @@ function Drivers() {
     }
   };
 
-  const filteredDrivers = drivers.filter((driver) => {
-    if (!searchText) return true;
-    return (
-      driver.full_name.toLowerCase().includes(searchText.toLowerCase()) ||
-      driver.phone_number.includes(searchText)
-    );
-  });
+  const filteredDrivers = useMemo(() => {
+    if (!searchText) return drivers;
+    const lowerSearch = searchText.toLowerCase();
+    return drivers.filter((driver) => {
+      return (
+        driver.full_name.toLowerCase().includes(lowerSearch) ||
+        driver.phone_number.includes(lowerSearch)
+      );
+    });
+  }, [drivers, searchText]);
 
   if (isError) {
     return (

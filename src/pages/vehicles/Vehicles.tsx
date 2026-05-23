@@ -1,5 +1,5 @@
 import { App, Button, Flex, Layout, Space, Popconfirm } from "antd";
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useSearchParams } from "react-router";
 import { usePageTitle } from "../../hooks/usePageTitle";
 import { useTranslation } from "react-i18next";
@@ -153,12 +153,13 @@ function Vehicles() {
     setIsModalOpen(true);
   };
 
-  const filteredVehicles = vehicles.filter((vehicle) => {
-    if (!searchText) return true;
-    return vehicle.licence_plate
-      .toLowerCase()
-      .includes(searchText.toLowerCase());
-  });
+  const filteredVehicles = useMemo(() => {
+    if (!searchText) return vehicles;
+    const lowerSearch = searchText.toLowerCase();
+    return vehicles.filter((vehicle) => {
+      return vehicle.licence_plate.toLowerCase().includes(lowerSearch);
+    });
+  }, [vehicles, searchText]);
 
   if (isError) {
     return (

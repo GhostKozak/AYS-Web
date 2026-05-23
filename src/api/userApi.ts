@@ -2,8 +2,8 @@ import apiClient from "./apiClient";
 import { API_ENDPOINTS } from "../constants";
 
 export const userApi = {
-  getAll: async () => {
-    const response = await apiClient.get(API_ENDPOINTS.USERS, { params: { limit: 10000 } });
+  getAll: async (params?: Record<string, unknown>) => {
+    const response = await apiClient.get(API_ENDPOINTS.USERS, { params });
     return response.data.data ?? response.data;
   },
 

@@ -1,6 +1,6 @@
 import { App, Button, Flex, Layout, Space, Popconfirm } from "antd";
 import Search from "antd/es/input/Search";
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useSearchParams } from "react-router";
 import { usePageTitle } from "../../hooks/usePageTitle";
 import { useTranslation } from "react-i18next";
@@ -137,10 +137,13 @@ function Companies() {
     setIsModalOpen(true);
   };
 
-  const filteredCompanies = companies.filter((company) => {
-    if (!searchText) return true;
-    return company.name.toLowerCase().includes(searchText.toLowerCase());
-  });
+  const filteredCompanies = useMemo(() => {
+    if (!searchText) return companies;
+    const lowerSearch = searchText.toLowerCase();
+    return companies.filter((company) => {
+      return company.name.toLowerCase().includes(lowerSearch);
+    });
+  }, [companies, searchText]);
 
   if (isError) {
     return (

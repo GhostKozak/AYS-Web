@@ -3,8 +3,8 @@ import { API_ENDPOINTS } from "../constants";
 import type { CreateVehiclePayload } from "../types";
 
 export const vehicleApi = {
-  getAll: async () => {
-    const response = await apiClient.get(API_ENDPOINTS.VEHICLES, { params: { limit: 10000 } });
+  getAll: async (params?: Record<string, unknown>) => {
+    const response = await apiClient.get(API_ENDPOINTS.VEHICLES, { params });
     return response.data.data ?? response.data;
   },
 

@@ -56,6 +56,33 @@ export default function CompaniesTable({
   };
   const tableFontSize = fontSizeMap[fontSize] ?? fontSizeMap.normal;
 
+  const tableComponents = useMemo(() => ({
+    header: {
+      cell: (cellProps: any) => (
+        <th
+          {...cellProps}
+          style={{
+            ...cellProps?.style,
+            fontSize: tableFontSize,
+            lineHeight: 1.5,
+          }}
+        />
+      ),
+    },
+    body: {
+      cell: (cellProps: any) => (
+        <td
+          {...cellProps}
+          style={{
+            ...cellProps?.style,
+            fontSize: tableFontSize,
+            lineHeight: 1.5,
+          }}
+        />
+      ),
+    },
+  }), [tableFontSize]);
+
   const columns = useMemo(() => {
     const allColumns: AuthenticatedColumnType[] = [
       {
@@ -151,32 +178,7 @@ export default function CompaniesTable({
     <div style={{ fontSize: tableFontSize }}>
       <Table
         style={{ fontSize: tableFontSize, lineHeight: 1.5 }}
-        components={{
-          header: {
-            cell: (cellProps: any) => (
-              <th
-                {...cellProps}
-                style={{
-                  ...cellProps?.style,
-                  fontSize: tableFontSize,
-                  lineHeight: 1.5,
-                }}
-              />
-            ),
-          },
-          body: {
-            cell: (cellProps: any) => (
-              <td
-                {...cellProps}
-                style={{
-                  ...cellProps?.style,
-                  fontSize: tableFontSize,
-                  lineHeight: 1.5,
-                }}
-              />
-            ),
-          },
-        }}
+        components={tableComponents}
         columns={columns}
         dataSource={companies}
         loading={isLoading}

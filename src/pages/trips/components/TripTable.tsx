@@ -8,7 +8,7 @@ import {
   formatPhoneNumber,
   getUniqueOptions,
 } from "../../../utils";
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useCallback } from "react";
 import type { ColumnType } from "antd/es/table";
 import type { TableRowSelection } from "antd/es/table/interface";
 import { useAuth } from "../../../hooks/useAuth";
@@ -67,6 +67,33 @@ export default function TripTable({
   const [selectedPhoto, setSelectedPhoto] = useState<string>("");
   const [glowingRowIds, setGlowingRowIds] = useState<Set<string>>(new Set());
 
+  const tableComponents = useMemo(() => ({
+    header: {
+      cell: (cellProps: any) => (
+        <th
+          {...cellProps}
+          style={{
+            ...cellProps?.style,
+            fontSize: tableFontSize,
+            lineHeight: 1.5,
+          }}
+        />
+      ),
+    },
+    body: {
+      cell: (cellProps: any) => (
+        <td
+          {...cellProps}
+          style={{
+            ...cellProps?.style,
+            fontSize: tableFontSize,
+            lineHeight: 1.5,
+          }}
+        />
+      ),
+    },
+  }), [tableFontSize]);
+
   useEffect(() => {
     const handleTripVerified = (event: Event) => {
       const tripId = (event as CustomEvent<string>).detail;
@@ -86,7 +113,7 @@ export default function TripTable({
     return () => window.removeEventListener("trip-verified", handleTripVerified);
   }, []);
 
-  const getRowClassName = (record: TripType) => {
+  const getRowClassName = useCallback((record: TripType) => {
     const classes: string[] = [];
     if (record.status === "PENDING") {
       classes.push("row-pending-glow");
@@ -95,12 +122,12 @@ export default function TripTable({
       classes.push("row-verified-glow");
     }
     return classes.join(" ");
-  };
+  }, [glowingRowIds]);
 
-  const openPhotoModal = (photoUrl: string) => {
+  const openPhotoModal = useCallback((photoUrl: string) => {
     setSelectedPhoto(photoUrl);
     setPhotoModalOpen(true);
-  };
+  }, []);
 
   const filters = useMemo(() => {
     return {
@@ -495,32 +522,7 @@ export default function TripTable({
     <div style={{ fontSize: tableFontSize }}>
       <Table
         style={{ fontSize: tableFontSize, lineHeight: 1.5 }}
-        components={{
-          header: {
-            cell: (cellProps: any) => (
-              <th
-                {...cellProps}
-                style={{
-                  ...cellProps?.style,
-                  fontSize: tableFontSize,
-                  lineHeight: 1.5,
-                }}
-              />
-            ),
-          },
-          body: {
-            cell: (cellProps: any) => (
-              <td
-                {...cellProps}
-                style={{
-                  ...cellProps?.style,
-                  fontSize: tableFontSize,
-                  lineHeight: 1.5,
-                }}
-              />
-            ),
-          },
-        }}
+        components={tableComponents}
         columns={columns}
         dataSource={trips}
         loading={isLoading}
