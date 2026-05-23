@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Table, Tag, Space, Input, Button, Modal, Layout, Flex } from "antd";
 import { useQuery } from "@tanstack/react-query";
 import { auditApi } from "../../api/auditApi";
@@ -10,7 +10,7 @@ import AuditDetailViewer from "./components/AuditDetailViewer";
 import { useIsMobile } from "../../hooks/useIsMobile";
 import ErrorState from "../../components/common/ErrorState";
 
-import type { AuditType } from "../../types";
+import type { AuditType, PaginatedResponse } from "../../types";
 
 
 
@@ -22,6 +22,8 @@ function AuditPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [selectedAudit, setSelectedAudit] = useState<AuditType | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
 
   const handleViewDetails = (record: AuditType) => {
     setSelectedAudit(record);
@@ -46,10 +48,15 @@ function AuditPage() {
     setSearchParams(next, { replace: true });
   };
 
-  const { data, isLoading, isError, refetch } = useQuery<AuditType[]>({
+  const { data: auditData, isLoading, isError, refetch } = useQuery<PaginatedResponse<AuditType>>({
     queryKey: ["audit", filters],
     queryFn: () => auditApi.getAll(filters),
   });
+  const data = auditData?.items ?? [];
+
+  useEffect(() => {
+    setPage(1);
+  }, [data]);
 
   const columns = [
     {
@@ -149,7 +156,20 @@ function AuditPage() {
         dataSource={data}
         loading={isLoading}
         rowKey="_id"
-        pagination={{ pageSize: 20 }}
+        pagination={{
+          current: page,
+          pageSize,
+          total: data.length,
+          onChange: (p, ps) => {
+            setPage(p);
+            setPageSize(ps);
+          },
+          showSizeChanger: true,
+          showQuickJumper: true,
+          showTotal: (total, range) =>
+            `${range[0]}-${range[1]} / ${total} ${t("Audit.TOTAL", "Total")}`,
+          pageSizeOptions: ["10", "20", "50", "100"],
+        }}
         scroll={{ x: "max-content" }}
       />
 

@@ -1,4 +1,5 @@
-import { useCompanies } from "../../hooks/useCompanies";
+import { useQuery } from "@tanstack/react-query";
+import { companyApi } from "../../api/companyApi";
 import CrudPage from "../common/CrudPage";
 import DriverCardList from "./components/DriverCardList";
 import { useDrivers } from "../../hooks/useDrivers";
@@ -7,8 +8,9 @@ import DriverModal from "./components/DriverModal";
 import { exportDriversToExcel } from "../../utils/excel.utils";
 
 function Drivers() {
-  const { drivers, isLoading, isError, refetch, createDriver, updateDriver, deleteDriver } = useDrivers();
-  const { companies } = useCompanies();
+  const { drivers, total, isLoading, isError, refetch, createDriver, updateDriver, deleteDriver, page, setPage, pageSize, setPageSize, search, setSearch } = useDrivers();
+  const { data: companiesData } = useQuery({ queryKey: ["companies", "all"], queryFn: () => companyApi.getAll({ limit: 10000 }) });
+  const companies = companiesData?.items ?? [];
 
   return (
     <CrudPage
@@ -20,6 +22,13 @@ function Drivers() {
       updateSuccessKey="Drivers.UPDATE_SUCCESS"
       updateNotificationTitleKey="Audit.DETAILS"
       data={drivers}
+      total={total}
+      page={page}
+      setPage={setPage}
+      pageSize={pageSize}
+      setPageSize={setPageSize}
+      search={search}
+      setSearch={setSearch}
       isLoading={isLoading}
       isError={isError}
       refetch={refetch}

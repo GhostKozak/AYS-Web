@@ -4,7 +4,12 @@ import { tripApi } from "../api/tripApi";
 import { type CreateTripPayload, type TripType } from "../types";
 import { socket } from "../utils/socket";
 
-export const useTrips = () => {
+interface UseTripsOptions {
+  paginated?: boolean;
+  pageSize?: number;
+}
+
+export const useTrips = (options?: UseTripsOptions) => {
   const [pollingInterval, setPollingInterval] = useState<number | false>(30000);
 
   useEffect(() => {
@@ -20,7 +25,7 @@ export const useTrips = () => {
 
     socket.on("connect", updateInterval);
     socket.on("disconnect", updateInterval);
-    updateInterval(); // Initial check
+    updateInterval();
 
     return () => {
       socket.off("connect", updateInterval);
@@ -28,19 +33,29 @@ export const useTrips = () => {
     };
   }, []);
 
-  const { data, isLoading, isError, refetch, create, update, remove } = useCrud<
+  const pagination = options?.paginated ? { pageSize: options.pageSize ?? 10 } : undefined;
+
+  const { data, total, isLoading, isError, refetch, create, update, remove, page, setPage, pageSize, setPageSize, search, setSearch } = useCrud<
     TripType,
     CreateTripPayload
-  >(tripApi, {
+  >(tripApi as any, {
     queryKey: ["trips"],
     refetchInterval: pollingInterval,
+    pagination,
   });
 
   return {
     trips: data,
+    total,
     isLoading,
     isError,
     refetch,
+    page,
+    setPage,
+    pageSize,
+    setPageSize,
+    search,
+    setSearch,
     createTrip: create,
     updateTrip: update,
     deleteTrip: remove,

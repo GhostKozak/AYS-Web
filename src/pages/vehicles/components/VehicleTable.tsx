@@ -25,6 +25,10 @@ type Props = {
   onDelete: (c: VehicleType) => void;
   rowSelection?: TableRowSelection<VehicleType>;
   settings?: TableSettings;
+  total?: number;
+  page?: number;
+  pageSize?: number;
+  onPageChange?: (page: number, pageSize: number) => void;
 };
 
 interface AuthenticatedColumnType extends ColumnType<VehicleType> {
@@ -38,6 +42,10 @@ export default function VehicleTable({
   onDelete,
   rowSelection,
   settings,
+  total: serverTotal,
+  page: serverPage,
+  pageSize: serverPageSize,
+  onPageChange,
 }: Props) {
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -200,7 +208,16 @@ export default function VehicleTable({
         loading={isLoading}
         rowKey="_id"
         rowSelection={rowSelection}
-        pagination={{
+        pagination={serverTotal !== undefined ? {
+          current: serverPage ?? 1,
+          pageSize: serverPageSize ?? 10,
+          total: serverTotal,
+          showSizeChanger: true,
+          showQuickJumper: true,
+          showTotal: (total, range) =>
+            `${range[0]}-${range[1]} / ${total} ${t("Vehicles.TOTAL")}`,
+          onChange: onPageChange,
+        } : {
           showSizeChanger: true,
           showQuickJumper: true,
           showTotal: (total, range) =>

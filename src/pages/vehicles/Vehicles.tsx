@@ -6,7 +6,7 @@ import VehicleModal from "./components/VehicleModal";
 import { exportVehiclesToExcel } from "../../utils/excel.utils";
 
 function Vehicles() {
-  const { vehicles, isLoading, isError, refetch, createVehicle, updateVehicle, deleteVehicle } = useVehicles();
+  const { vehicles, total, isLoading, isError, refetch, createVehicle, updateVehicle, deleteVehicle, page, setPage, pageSize, setPageSize, search, setSearch } = useVehicles();
 
   return (
     <CrudPage
@@ -17,6 +17,13 @@ function Vehicles() {
       createSuccessKey="Vehicles.CREATE_SUCCESS"
       updateSuccessKey="Vehicles.UPDATE_SUCCESS"
       data={vehicles}
+      total={total}
+      page={page}
+      setPage={setPage}
+      pageSize={pageSize}
+      setPageSize={setPageSize}
+      search={search}
+      setSearch={setSearch}
       isLoading={isLoading}
       isError={isError}
       refetch={refetch}

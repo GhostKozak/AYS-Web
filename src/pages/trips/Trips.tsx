@@ -1,8 +1,8 @@
 import React from "react";
-import { useQueryClient } from "@tanstack/react-query";
-import { useCompanies } from "../../hooks/useCompanies";
-import { useDrivers } from "../../hooks/useDrivers";
-import { useVehicles } from "../../hooks/useVehicles";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { companyApi } from "../../api/companyApi";
+import { driverApi } from "../../api/driverApi";
+import { vehicleApi } from "../../api/vehicleApi";
 import CrudPage from "../common/CrudPage";
 import TripCardList from "./components/TripCardList";
 import { useTrips } from "../../hooks/useTrips";
@@ -12,15 +12,21 @@ import { exportTripsToExcel } from "../../utils/excel.utils";
 
 function Trips() {
   const queryClient = useQueryClient();
-  const { trips, isLoading, isError, refetch, createTrip, updateTrip, deleteTrip } = useTrips();
-  const { companies } = useCompanies();
-  const { drivers } = useDrivers();
-  const { vehicles } = useVehicles();
+  const { trips, total, isLoading, isError, refetch, createTrip, updateTrip, deleteTrip, page, setPage, pageSize, setPageSize, search, setSearch } = useTrips({ paginated: true, pageSize: 10 });
+  const { data: companiesData } = useQuery({ queryKey: ["companies", "all"], queryFn: () => companyApi.getAll({ limit: 10000 }) });
+  const { data: driversData } = useQuery({ queryKey: ["drivers", "all"], queryFn: () => driverApi.getAll({ limit: 10000 }) });
+  const { data: vehiclesData } = useQuery({ queryKey: ["vehicles", "all"], queryFn: () => vehicleApi.getAll({ limit: 10000 }) });
+  const companies = companiesData?.items ?? [];
+  const drivers = driversData?.items ?? [];
+  const vehicles = vehiclesData?.items ?? [];
 
   const handleCreated = React.useCallback(() => {
     queryClient.invalidateQueries({ queryKey: ["companies"] });
     queryClient.invalidateQueries({ queryKey: ["drivers"] });
     queryClient.invalidateQueries({ queryKey: ["vehicles"] });
+    queryClient.invalidateQueries({ queryKey: ["companies", "all"] });
+    queryClient.invalidateQueries({ queryKey: ["drivers", "all"] });
+    queryClient.invalidateQueries({ queryKey: ["vehicles", "all"] });
   }, [queryClient]);
 
   return (
@@ -32,6 +38,13 @@ function Trips() {
       createSuccessKey="Trips.CREATE_SUCCESS"
       updateSuccessKey="Trips.UPDATE_SUCCESS"
       data={trips}
+      total={total}
+      page={page}
+      setPage={setPage}
+      pageSize={pageSize}
+      setPageSize={setPageSize}
+      search={search}
+      setSearch={setSearch}
       isLoading={isLoading}
       isError={isError}
       refetch={refetch}

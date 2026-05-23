@@ -7,7 +7,7 @@ import { useState } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import dayjs from "dayjs";
 import { usePageTitle } from "../../hooks/usePageTitle";
-import type { User, CreateUserPayload } from "../../types";
+import type { User, CreateUserPayload, PaginatedResponse } from "../../types";
 import { USER_ROLES } from "../../types";
 import { getUser } from "../../utils/auth.utils";
 import { useIsMobile } from "../../hooks/useIsMobile";
@@ -25,10 +25,11 @@ function UserManagementPage() {
   const [form] = Form.useForm();
   const isMobile = useIsMobile();
 
-  const { data, isLoading } = useQuery<User[]>({
+  const { data: usersData, isLoading } = useQuery<PaginatedResponse<User>>({
     queryKey: ["users"],
-    queryFn: () => userApi.getAll(),
+    queryFn: () => userApi.getAll({ limit: 10000 }),
   });
+  const users = usersData?.items ?? [];
 
   const createMutation = useMutation({
     mutationFn: (payload: CreateUserPayload) => userApi.create(payload),
@@ -188,7 +189,7 @@ function UserManagementPage() {
       </div>
       <Table
         columns={columns}
-        dataSource={data}
+        dataSource={users}
         loading={isLoading}
         rowKey="_id"
         scroll={{ x: "max-content" }}

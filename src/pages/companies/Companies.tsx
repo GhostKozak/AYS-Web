@@ -6,7 +6,7 @@ import CompanyModal from "./components/CompanyModal";
 import { exportCompaniesToExcel } from "../../utils/excel.utils";
 
 function Companies() {
-  const { companies, isLoading, isError, refetch, createCompany, updateCompany, deleteCompany } = useCompanies();
+  const { companies, total, isLoading, isError, refetch, createCompany, updateCompany, deleteCompany, page, setPage, pageSize, setPageSize, search, setSearch } = useCompanies();
 
   return (
     <CrudPage
@@ -17,6 +17,13 @@ function Companies() {
       createSuccessKey="Companies.CREATE_SUCCESS"
       updateSuccessKey="Companies.UPDATE_SUCCESS"
       data={companies}
+      total={total}
+      page={page}
+      setPage={setPage}
+      pageSize={pageSize}
+      setPageSize={setPageSize}
+      search={search}
+      setSearch={setSearch}
       isLoading={isLoading}
       isError={isError}
       refetch={refetch}

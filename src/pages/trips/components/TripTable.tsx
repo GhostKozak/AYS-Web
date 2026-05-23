@@ -41,6 +41,10 @@ type Props = {
   onDelete: (c: TripType) => void;
   rowSelection?: TableRowSelection<TripType>;
   settings?: TableSettings;
+  total?: number;
+  page?: number;
+  pageSize?: number;
+  onPageChange?: (page: number, pageSize: number) => void;
 };
 
 interface AuthenticatedColumnType extends ColumnType<TripType> {
@@ -54,6 +58,10 @@ export default function TripTable({
   onDelete,
   rowSelection,
   settings,
+  total: serverTotal,
+  page: serverPage,
+  pageSize: serverPageSize,
+  onPageChange,
 }: Props) {
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -534,7 +542,16 @@ export default function TripTable({
         rowSelection={rowSelection}
         rowClassName={getRowClassName}
         scroll={{ x: 1500 }}
-        pagination={{
+        pagination={serverTotal !== undefined ? {
+          current: serverPage ?? 1,
+          pageSize: serverPageSize ?? 10,
+          total: serverTotal,
+          showSizeChanger: true,
+          showQuickJumper: true,
+          showTotal: (total, range) =>
+            `${range[0]}-${range[1]} / ${total} ${t("Trips.TOTAL")}`,
+          onChange: onPageChange,
+        } : {
           showSizeChanger: true,
           showQuickJumper: true,
           showTotal: (total, range) =>

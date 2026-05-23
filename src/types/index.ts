@@ -172,6 +172,17 @@ export const USER_ROLES = {
   USER: 'user',
 } as const;
 
+export interface PaginationParams {
+  limit?: number;
+  offset?: number;
+  search?: string;
+}
+
+export interface PaginatedResponse<T> {
+  items: T[];
+  total: number;
+}
+
 export interface User {
   _id: string;
   email: string;

@@ -26,6 +26,10 @@ type Props = {
   onDelete: (c: DriverType) => void;
   rowSelection?: TableRowSelection<DriverType>;
   settings?: TableSettings;
+  total?: number;
+  page?: number;
+  pageSize?: number;
+  onPageChange?: (page: number, pageSize: number) => void;
 };
 
 interface AuthenticatedColumnType extends ColumnType<DriverType> {
@@ -39,6 +43,10 @@ export default function DriverTable({
   onDelete,
   rowSelection,
   settings,
+  total: serverTotal,
+  page: serverPage,
+  pageSize: serverPageSize,
+  onPageChange,
 }: Props) {
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -209,7 +217,16 @@ export default function DriverTable({
         rowKey="_id"
         rowSelection={rowSelection}
         scroll={{ x: 1000 }}
-        pagination={{
+        pagination={serverTotal !== undefined ? {
+          current: serverPage ?? 1,
+          pageSize: serverPageSize ?? 10,
+          total: serverTotal,
+          showSizeChanger: true,
+          showQuickJumper: true,
+          showTotal: (total, range) =>
+            `${range[0]}-${range[1]} / ${total} ${t("Drivers.TOTAL")}`,
+          onChange: onPageChange,
+        } : {
           showSizeChanger: true,
           showQuickJumper: true,
           showTotal: (total, range) =>

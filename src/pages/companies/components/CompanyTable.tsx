@@ -24,6 +24,10 @@ type Props = {
   onDelete: (c: CompanyType) => void;
   rowSelection?: TableRowSelection<CompanyType>;
   settings?: TableSettings;
+  total?: number;
+  page?: number;
+  pageSize?: number;
+  onPageChange?: (page: number, pageSize: number) => void;
 };
 
 interface AuthenticatedColumnType extends ColumnType<CompanyType> {
@@ -37,6 +41,10 @@ export default function CompaniesTable({
   onDelete,
   rowSelection,
   settings,
+  total: serverTotal,
+  page: serverPage,
+  pageSize: serverPageSize,
+  onPageChange,
 }: Props) {
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -184,7 +192,16 @@ export default function CompaniesTable({
         loading={isLoading}
         rowKey="_id"
         rowSelection={rowSelection}
-        pagination={{
+        pagination={serverTotal !== undefined ? {
+          current: serverPage ?? 1,
+          pageSize: serverPageSize ?? 10,
+          total: serverTotal,
+          showSizeChanger: true,
+          showQuickJumper: true,
+          showTotal: (total, range) =>
+            `${range[0]}-${range[1]} / ${total} ${t("Companies.TOTAL")}`,
+          onChange: onPageChange,
+        } : {
           showSizeChanger: true,
           showQuickJumper: true,
           showTotal: (total, range) =>

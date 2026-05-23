@@ -35,6 +35,14 @@ type CrudPageProps<T extends { _id: string }> = {
   updateNotificationTitleKey?: string;
 
   data: T[];
+  total?: number;
+  page?: number;
+  setPage?: (page: number) => void;
+  pageSize?: number;
+  setPageSize?: (pageSize: number) => void;
+  search?: string;
+  setSearch?: (search: string) => void;
+
   isLoading: boolean;
   isError: boolean;
   refetch: () => void;
@@ -51,6 +59,10 @@ type CrudPageProps<T extends { _id: string }> = {
     onDelete: (item: T) => void;
     rowSelection?: TableRowSelection<T>;
     settings?: TableSettings;
+    total?: number;
+    page?: number;
+    pageSize?: number;
+    onPageChange?: (page: number, pageSize: number) => void;
   }>;
 
   CardList: React.ComponentType<{
@@ -81,6 +93,13 @@ function CrudPage<T extends { _id: string }>({
   updateNotificationTitleKey = "Common.INFO",
 
   data,
+  total: serverTotal,
+  page,
+  setPage,
+  pageSize,
+  setPageSize,
+  search: serverSearch,
+  setSearch: setServerSearch,
   isLoading,
   isError,
   refetch,
@@ -103,11 +122,17 @@ function CrudPage<T extends { _id: string }>({
   const { t } = useTranslation();
   const { notification } = App.useApp();
 
-  const [searchParams, setSearchParams] = useSearchParams();
-  const searchText = searchParams.get("q") ?? "";
-  const debouncedSearch = useDebounce(searchText, 300);
-  const setSearchText = (val: string) =>
-    setSearchParams(val ? { q: val } : {}, { replace: true });
+  const isPaginated = page !== undefined && setPage !== undefined && setPageSize !== undefined;
+
+  const [localSearchParams, setLocalSearchParams] = useSearchParams();
+  const localSearchText = localSearchParams.get("q") ?? "";
+  const debouncedLocalSearch = useDebounce(localSearchText, 300);
+
+  const debouncedSearch = isPaginated ? (serverSearch ?? "") : debouncedLocalSearch;
+
+  const handleSearch = isPaginated
+    ? (val: string) => { setPage!(1); setServerSearch!(val); }
+    : (val: string) => setLocalSearchParams(val ? { q: val } : {}, { replace: true });
 
   usePageTitle(t(breadcrumbKey));
 
@@ -265,8 +290,8 @@ function CrudPage<T extends { _id: string }>({
             )
           }
           size="large"
-          onSearch={setSearchText}
-          onChange={(e) => setSearchText(e.target.value)}
+          onSearch={handleSearch}
+          onChange={(e) => handleSearch(e.target.value)}
         />
         <RoleGuard allowedRoles={[USER_ROLES.ADMIN, USER_ROLES.EDITOR]}>
           <Space>
@@ -316,6 +341,11 @@ function CrudPage<T extends { _id: string }>({
           isLoading={isLoading}
           onEdit={handleEdit}
           onDelete={handleDelete}
+          settings={settings}
+          total={serverTotal}
+          page={page}
+          pageSize={pageSize}
+          onPageChange={isPaginated ? ((p: number, ps: number) => { setPage!(p); setPageSize!(ps); }) : undefined}
           rowSelection={
             isAdmin
               ? {
@@ -324,7 +354,6 @@ function CrudPage<T extends { _id: string }>({
                 }
               : undefined
           }
-          settings={settings}
         />
       )}
       <TableSettingsModal
