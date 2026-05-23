@@ -1,328 +1,81 @@
-import { App, Button, Flex, Layout, Space, Popconfirm } from "antd";
-import React, { useState, useMemo } from "react";
+import React from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { useTranslation } from "react-i18next";
-import { useSearchParams } from "react-router";
-import { usePageTitle } from "../../hooks/usePageTitle";
-
-import {
-  FileExcelOutlined,
-  PlusOutlined,
-  SearchOutlined,
-  DeleteOutlined,
-  SettingOutlined,
-} from "@ant-design/icons";
-
-import { USER_ROLES, type TripType } from "../../types";
-import { useIsMobile } from "../../hooks/useIsMobile";
+import { useCompanies } from "../../hooks/useCompanies";
+import { useDrivers } from "../../hooks/useDrivers";
+import { useVehicles } from "../../hooks/useVehicles";
+import CrudPage from "../common/CrudPage";
+import TripCardList from "./components/TripCardList";
 import { useTrips } from "../../hooks/useTrips";
 import TripTable, { getTripTableSettingsOptions } from "./components/TripTable";
-import Search from "antd/es/input/Search";
-import TripCardList from "./components/TripCardList";
 import TripModal from "./components/TripModal";
-import { useTableSettings } from "../../hooks/useTableSettings";
-import TableSettingsModal from "../../components/TableSettingsModal";
-
-import { useCompanies } from "../../hooks/useCompanies";
-import { useVehicles } from "../../hooks/useVehicles";
-import { useDrivers } from "../../hooks/useDrivers";
 import { exportTripsToExcel } from "../../utils/excel.utils";
-import { RoleGuard } from "../../components/auth/RoleGuard";
-import { useAuth } from "../../hooks/useAuth";
-import ErrorState from "../../components/common/ErrorState";
 
 function Trips() {
-  const { t } = useTranslation();
-  const { notification } = App.useApp();
-
-  const [searchParams, setSearchParams] = useSearchParams();
-  const searchText = searchParams.get("q") ?? "";
-  const setSearchText = (val: string) =>
-    setSearchParams(val ? { q: val } : {}, { replace: true });
-
-  usePageTitle(t("Breadcrumbs.TRIPS"));
-
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const defaultTripTableSettings = React.useMemo(
-    () => ({
-      visibleColumns: [
-        "time_range",
-        "driver",
-        "company",
-        "vehicle",
-        "unload_status",
-        "location",
-        "status",
-        "action",
-      ],
-      fontSize: "normal" as const,
-    }),
-    [],
-  );
-
-  const { settings: tripTableSettings, saveSettings: saveTripTableSettings, resetSettings: resetTripTableSettings } =
-    useTableSettings("trips", defaultTripTableSettings);
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedRecord, setSelectedRecord] = useState<TripType | undefined>(
-    undefined,
-  );
-  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
-  const [isBulkDeleting, setIsBulkDeleting] = useState(false);
-
+  const queryClient = useQueryClient();
   const { trips, isLoading, isError, refetch, createTrip, updateTrip, deleteTrip } = useTrips();
-  const isMobile = useIsMobile(1024);
   const { companies } = useCompanies();
   const { drivers } = useDrivers();
   const { vehicles } = useVehicles();
-  const queryClient = useQueryClient();
-  const { user } = useAuth();
-  const isAdmin = user?.role === USER_ROLES.ADMIN;
 
-  const handleExport = () => {
-    exportTripsToExcel(filteredTrips);
-  };
-
-  const handleDelete = async (record: TripType) => {
-    try {
-      await deleteTrip(record._id);
-      notification.success({
-        title: t("Common.SUCCESS"),
-        description: t("Trips.DELETE_SUCCESS"),
-      });
-      setSelectedRowKeys(prev => prev.filter(key => key !== record._id));
-    } catch (error: any) {
-      notification.error({
-        title: t("Common.ERROR"),
-        description: t("Errors.DELETE_FAILED"),
-      });
-    }
-  };
-
-  const handleBulkDelete = async () => {
-    setIsBulkDeleting(true);
-    try {
-      const results = await Promise.allSettled(
-        selectedRowKeys.map((id) => deleteTrip(id.toString()))
-      );
-      const successCount = results.filter(r => r.status === 'fulfilled').length;
-      notification.success({
-        title: t("Common.SUCCESS"),
-        description: t("Common.BULK_DELETE_SUCCESS", { count: successCount }),
-      });
-      setSelectedRowKeys([]);
-    } catch (error: any) {
-      notification.error({
-        title: t("Common.ERROR"),
-        description: t("Errors.DELETE_FAILED"),
-      });
-    } finally {
-      setIsBulkDeleting(false);
-    }
-  };
-
-
-  const handleAdd = () => {
-    setSelectedRecord(undefined);
-    setIsModalOpen(true);
-  };
-
-  const handleEdit = (record: TripType) => {
-    setSelectedRecord(record);
-    setIsModalOpen(true);
-  };
-
-  const handleFormSubmit = async (values: {
-    driver_full_name: string;
-    driver_phone_number: string;
-    company: string;
-    vehicle: string;
-    driver?: string;
-    departure_time?: string;
-    arrival_time?: string;
-    unload_status?: string;
-    has_gps_tracking?: boolean;
-    is_in_temporary_parking_lot?: boolean;
-    is_trip_canceled?: boolean;
-    notes?: string;
-  }) => {
-    try {
-      const payload = {
-        driver: values.driver,
-        company: values.company,
-        vehicle: values.vehicle,
-        driver_full_name: values.driver_full_name,
-        driver_phone_number: values.driver_phone_number,
-        departure_time: values.departure_time,
-        arrival_time: values.arrival_time,
-        unload_status: values.unload_status,
-        has_gps_tracking: values.has_gps_tracking,
-        is_in_temporary_parking_lot: values.is_in_temporary_parking_lot,
-        is_trip_canceled: values.is_trip_canceled,
-        notes: values.notes,
-      };
-
-      if (selectedRecord) {
-        await updateTrip({ id: selectedRecord._id, ...payload });
-        notification.info({
-          title: t("Common.INFO"),
-          description: t("Trips.UPDATE_SUCCESS"),
-        });
-      } else {
-        await createTrip(payload);
-        notification.success({
-          title: t("Common.SUCCESS"),
-          description: t("Trips.CREATE_SUCCESS"),
-        });
-      }
-      setIsModalOpen(false);
-    } catch (error: any) {
-      const errMsg = error?.response?.data?.message || error?.message || t("Errors.OPERATION_FAILED");
-      notification.error({
-        title: t("Common.ERROR"),
-        description: errMsg,
-      });
-    }
-  };
-
-  const filteredTrips = useMemo(() => {
-    if (!searchText) return trips;
-
-    const lowerSearch = searchText.toLowerCase();
-    return trips.filter((trip) => {
-      return (
-        trip.company?.name?.toLowerCase().includes(lowerSearch) ||
-        trip.driver?.full_name?.toLowerCase().includes(lowerSearch) ||
-        trip.driver?.phone_number?.includes(searchText) ||
-        trip.vehicle?.licence_plate?.toLowerCase().includes(lowerSearch)
-      );
-    });
-  }, [trips, searchText]);
-
-  if (isError) {
-    return (
-      <Layout style={{ padding: isMobile ? "0 12px" : "0 20px" }}>
-        <ErrorState onRetry={() => refetch()} />
-      </Layout>
-    );
-  }
+  const handleCreated = React.useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: ["companies"] });
+    queryClient.invalidateQueries({ queryKey: ["drivers"] });
+    queryClient.invalidateQueries({ queryKey: ["vehicles"] });
+  }, [queryClient]);
 
   return (
-    <Layout style={{ padding: isMobile ? "0 12px" : "0 20px" }}>
-      <Flex
-        justify="space-between"
-        align="center"
-        style={{ marginTop: 0, marginBottom: 10 }}
-      >
-        <h1 style={{ margin: 0 }}>{t("Breadcrumbs.TRIPS")}</h1>
-        <Flex gap={12} align="center">
-          <Button icon={<SettingOutlined />} onClick={() => setIsSettingsOpen(true)}>
-            {t("TableSettings.TITLE", "Table Settings")}
-          </Button>
-          <RoleGuard allowedRoles={[USER_ROLES.ADMIN]}>
-            <Button
-              type="primary"
-              icon={<FileExcelOutlined />}
-              style={{ backgroundColor: "#217346" }} // Excel yeşili :)
-              onClick={handleExport}
-            >
-              {t("Common.EXPORT_EXCEL")}
-            </Button>
-          </RoleGuard>
-        </Flex>
-      </Flex>
-      <Flex gap={isMobile ? 10 : 25} style={{ marginBottom: 20 }}>
-        <Search
-          placeholder={t("Trips.SEARCH")}
-          allowClear
-          enterButton={
-            !isMobile && (
-              <>
-                <SearchOutlined /> {t("Common.SEARCH")}
-              </>
-            )
-          }
-          size="large"
-          onSearch={setSearchText}
-          onChange={(e) => setSearchText(e.target.value)}
-        />
-        <RoleGuard allowedRoles={[USER_ROLES.ADMIN, USER_ROLES.EDITOR]}>
-          <Space>
-            {selectedRowKeys.length > 0 && isAdmin && (
-              <Popconfirm
-                title={t("Common.BULK_DELETE_CONFIRM_TITLE")}
-                description={t("Common.BULK_DELETE_CONFIRM_DESC", { count: selectedRowKeys.length })}
-                onConfirm={handleBulkDelete}
-                okText={t("Common.YES")}
-                cancelText={t("Common.NO")}
-              >
-                <Button color="danger" variant="solid" size="large" loading={isBulkDeleting}>
-                  <DeleteOutlined /> {t("Common.BULK_DELETE", { count: selectedRowKeys.length })}
-                </Button>
-              </Popconfirm>
-            )}
-            <Button color="cyan" variant="solid" size="large" onClick={handleAdd}>
-              <PlusOutlined />{" "}
-              {isMobile ? t("Common.ADD") : t("Trips.ADD_BUTTON")}
-            </Button>
-          </Space>
-        </RoleGuard>
-      </Flex>
-      {isMobile ? (
-        <TripCardList
-          trips={filteredTrips}
-          isLoading={isLoading}
-          onDelete={handleDelete}
-          onEdit={handleEdit}
-        />
-      ) : (
-        <TripTable
-          trips={filteredTrips}
-          isLoading={isLoading}
-          onDelete={handleDelete}
-          onEdit={handleEdit}
-          rowSelection={isAdmin ? {
-            selectedRowKeys,
-            onChange: setSelectedRowKeys,
-          } : undefined}
-          settings={tripTableSettings}
-        />
-      )}
-      <TableSettingsModal
-        open={isSettingsOpen}
-        onClose={() => setIsSettingsOpen(false)}
-        onSave={(nextSettings) => {
-          saveTripTableSettings(nextSettings);
-          setIsSettingsOpen(false);
-        }}
-        onReset={() => {
-          resetTripTableSettings();
-          setIsSettingsOpen(false);
-        }}
-        settings={tripTableSettings}
-        columns={getTripTableSettingsOptions(t)}
-        tableId="trips"
-      />
-      <TripModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onFinish={handleFormSubmit}
-        onCreated={() => {
-          // ensure lists refresh immediately after modal-created items
-          try {
-            queryClient.invalidateQueries({ queryKey: ["companies"] });
-            queryClient.invalidateQueries({ queryKey: ["drivers"] });
-            queryClient.invalidateQueries({ queryKey: ["vehicles"] });
-          } catch (error: any) {
-            /* ignore */
-          }
-        }}
-        selectedRecord={selectedRecord}
-        companies={companies}
-        vehicles={vehicles}
-        drivers={drivers}
-      />
-    </Layout>
+    <CrudPage
+      breadcrumbKey="Breadcrumbs.TRIPS"
+      searchPlaceholderKey="Trips.SEARCH"
+      addButtonKey="Trips.ADD_BUTTON"
+      deleteSuccessKey="Trips.DELETE_SUCCESS"
+      createSuccessKey="Trips.CREATE_SUCCESS"
+      updateSuccessKey="Trips.UPDATE_SUCCESS"
+      data={trips}
+      isLoading={isLoading}
+      isError={isError}
+      refetch={refetch}
+      onDeleteItem={deleteTrip}
+      filterFn={(trip, searchText) =>
+        !!(trip.company?.name?.toLowerCase().includes(searchText) ||
+        trip.driver?.full_name?.toLowerCase().includes(searchText) ||
+        trip.driver?.phone_number?.includes(searchText) ||
+        trip.vehicle?.licence_plate?.toLowerCase().includes(searchText))
+      }
+      exportFn={exportTripsToExcel}
+      onFormSubmit={async (values, selectedRecord) => {
+        const payload = {
+          driver: values.driver,
+          company: values.company,
+          vehicle: values.vehicle,
+          driver_full_name: values.driver_full_name,
+          driver_phone_number: values.driver_phone_number,
+          departure_time: values.departure_time,
+          arrival_time: values.arrival_time,
+          unload_status: values.unload_status,
+          has_gps_tracking: values.has_gps_tracking,
+          is_in_temporary_parking_lot: values.is_in_temporary_parking_lot,
+          is_trip_canceled: values.is_trip_canceled,
+          notes: values.notes,
+        };
+        if (selectedRecord) {
+          await updateTrip({ id: selectedRecord._id, ...payload });
+        } else {
+          await createTrip(payload);
+          queryClient.invalidateQueries({ queryKey: ["companies"] });
+          queryClient.invalidateQueries({ queryKey: ["drivers"] });
+          queryClient.invalidateQueries({ queryKey: ["vehicles"] });
+        }
+      }}
+      Table={TripTable}
+      CardList={TripCardList}
+      ModalComponent={TripModal}
+      modalExtraProps={{ companies, drivers, vehicles, onCreated: handleCreated } as any}
+      getSettingsOptions={getTripTableSettingsOptions}
+      defaultVisibleColumns={["time_range", "driver", "company", "vehicle", "unload_status", "location", "status", "action"]}
+      settingsKey="trips"
+      mobileBreakpoint={1024}
+    />
   );
 }
 

@@ -20,7 +20,7 @@ export const getDriverTableSettingsOptions = (t: TFunction) => [
 ];
 
 type Props = {
-  drivers: DriverType[];
+  items: DriverType[];
   isLoading: boolean;
   onEdit: (c: DriverType) => void;
   onDelete: (c: DriverType) => void;
@@ -33,7 +33,7 @@ interface AuthenticatedColumnType extends ColumnType<DriverType> {
 }
 
 export default function DriverTable({
-  drivers,
+  items: drivers,
   isLoading,
   onEdit,
   onDelete,

@@ -19,7 +19,7 @@ export const getVehicleTableSettingsOptions = (t: TFunction) => [
 ];
 
 type Props = {
-  vehicles: VehicleType[];
+  items: VehicleType[];
   isLoading: boolean;
   onEdit: (c: VehicleType) => void;
   onDelete: (c: VehicleType) => void;
@@ -32,7 +32,7 @@ interface AuthenticatedColumnType extends ColumnType<VehicleType> {
 }
 
 export default function VehicleTable({
-  vehicles,
+  items: vehicles,
   isLoading,
   onEdit,
   onDelete,

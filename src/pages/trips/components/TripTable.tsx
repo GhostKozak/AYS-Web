@@ -32,7 +32,7 @@ export const getTripTableSettingsOptions = (t: TFunction) => [
 ];
 
 type Props = {
-  trips: TripType[];
+  items: TripType[];
   isLoading: boolean;
   onEdit: (c: TripType) => void;
   onDelete: (c: TripType) => void;
@@ -45,7 +45,7 @@ interface AuthenticatedColumnType extends ColumnType<TripType> {
 }
 
 export default function TripTable({
-  trips,
+  items: trips,
   isLoading,
   onEdit,
   onDelete,

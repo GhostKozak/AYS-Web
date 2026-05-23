@@ -18,7 +18,7 @@ export const getCompanyTableSettingsOptions = (t: TFunction) => [
 ];
 
 type Props = {
-  companies: CompanyType[];
+  items: CompanyType[];
   isLoading: boolean;
   onEdit: (c: CompanyType) => void;
   onDelete: (c: CompanyType) => void;
@@ -31,7 +31,7 @@ interface AuthenticatedColumnType extends ColumnType<CompanyType> {
 }
 
 export default function CompaniesTable({
-  companies,
+  items: companies,
   isLoading,
   onEdit,
   onDelete,
