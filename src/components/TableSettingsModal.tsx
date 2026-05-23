@@ -151,7 +151,7 @@ export default function TableSettingsModal({
       okText={t("Common.SAVE", "Save")}
       cancelText={t("Common.CANCEL", "Cancel")}
       width={520}
-      bodyStyle={{ paddingBottom: 16 }}
+      styles={{ body: { paddingBottom: 16 } }}
     >
       {/* Presets Section */}
       <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 16 }}>

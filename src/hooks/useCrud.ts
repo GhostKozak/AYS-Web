@@ -34,7 +34,7 @@ export const useCrud = <T, CreatePayload>(
     refetch,
   } = useQuery<T[]>({
     queryKey,
-    queryFn: api.getAll,
+    queryFn: () => api.getAll(),
     staleTime,
     ...queryOpts,
   });
