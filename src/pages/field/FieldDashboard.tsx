@@ -61,9 +61,13 @@ function FieldDashboard() {
     return () => { if (searchTimerRef.current) clearTimeout(searchTimerRef.current); };
   }, [searchQuery]);
 
-  const handleRefresh = () => {
+  const refreshQueries = useCallback(() => {
     queryClient.invalidateQueries({ queryKey: ["trips"] });
     queryClient.invalidateQueries({ queryKey: ["pending-trips"] });
+  }, [queryClient]);
+
+  const handleRefresh = () => {
+    refreshQueries();
     setLastSyncAt(Date.now());
     message.success(t("FieldOps.REFRESH_SUCCESS"));
   };
@@ -112,13 +116,12 @@ function FieldDashboard() {
       setVerificationModalOpen(false);
       clearPhoto();
       setSelectedTrip(null);
-      queryClient.invalidateQueries({ queryKey: ["trips"] });
-      queryClient.invalidateQueries({ queryKey: ["pending-trips"] });
     } catch (err: any) {
       const msg = err?.response?.data?.message || err?.message || t("Errors.OPERATION_FAILED");
       message.error(typeof msg === "string" ? msg : t("Errors.OPERATION_FAILED"));
     } finally {
       setVerifying(false);
+      refreshQueries();
     }
   };
 
@@ -126,11 +129,11 @@ function FieldDashboard() {
     try {
       await tripApi.update(trip._id, { is_trip_canceled: true });
       message.success(t("FieldOps.REJECT_SUCCESS"));
-      queryClient.invalidateQueries({ queryKey: ["trips"] });
-      queryClient.invalidateQueries({ queryKey: ["pending-trips"] });
     } catch (err: any) {
       const msg = err?.response?.data?.message || err?.message || t("Errors.OPERATION_FAILED");
       message.error(typeof msg === "string" ? msg : t("Errors.OPERATION_FAILED"));
+    } finally {
+      refreshQueries();
     }
   };
 

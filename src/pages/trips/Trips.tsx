@@ -93,7 +93,7 @@ function Trips() {
       ModalComponent={TripModal}
       modalExtraProps={{ companies, drivers, vehicles } as any}
       getSettingsOptions={getTripTableSettingsOptions}
-      defaultVisibleColumns={["time_range", "driver", "company", "vehicle", "unload_status", "location", "action"]}
+      defaultVisibleColumns={["time_range", "driver", "company", "vehicle", "unload_status", "status", "location", "action"]}
       settingsKey="trips"
       mobileBreakpoint={1024}
       tableExtraProps={{
