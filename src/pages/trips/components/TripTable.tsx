@@ -559,8 +559,8 @@ export default function TripTable({
       <Image.PreviewGroup
         preview={{
           current: currentPreview,
-          visible: previewVisible,
-          onVisibleChange: (vis) => setPreviewVisible(vis),
+          open: previewVisible,
+          onOpenChange: (vis) => setPreviewVisible(vis),
         }}
       >
         {previewImages.map((src, idx) => (
