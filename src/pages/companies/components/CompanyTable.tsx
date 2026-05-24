@@ -1,21 +1,14 @@
-import { Table, Tag, Popconfirm, Button, Space } from "antd";
+import { Table, Tag, Popconfirm, Button, Space, Input } from "antd";
+import { SearchOutlined } from "@ant-design/icons";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { USER_ROLES, type CompanyType, type TableSettings } from "../../../types";
 import { Trans, useTranslation } from "react-i18next";
-import type { TFunction } from "i18next";
-import { getUniqueOptions, formatDateTime } from "../../../utils";
+import { formatDateTime } from "../../../utils";
 import { useMemo } from "react";
 import { useAuth } from "../../../hooks/useAuth";
 import type { ColumnType } from "antd/es/table";
 import type { TableRowSelection } from "antd/es/table/interface";
 
-export const getCompanyTableSettingsOptions = (t: TFunction) => [
-  { key: "name", title: t("Companies.COMPANY_NAME", "Company Name") },
-  { key: "createdAt", title: t("Table.CREATED_AT", "Created At") },
-  { key: "updatedAt", title: t("Table.UPDATED_AT", "Updated At") },
-  { key: "deleted", title: t("Table.STATUS", "Status") },
-  { key: "action", title: t("Table.ACTIONS", "Actions") },
-];
 
 type Props = {
   items: CompanyType[];
@@ -28,6 +21,7 @@ type Props = {
   page?: number;
   pageSize?: number;
   onPageChange?: (page: number, pageSize: number) => void;
+  tableExtraProps?: any;
 };
 
 interface AuthenticatedColumnType extends ColumnType<CompanyType> {
@@ -45,16 +39,64 @@ export default function CompaniesTable({
   page: serverPage,
   pageSize: serverPageSize,
   onPageChange,
+  tableExtraProps,
 }: Props) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const canEdit = user?.role === USER_ROLES.ADMIN || user?.role === USER_ROLES.EDITOR;
 
-  const filters = useMemo(() => {
+  const getCustomFilterProps = (
+    _dataIndex: string,
+    placeholder: string,
+    _filterProps: any,
+    setGlobalSearch?: (s: string) => void
+  ) => {
     return {
-      name: getUniqueOptions(companies, (company) => company.name),
+      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }: any) => (
+        <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
+          <Input
+            placeholder={`${placeholder} ara...`}
+            value={selectedKeys[0]}
+            onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+            onPressEnter={() => {
+              confirm();
+              if (setGlobalSearch) setGlobalSearch(selectedKeys[0] as string);
+            }}
+            style={{ marginBottom: 8, display: "block" }}
+          />
+          <Space>
+            <Button
+              type="primary"
+              onClick={() => {
+                confirm();
+                if (setGlobalSearch) setGlobalSearch(selectedKeys[0] as string);
+              }}
+              icon={<SearchOutlined />}
+              size="small"
+              style={{ width: 90 }}
+            >
+              {t("Common.SEARCH", "Ara")}
+            </Button>
+            <Button
+              onClick={() => {
+                clearFilters?.();
+                setSelectedKeys([]);
+                confirm();
+                if (setGlobalSearch) setGlobalSearch("");
+              }}
+              size="small"
+              style={{ width: 90 }}
+            >
+              {t("Common.RESET", "Sıfırla")}
+            </Button>
+          </Space>
+        </div>
+      ),
+      filterIcon: (filtered: boolean) => (
+        <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined }} />
+      ),
     };
-  }, [companies]);
+  };
 
   const fontSize = settings?.fontSize ?? "normal";
   const fontSizeMap: Record<string, string> = {
@@ -97,9 +139,7 @@ export default function CompaniesTable({
         title: t("Companies.COMPANY_NAME"),
         dataIndex: "name",
         key: "name",
-        filters: filters.name,
-        onFilter: (value, record) => record.name === value,
-        filterSearch: true,
+        ...getCustomFilterProps("name", t("Companies.COMPANY_NAME"), {}, tableExtraProps?.setSearch),
       },
       {
         title: t("Table.CREATED_AT"),
@@ -180,7 +220,7 @@ export default function CompaniesTable({
       });
     }
     return filtered;
-  }, [t, filters, onEdit, onDelete, canEdit, settings]);
+  }, [t, onEdit, onDelete, canEdit, settings, tableExtraProps]);
 
   return (
     <div style={{ fontSize: tableFontSize }}>
@@ -194,7 +234,7 @@ export default function CompaniesTable({
         rowSelection={rowSelection}
         pagination={serverTotal !== undefined ? {
           current: serverPage ?? 1,
-          pageSize: serverPageSize ?? 10,
+          pageSize: Math.max(serverPageSize ?? 10, companies.length),
           total: serverTotal,
           showSizeChanger: true,
           showQuickJumper: true,

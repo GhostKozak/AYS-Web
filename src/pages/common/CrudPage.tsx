@@ -1,6 +1,6 @@
 import { App, Button, Flex, Layout, Space, Popconfirm } from "antd";
 import Search from "antd/es/input/Search";
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useDebounce } from "../../hooks/useDebounce";
 import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router";
@@ -50,6 +50,7 @@ type CrudPageProps<T extends { _id: string }> = {
 
   filterFn: (item: T, searchText: string) => boolean;
   exportFn: (items: T[]) => void;
+  exportAllFn?: (search?: string) => Promise<void>;
   onFormSubmit: (values: any, selectedRecord?: T) => Promise<void>;
 
   Table: React.ComponentType<{
@@ -75,6 +76,7 @@ type CrudPageProps<T extends { _id: string }> = {
   ModalComponent: React.ComponentType<any>;
 
   modalExtraProps?: Record<string, unknown>;
+  tableExtraProps?: Record<string, unknown>;
 
   getSettingsOptions: (t: TFunction) => SettingsOption[];
   defaultVisibleColumns: string[];
@@ -98,7 +100,6 @@ function CrudPage<T extends { _id: string }>({
   setPage,
   pageSize,
   setPageSize,
-  search: serverSearch,
   setSearch: setServerSearch,
   isLoading,
   isError,
@@ -107,6 +108,7 @@ function CrudPage<T extends { _id: string }>({
 
   filterFn,
   exportFn,
+  exportAllFn,
   onFormSubmit,
 
   Table,
@@ -118,6 +120,7 @@ function CrudPage<T extends { _id: string }>({
   settingsKey,
   mobileBreakpoint = 768,
   modalExtraProps,
+  tableExtraProps,
 }: CrudPageProps<T>) {
   const { t } = useTranslation();
   const { notification } = App.useApp();
@@ -128,10 +131,28 @@ function CrudPage<T extends { _id: string }>({
   const localSearchText = localSearchParams.get("q") ?? "";
   const debouncedLocalSearch = useDebounce(localSearchText, 300);
 
-  const debouncedSearch = isPaginated ? (serverSearch ?? "") : debouncedLocalSearch;
+  const [pendingPaginatedSearch, setPendingPaginatedSearch] = useState("");
+  const debouncedPendingSearch = useDebounce(pendingPaginatedSearch, 350);
 
-  const handleSearch = isPaginated
-    ? (val: string) => { setPage!(1); setServerSearch!(val); }
+  useEffect(() => {
+    if (isPaginated) {
+      setPage!(1);
+      setServerSearch!(debouncedPendingSearch);
+    }
+  }, [debouncedPendingSearch, isPaginated, setPage, setServerSearch]);
+
+  const debouncedSearch = isPaginated ? debouncedPendingSearch : debouncedLocalSearch;
+
+  const handleSearchChange = isPaginated
+    ? (val: string) => setPendingPaginatedSearch(val)
+    : (val: string) => setLocalSearchParams(val ? { q: val } : {}, { replace: true });
+
+  const handleSearchSubmit = isPaginated
+    ? (val: string) => {
+        setPendingPaginatedSearch(val);
+        setPage!(1);
+        setServerSearch!(val);
+      }
     : (val: string) => setLocalSearchParams(val ? { q: val } : {}, { replace: true });
 
   usePageTitle(t(breadcrumbKey));
@@ -142,7 +163,7 @@ function CrudPage<T extends { _id: string }>({
       visibleColumns: defaultVisibleColumns,
       fontSize: "normal" as const,
     }),
-    [],
+    [defaultVisibleColumns],
   );
   const { settings, saveSettings, resetSettings } =
     useTableSettings(settingsKey, defaultSettings);
@@ -152,12 +173,20 @@ function CrudPage<T extends { _id: string }>({
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [isBulkDeleting, setIsBulkDeleting] = useState(false);
 
+  useEffect(() => {
+    setSelectedRowKeys([]);
+  }, [page]);
+
   const isMobile = useIsMobile(mobileBreakpoint);
   const { user } = useAuth();
   const isAdmin = user?.role === USER_ROLES.ADMIN;
 
   const handleExport = () => {
-    exportFn(filtered);
+    if (isPaginated && exportAllFn) {
+      exportAllFn(debouncedSearch);
+    } else {
+      exportFn(filtered);
+    }
   };
 
   const handleDelete = async (record: T) => {
@@ -238,10 +267,11 @@ function CrudPage<T extends { _id: string }>({
   };
 
   const filtered = useMemo(() => {
+    if (isPaginated) return data;
     if (!debouncedSearch) return data;
     const lowerSearch = debouncedSearch.toLowerCase();
     return data.filter((item) => filterFn(item, lowerSearch));
-  }, [data, debouncedSearch, filterFn]);
+  }, [data, debouncedSearch, filterFn, isPaginated]);
 
   if (isError) {
     return (
@@ -282,6 +312,7 @@ function CrudPage<T extends { _id: string }>({
         <Search
           placeholder={t(searchPlaceholderKey)}
           allowClear
+          value={isPaginated ? pendingPaginatedSearch : localSearchText}
           enterButton={
             !isMobile && (
               <>
@@ -290,8 +321,8 @@ function CrudPage<T extends { _id: string }>({
             )
           }
           size="large"
-          onSearch={handleSearch}
-          onChange={(e) => handleSearch(e.target.value)}
+          onSearch={handleSearchSubmit}
+          onChange={(e) => handleSearchChange(e.target.value)}
         />
         <RoleGuard allowedRoles={[USER_ROLES.ADMIN, USER_ROLES.EDITOR]}>
           <Space>
@@ -354,6 +385,7 @@ function CrudPage<T extends { _id: string }>({
                 }
               : undefined
           }
+          {...tableExtraProps}
         />
       )}
       <TableSettingsModal

@@ -27,7 +27,7 @@ function UserManagementPage() {
 
   const { data: usersData, isLoading } = useQuery<PaginatedResponse<User>>({
     queryKey: ["users"],
-    queryFn: () => userApi.getAll({ limit: 10000 }),
+    queryFn: () => userApi.getAll({ limit: 1000 }),
   });
   const users = usersData?.items ?? [];
 

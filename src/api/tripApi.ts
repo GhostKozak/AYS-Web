@@ -2,14 +2,11 @@ import apiClient from "./apiClient";
 import { API_ENDPOINTS } from "../constants";
 import type { CreateTripPayload, PaginatedResponse, PaginationParams } from "../types";
 
+import { asyncSearch } from "./asyncSearch";
+
 export const tripApi = {
   getAll: async (params?: PaginationParams): Promise<PaginatedResponse<any>> => {
-    const response = await apiClient.get(API_ENDPOINTS.TRIPS, { params });
-    const data = response.data.data ?? response.data;
-    return {
-      items: Array.isArray(data) ? data : [],
-      total: response.data.count ?? (Array.isArray(data) ? data.length : 0),
-    };
+    return asyncSearch("trips", params || {});
   },
 
   create: async (payload: CreateTripPayload) => {

@@ -56,7 +56,7 @@ function AuditPage() {
 
   useEffect(() => {
     setPage(1);
-  }, [data]);
+  }, [filters.entity, filters.entityId]);
 
   const columns = [
     {
@@ -159,7 +159,7 @@ function AuditPage() {
         pagination={{
           current: page,
           pageSize,
-          total: data.length,
+          total: auditData?.total ?? data.length,
           onChange: (p, ps) => {
             setPage(p);
             setPageSize(ps);

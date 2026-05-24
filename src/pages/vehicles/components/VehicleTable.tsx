@@ -1,22 +1,14 @@
-import { Table, Tag, Popconfirm, Button, Space } from "antd";
+import { Table, Tag, Popconfirm, Button, Space, Input } from "antd";
+import { SearchOutlined } from "@ant-design/icons";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { USER_ROLES, type VehicleType, type TableSettings } from "../../../types";
 import { Trans, useTranslation } from "react-i18next";
-import type { TFunction } from "i18next";
 import { formatLicencePlate, getUniqueOptions, formatDateTime } from "../../../utils";
 import { useMemo } from "react";
 import type { ColumnType } from "antd/es/table";
 import type { TableRowSelection } from "antd/es/table/interface";
 import { useAuth } from "../../../hooks/useAuth";
 
-export const getVehicleTableSettingsOptions = (t: TFunction) => [
-  { key: "licence_plate", title: t("Vehicles.LICENSE_PLATE", "License Plate") },
-  { key: "vehicle_type", title: t("Vehicles.VEHICLE_TYPE", "Vehicle Type") },
-  { key: "createdAt", title: t("Table.CREATED_AT", "Created At") },
-  { key: "updatedAt", title: t("Table.UPDATED_AT", "Updated At") },
-  { key: "deleted", title: t("Table.STATUS", "Status") },
-  { key: "action", title: t("Table.ACTIONS", "Actions") },
-];
 
 type Props = {
   items: VehicleType[];
@@ -29,6 +21,7 @@ type Props = {
   page?: number;
   pageSize?: number;
   onPageChange?: (page: number, pageSize: number) => void;
+  tableExtraProps?: any;
 };
 
 interface AuthenticatedColumnType extends ColumnType<VehicleType> {
@@ -46,6 +39,7 @@ export default function VehicleTable({
   page: serverPage,
   pageSize: serverPageSize,
   onPageChange,
+  tableExtraProps,
 }: Props) {
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -53,14 +47,62 @@ export default function VehicleTable({
 
   const filters = useMemo(() => {
     return {
-      plate: getUniqueOptions(
-        vehicles,
-        (v) => v.licence_plate,
-        formatLicencePlate,
-      ),
       type: getUniqueOptions(vehicles, (v) => v.vehicle_type),
     };
   }, [vehicles]);
+
+  const getCustomFilterProps = (
+    _dataIndex: string,
+    placeholder: string,
+    _filterProps: any,
+    setGlobalSearch?: (s: string) => void
+  ) => {
+    return {
+      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }: any) => (
+        <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
+          <Input
+            placeholder={`${placeholder} ara...`}
+            value={selectedKeys[0]}
+            onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+            onPressEnter={() => {
+              confirm();
+              if (setGlobalSearch) setGlobalSearch(selectedKeys[0] as string);
+            }}
+            style={{ marginBottom: 8, display: "block" }}
+          />
+          <Space>
+            <Button
+              type="primary"
+              onClick={() => {
+                confirm();
+                if (setGlobalSearch) setGlobalSearch(selectedKeys[0] as string);
+              }}
+              icon={<SearchOutlined />}
+              size="small"
+              style={{ width: 90 }}
+            >
+              {t("Common.SEARCH", "Ara")}
+            </Button>
+            <Button
+              onClick={() => {
+                clearFilters?.();
+                setSelectedKeys([]);
+                confirm();
+                if (setGlobalSearch) setGlobalSearch("");
+              }}
+              size="small"
+              style={{ width: 90 }}
+            >
+              {t("Common.RESET", "Sıfırla")}
+            </Button>
+          </Space>
+        </div>
+      ),
+      filterIcon: (filtered: boolean) => (
+        <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined }} />
+      ),
+    };
+  };
 
   const fontSize = settings?.fontSize ?? "normal";
   const fontSizeMap: Record<string, string> = {
@@ -104,9 +146,7 @@ export default function VehicleTable({
         dataIndex: "licence_plate",
         key: "licence_plate",
         render: formatLicencePlate,
-        filters: filters.plate,
-        onFilter: (value, record) => record.licence_plate === value,
-        filterSearch: true,
+        ...getCustomFilterProps("licence_plate", t("Vehicles.LICENSE_PLATE"), {}, tableExtraProps?.setSearch),
       },
       {
         title: t("Vehicles.VEHICLE_TYPE"),
@@ -116,6 +156,7 @@ export default function VehicleTable({
         filters: filters.type,
         onFilter: (value, record) => record.vehicle_type === value,
         filterSearch: true,
+
       },
       {
         title: t("Table.CREATED_AT"),
@@ -196,7 +237,7 @@ export default function VehicleTable({
       });
     }
     return filtered;
-  }, [t, filters, onEdit, onDelete, canEdit, settings]);
+  }, [t, filters, onEdit, onDelete, canEdit, settings, tableExtraProps]);
 
   return (
     <div style={{ fontSize: tableFontSize }}>
@@ -210,7 +251,7 @@ export default function VehicleTable({
         rowSelection={rowSelection}
         pagination={serverTotal !== undefined ? {
           current: serverPage ?? 1,
-          pageSize: serverPageSize ?? 10,
+          pageSize: Math.max(serverPageSize ?? 10, vehicles.length),
           total: serverTotal,
           showSizeChanger: true,
           showQuickJumper: true,

@@ -30,6 +30,11 @@ export const RoleGuard = ({
     return <Navigate to={ROUTES.LOGIN} state={{ from: location }} replace />;
   }
 
+  // If role is undefined, wait for the background query to update the cache
+  if (!user.role) {
+    return null;
+  }
+
   // Logged in but wrong role
   if (!allowedRoles.includes(user.role)) {
     if (fallback !== undefined) return <>{fallback}</>;

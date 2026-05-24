@@ -1,10 +1,13 @@
-import { Modal, Form, Input, Button, Select, Row, Col, Flex } from "antd";
+import { Modal, Form, Input, Button, Row, Col, Flex } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import { type CompanyType, type DriverType } from "../../../types";
 import { useTranslation } from "react-i18next";
 import { calculateDiffs } from "../../../utils";
 import DiffViewer from "../../common/DiffViewer";
 import { COUNTRY_CODES, DEFAULT_COUNTRY_CODE } from "../../../constants/countries";
+
+import { Select } from "antd";
+import { AsyncSelect } from "../../../components/common/AsyncSelect";
 
 interface DriverFormValues {
   full_name: string;
@@ -36,12 +39,23 @@ const DriverModal = ({
 
   const currentValues = Form.useWatch([], form);
 
+  const companyOptions = useMemo(() => {
+    const list = companies.map(c => ({ label: c.name, value: c._id }));
+    if (selectedRecord?.company && !list.some(x => x.value === selectedRecord.company?._id)) {
+      list.push({
+        label: selectedRecord.company.name,
+        value: selectedRecord.company._id,
+      });
+    }
+    return list;
+  }, [companies, selectedRecord]);
+
   const diffs = useMemo(() => {
     return calculateDiffs(selectedRecord, currentValues, [
       {
         label: t("Drivers.COMPANY_NAME"),
         getOldValue: (r) => r.company?.name,
-        getNewValue: (f) => companies.find((c) => c._id === f?.company)?.name,
+        getNewValue: (f) => companyOptions.find((c) => c.value === f?.company)?.label || f?.company,
       },
       {
         label: t("Drivers.FULL_NAME"),
@@ -58,7 +72,7 @@ const DriverModal = ({
         },
       },
     ]);
-  }, [selectedRecord, currentValues, companies, t]);
+  }, [selectedRecord, currentValues, companyOptions, t]);
 
   const hasChanges = diffs.length > 0;
 
@@ -173,13 +187,12 @@ const DriverModal = ({
                 { required: true, message: t("Drivers.COMPANY_REQUIRED") },
               ]}
             >
-              <Select
+              <AsyncSelect<CompanyType>
+                moduleName="companies"
+                labelKey="name"
+                valueKey="_id"
                 placeholder={t("Drivers.COMPANY_REQUIRED")}
-                showSearch={{
-                  filterOption: (input, option: any) =>
-                    option?.label?.toLowerCase().includes(input.toLowerCase()),
-                }}
-                options={companies.map(c => ({ label: c.name, value: c._id }))}
+                defaultOptions={companyOptions}
               />
             </Form.Item>
 
@@ -209,7 +222,7 @@ const DriverModal = ({
                         const re = new RegExp(natPattern);
                         if (re.test(value)) return Promise.resolve();
                         return Promise.reject(t("Drivers.PHONE_FORMAT_ERROR", { defaultValue: "Enter a valid number" }));
-                      } catch (e) {
+                      } catch (_e) {
                         // If pattern is invalid, fall back to generic
                       }
                     }

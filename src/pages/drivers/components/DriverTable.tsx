@@ -1,23 +1,14 @@
-import { Table, Tag, Popconfirm, Button, Space } from "antd";
+import { Table, Tag, Popconfirm, Button, Space, Input } from "antd";
+import { SearchOutlined } from "@ant-design/icons";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { USER_ROLES, type DriverType, type TableSettings } from "../../../types";
 import { Trans, useTranslation } from "react-i18next";
-import type { TFunction } from "i18next";
 import { formatPhoneNumber, getUniqueOptions, formatDateTime } from "../../../utils";
 import { useMemo } from "react";
 import type { ColumnType } from "antd/es/table";
 import type { TableRowSelection } from "antd/es/table/interface";
 import { useAuth } from "../../../hooks/useAuth";
 
-export const getDriverTableSettingsOptions = (t: TFunction) => [
-  { key: "full_name", title: t("Drivers.FULL_NAME", "Full Name") },
-  { key: "phone_number", title: t("Drivers.PHONE_NUMBER", "Phone Number") },
-  { key: "company", title: t("Drivers.COMPANY_NAME", "Company Name") },
-  { key: "createdAt", title: t("Table.CREATED_AT", "Created At") },
-  { key: "updatedAt", title: t("Table.UPDATED_AT", "Updated At") },
-  { key: "deleted", title: t("Table.STATUS", "Status") },
-  { key: "action", title: t("Table.ACTIONS", "Actions") },
-];
 
 type Props = {
   items: DriverType[];
@@ -30,6 +21,7 @@ type Props = {
   page?: number;
   pageSize?: number;
   onPageChange?: (page: number, pageSize: number) => void;
+  tableExtraProps?: any;
 };
 
 interface AuthenticatedColumnType extends ColumnType<DriverType> {
@@ -47,6 +39,7 @@ export default function DriverTable({
   page: serverPage,
   pageSize: serverPageSize,
   onPageChange,
+  tableExtraProps,
 }: Props) {
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -54,15 +47,62 @@ export default function DriverTable({
 
   const filters = useMemo(() => {
     return {
-      name: getUniqueOptions(drivers, (driver) => driver.full_name),
-      phone: getUniqueOptions(
-        drivers,
-        (driver) => driver.phone_number,
-        formatPhoneNumber,
-      ),
       company: getUniqueOptions(drivers, (driver) => driver.company?.name),
     };
   }, [drivers]);
+
+  const getCustomFilterProps = (
+    _dataIndex: string,
+    placeholder: string,
+    _filterProps: any,
+    setGlobalSearch?: (s: string) => void
+  ) => {
+    return {
+      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }: any) => (
+        <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
+          <Input
+            placeholder={`${placeholder} ara...`}
+            value={selectedKeys[0]}
+            onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+            onPressEnter={() => {
+              confirm();
+              if (setGlobalSearch) setGlobalSearch(selectedKeys[0] as string);
+            }}
+            style={{ marginBottom: 8, display: "block" }}
+          />
+          <Space>
+            <Button
+              type="primary"
+              onClick={() => {
+                confirm();
+                if (setGlobalSearch) setGlobalSearch(selectedKeys[0] as string);
+              }}
+              icon={<SearchOutlined />}
+              size="small"
+              style={{ width: 90 }}
+            >
+              {t("Common.SEARCH", "Ara")}
+            </Button>
+            <Button
+              onClick={() => {
+                clearFilters?.();
+                setSelectedKeys([]);
+                confirm();
+                if (setGlobalSearch) setGlobalSearch("");
+              }}
+              size="small"
+              style={{ width: 90 }}
+            >
+              {t("Common.RESET", "Sıfırla")}
+            </Button>
+          </Space>
+        </div>
+      ),
+      filterIcon: (filtered: boolean) => (
+        <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined }} />
+      ),
+    };
+  };
 
   const fontSize = settings?.fontSize ?? "normal";
   const fontSizeMap: Record<string, string> = {
@@ -105,18 +145,14 @@ export default function DriverTable({
         title: t("Drivers.FULL_NAME"),
         dataIndex: "full_name",
         key: "full_name",
-        filters: filters.name,
-        onFilter: (value, record) => record.full_name === value,
-        filterSearch: true,
+        ...getCustomFilterProps("full_name", t("Drivers.FULL_NAME"), {}, tableExtraProps?.setSearch),
       },
       {
         title: t("Drivers.PHONE_NUMBER"),
         dataIndex: "phone_number",
         key: "phone_number",
         render: formatPhoneNumber,
-        filters: filters.phone,
-        onFilter: (value, record) => record.phone_number === value,
-        filterSearch: true,
+        ...getCustomFilterProps("phone_number", t("Drivers.PHONE_NUMBER"), {}, tableExtraProps?.setSearch),
       },
       {
         title: t("Drivers.COMPANY_NAME"),
@@ -125,6 +161,7 @@ export default function DriverTable({
         filters: filters.company,
         onFilter: (value, record) => record.company?.name === value,
         filterSearch: true,
+
       },
       {
         title: t("Table.CREATED_AT"),
@@ -204,7 +241,7 @@ export default function DriverTable({
       });
     }
     return filtered;
-  }, [t, filters, onEdit, onDelete, canEdit, settings]);
+  }, [t, filters, onEdit, onDelete, canEdit, settings, tableExtraProps]);
 
   return (
     <div style={{ fontSize: tableFontSize }}>
@@ -219,7 +256,7 @@ export default function DriverTable({
         scroll={{ x: 1000 }}
         pagination={serverTotal !== undefined ? {
           current: serverPage ?? 1,
-          pageSize: serverPageSize ?? 10,
+          pageSize: Math.max(serverPageSize ?? 10, drivers.length),
           total: serverTotal,
           showSizeChanger: true,
           showQuickJumper: true,

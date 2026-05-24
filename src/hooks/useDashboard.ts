@@ -1,16 +1,7 @@
 import { useMemo } from "react";
 import type { DailyStat, TripType } from "../types";
 import { useTranslation } from "react-i18next";
-import { getTopResultsWithOthers } from "../utils/stats.utils";
 import { getNow, isSameDay, isSameMonth, getLast7Days } from "../utils/date.utils";
-
-const STATUS_COLORS: Record<string, string> = {
-  WAITING: "#faad14", // Sarı
-  COMPLETED: "#52c41a", // Yeşil
-  UNLOADED: "#13c2c2", // Camgöbeği
-  CANCELED: "#ff4d4f", // Kırmızı
-  UNKNOWN: "#d9d9d9", // Gri
-};
 
 export const useDashboardMetrics = (trips: TripType[]) => {
   const { t } = useTranslation();
@@ -77,54 +68,4 @@ export const useDashboardMetrics = (trips: TripType[]) => {
 
     return metrics;
   }, [trips, t]);
-};
-
-export const useCompanyStats = (trips: TripType[]) => {
-  const { t } = useTranslation();
-  const { companyCounts } = useDashboardMetrics(trips);
-
-  return useMemo(() => {
-    const formatted = Object.entries(companyCounts)
-      .map(([id, value]) => ({ id, value }))
-      .sort((a, b) => b.value - a.value);
-    return getTopResultsWithOthers(formatted, 5, t("Common.OTHERS"));
-  }, [companyCounts, t]);
-};
-
-export const useMonthCompanyStats = (trips: TripType[]) => {
-  const { t } = useTranslation();
-  const { monthCompanyCounts } = useDashboardMetrics(trips);
-
-  return useMemo(() => {
-    const formatted = Object.entries(monthCompanyCounts).map(([id, value]) => ({ id, value }));
-    if (!formatted.length) return [{ id: t("Common.NO_DATA_THIS_MONTH"), value: 1 }];
-    return getTopResultsWithOthers(formatted, 5, t("Common.OTHERS"));
-  }, [monthCompanyCounts, t]);
-};
-
-export const useVehicleUnloadStats = (trips: TripType[]) => {
-  const { t } = useTranslation();
-  const { unloadCounts } = useDashboardMetrics(trips);
-
-  return useMemo(() => {
-    const formatted = Object.entries(unloadCounts).map(([id, value]) => ({
-      id: t(`Trips.STATUS_${id}`),
-      value,
-      color: STATUS_COLORS[id] || STATUS_COLORS.UNKNOWN,
-    }));
-    if (!formatted.length) return [{ id: t("Table.NO_DATA"), value: 1, color: STATUS_COLORS["UNKNOWN"] }];
-    return formatted;
-  }, [unloadCounts, t]);
-};
-
-export const useDailyTripStats = (trips: TripType[]) => {
-  const { dailyStats } = useDashboardMetrics(trips);
-  return dailyStats;
-};
-
-export const useCalendarStats = (trips: TripType[]) => {
-  const { calendarMap } = useDashboardMetrics(trips);
-  return useMemo(() => {
-    return Object.entries(calendarMap).map(([day, value]) => ({ day, value }));
-  }, [calendarMap]);
 };

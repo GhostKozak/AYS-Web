@@ -10,17 +10,13 @@ interface UseTripsOptions {
 }
 
 export const useTrips = (options?: UseTripsOptions) => {
-  const [pollingInterval, setPollingInterval] = useState<number | false>(30000);
+  const [pollingInterval, setPollingInterval] = useState<number | false>(
+    socket.connected ? false : 30000,
+  );
 
   useEffect(() => {
     const updateInterval = () => {
-      if (socket.connected) {
-        console.log("[useTrips] WebSocket active: polling disabled");
-        setPollingInterval(false);
-      } else {
-        console.log("[useTrips] WebSocket inactive: polling fallback at 30s");
-        setPollingInterval(30000);
-      }
+      setPollingInterval(socket.connected ? false : 30000);
     };
 
     socket.on("connect", updateInterval);

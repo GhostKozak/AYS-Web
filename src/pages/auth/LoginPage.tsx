@@ -3,7 +3,8 @@ import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import { useLocation, useNavigate } from "react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { authApi } from "../../api/authApi";
-import { ROUTES } from "../../constants";
+import { connectSocket } from "../../utils/socket";
+import { ROUTES, STORAGE_KEYS } from "../../constants";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { setUser } from "../../utils/auth.utils";
@@ -33,6 +34,7 @@ function LoginPage() {
       const frontendUser = { ...data.user, _id: data.user.id };
 
       // 1. Persist to localStorage so useAuth initialData hydrates immediately
+      localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, data.access_token);
       setUser(frontendUser as any);
 
       // 2. Set cache synchronously — AuthGuard will unblock on next render
@@ -42,6 +44,7 @@ function LoginPage() {
       // condition where the fresh response could race with the cache set.
 
       message.success(t("Login.SUCCESS"));
+      connectSocket();
       navigate(from, { replace: true });
     } catch (error: any) {
       const errorMessage =

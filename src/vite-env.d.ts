@@ -11,6 +11,7 @@ interface ImportMetaEnv {
   readonly VITE_DEFAULT_PAGE_SIZE: string;
   readonly VITE_DEFAULT_LOCALE: string;
   readonly VITE_ENABLE_DEBUG: string;
+  readonly VITE_BACKEND_URL: string;
 }
 
 interface ImportMeta {

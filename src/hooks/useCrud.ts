@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   useQuery,
   useMutation,
@@ -6,7 +6,6 @@ import {
 } from "@tanstack/react-query";
 import { App } from "antd";
 import type { PaginatedResponse, PaginationParams } from "../types";
-import { useDebounce } from "./useDebounce";
 
 interface CrudApi<T, CreatePayload> {
   getAll: (params?: PaginationParams) => Promise<PaginatedResponse<T>>;
@@ -35,12 +34,17 @@ export const useCrud = <T, CreatePayload>(
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(pagination?.pageSize ?? 10);
   const [search, setSearch] = useState("");
-  const debouncedSearch = useDebounce(search, 300);
 
-  const queryPageKey = pagination ? [...queryKey, "p", page, "s", debouncedSearch, "l", pageSize] : queryKey;
+  useEffect(() => {
+    if (pagination?.pageSize) {
+      setPageSize(pagination.pageSize);
+    }
+  }, [pagination?.pageSize]);
+
+  const queryPageKey = pagination ? [...queryKey, "p", page, "s", search, "l", pageSize] : queryKey;
   const queryFn = pagination
-    ? () => api.getAll({ limit: pageSize, offset: (page - 1) * pageSize })
-    : () => api.getAll({ limit: 10000 });
+    ? () => api.getAll({ limit: pageSize, offset: (page - 1) * pageSize, search: search || undefined })
+    : () => api.getAll();
 
   const { data: rawData, isLoading, isError, refetch } = useQuery<PaginatedResponse<T>>({
     queryKey: queryPageKey,

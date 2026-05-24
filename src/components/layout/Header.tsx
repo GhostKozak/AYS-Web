@@ -25,7 +25,7 @@ import {
 } from "@ant-design/icons";
 import type { MenuProps } from "antd";
 import { useAppConfig } from "../../utils/AppConfigProvider";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useIsMobile } from "../../hooks/useIsMobile";
 
@@ -56,9 +56,9 @@ function Header() {
 
   const currentLang = i18n.language || "tr";
 
-  const handleLogout = () => {
+  const handleLogout = useCallback(() => {
     logout();
-  };
+  }, [logout]);
 
   const toggleLang = () => {
     const newLang = currentLang === "tr" ? "en" : "tr";
@@ -325,7 +325,7 @@ function Header() {
                   {userObject.firstName} {userObject.lastName}
                 </div>
                 <Tag color={getRoleColor(userObject.role)}>
-                  <strong>{userObject.role.toUpperCase()}</strong>
+                  <strong>{userObject.role?.toUpperCase()}</strong>
                 </Tag>
               </div>
             </Flex>

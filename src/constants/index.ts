@@ -2,6 +2,7 @@
 export const API_ENDPOINTS = {
   AUTH: {
     LOGIN: '/auth/login',
+    LOGOUT: '/auth/logout',
   },
   COMPANIES: '/companies',
   COMPANIES_SEARCH: '/companies/search',
@@ -102,5 +103,5 @@ export const CONFIG = {
   },
   DEFAULT_LOCALE: import.meta.env.VITE_DEFAULT_LOCALE,
   DEFAULT_PAGE_SIZE: import.meta.env.VITE_DEFAULT_PAGE_SIZE,
-  DEBUG: import.meta.env.ENABLE_DEBUG
+  DEBUG: import.meta.env.VITE_ENABLE_DEBUG
 } as const;

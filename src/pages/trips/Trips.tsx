@@ -1,33 +1,31 @@
-import React from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { companyApi } from "../../api/companyApi";
-import { driverApi } from "../../api/driverApi";
-import { vehicleApi } from "../../api/vehicleApi";
+import { tripApi } from "../../api/tripApi";
 import CrudPage from "../common/CrudPage";
 import TripCardList from "./components/TripCardList";
+import TripTable from "./components/TripTable";
 import { useTrips } from "../../hooks/useTrips";
-import TripTable, { getTripTableSettingsOptions } from "./components/TripTable";
+import { useCompanies } from "../../hooks/useCompanies";
+import { useDrivers } from "../../hooks/useDrivers";
+import { useVehicles } from "../../hooks/useVehicles";
+import type { TFunction } from "i18next";
+
+const getTripTableSettingsOptions = (t: TFunction) => [
+  { key: "time_range", title: t("Trips.TIME_RANGE") },
+  { key: "driver", title: t("Trips.DRIVER") },
+  { key: "company", title: t("Trips.COMPANY_NAME") },
+  { key: "vehicle", title: t("Trips.LICENSE_PLATE") },
+  { key: "unload_status", title: t("Trips.UNLOAD_STATUS") },
+  { key: "location", title: t("Trips.LOCATION") },
+  { key: "status", title: t("Trips.STATUS") },
+  { key: "action", title: t("Table.ACTIONS") },
+];
 import TripModal from "./components/TripModal";
 import { exportTripsToExcel } from "../../utils/excel.utils";
 
 function Trips() {
-  const queryClient = useQueryClient();
   const { trips, total, isLoading, isError, refetch, createTrip, updateTrip, deleteTrip, page, setPage, pageSize, setPageSize, search, setSearch } = useTrips({ paginated: true, pageSize: 10 });
-  const { data: companiesData } = useQuery({ queryKey: ["companies", "all"], queryFn: () => companyApi.getAll({ limit: 10000 }) });
-  const { data: driversData } = useQuery({ queryKey: ["drivers", "all"], queryFn: () => driverApi.getAll({ limit: 10000 }) });
-  const { data: vehiclesData } = useQuery({ queryKey: ["vehicles", "all"], queryFn: () => vehicleApi.getAll({ limit: 10000 }) });
-  const companies = companiesData?.items ?? [];
-  const drivers = driversData?.items ?? [];
-  const vehicles = vehiclesData?.items ?? [];
-
-  const handleCreated = React.useCallback(() => {
-    queryClient.invalidateQueries({ queryKey: ["companies"] });
-    queryClient.invalidateQueries({ queryKey: ["drivers"] });
-    queryClient.invalidateQueries({ queryKey: ["vehicles"] });
-    queryClient.invalidateQueries({ queryKey: ["companies", "all"] });
-    queryClient.invalidateQueries({ queryKey: ["drivers", "all"] });
-    queryClient.invalidateQueries({ queryKey: ["vehicles", "all"] });
-  }, [queryClient]);
+  const { companies } = useCompanies();
+  const { drivers } = useDrivers();
+  const { vehicles } = useVehicles();
 
   return (
     <CrudPage
@@ -56,6 +54,10 @@ function Trips() {
         trip.vehicle?.licence_plate?.toLowerCase().includes(searchText))
       }
       exportFn={exportTripsToExcel}
+      exportAllFn={async (s) => {
+        const res = await tripApi.getAll({ search: s || undefined });
+        exportTripsToExcel(res.items);
+      }}
       onFormSubmit={async (values, selectedRecord) => {
         const payload = {
           driver: values.driver,
@@ -75,19 +77,19 @@ function Trips() {
           await updateTrip({ id: selectedRecord._id, ...payload });
         } else {
           await createTrip(payload);
-          queryClient.invalidateQueries({ queryKey: ["companies"] });
-          queryClient.invalidateQueries({ queryKey: ["drivers"] });
-          queryClient.invalidateQueries({ queryKey: ["vehicles"] });
         }
       }}
       Table={TripTable}
       CardList={TripCardList}
       ModalComponent={TripModal}
-      modalExtraProps={{ companies, drivers, vehicles, onCreated: handleCreated } as any}
+      modalExtraProps={{ companies, drivers, vehicles } as any}
       getSettingsOptions={getTripTableSettingsOptions}
       defaultVisibleColumns={["time_range", "driver", "company", "vehicle", "unload_status", "location", "status", "action"]}
       settingsKey="trips"
       mobileBreakpoint={1024}
+      tableExtraProps={{
+        setSearch
+      }}
     />
   );
 }

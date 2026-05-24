@@ -13,7 +13,7 @@ const YearlyActivityMap = ({ year }: { year?: number }) => {
   // 'all' periyodu günlük verileri (YYYY-MM-DD) döndürdüğü için takvim görünümü için bunu kullanıyoruz
   const { data: rawData, isLoading } = useReportTrend("all", currentYear);
   const { token } = theme.useToken();
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const isMobile = useIsMobile();
 
   const data = (rawData || [])

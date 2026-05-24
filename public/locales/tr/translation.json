@@ -149,6 +149,16 @@
     "WIDGET_LOAD_ERROR": "Widget yüklenemedi"
   },
 
+  "OfflineQueue": {
+    "QUEUED_TITLE": "İstek Kuyruğa Alındı",
+    "QUEUED_DESC": "Bağlantı sağlandığında istek tekrar gönderilecek.",
+    "SYNCED_TITLE": "İstekler Senkronize Edildi",
+    "SYNCED_DESC": "{{count}} istek başarıyla tamamlandı.",
+    "FAILED_TITLE": "Senkronizasyon Başarısız",
+    "FAILED_DESC": "{{count}} istek işlenemedi.",
+    "PENDING": "{{count}} bekleyen istek"
+  },
+
   "Validation": {
     "REQUIRED": "Bu alan zorunludur!",
     "PASSWORD_MIN_LENGTH": "Şifre en az 8 karakter olmalıdır.",
@@ -429,7 +439,29 @@
     "PENDING_EMPTY": "Giriş onayı bekleyen araç bulunmuyor.",
     "VERIFY_SUBMIT": "Doğrulamayı Gönder",
     "SEAL_OPTIONAL": "(İsteğe Bağlı)",
-    "ARRIVAL": "Geliş Zamanı"
+    "ARRIVAL": "Geliş Zamanı",
+    "REJECT": "Reddet",
+    "REJECT_SUCCESS": "Reddedildi",
+    "MOVE_TO_PARK_SUCCESS": "Parka alındı",
+    "RAMP_ALERT": "Boşalan araç var — rampadan çekin!",
+    "JUST_NOW": "az önce",
+    "PHOTO_TITLE": "Araç Fotoğrafı",
+    "RAMP_DONE": "Boşaltma Tamamlandı — Rampayı Boşaltın",
+    "UPDATE_SEAL_PHOTO": "Mühür / Fotoğraf Güncelle",
+    "MOVE_TO_PARK": "Parka Çek",
+    "LIVE": "Canlı",
+    "LOADING": "Yükleniyor...",
+    "PENDING_EMPTY_TITLE": "Giriş Bekleyen Araç Yok",
+    "NEW_ARRIVALS": "🆕 Yeni Gelenler — {{count}} araç",
+    "AWAITING_APPROVAL": "⏳ Onay Bekleyenler — {{count}} araç",
+    "WAITING_EMPTY_TITLE": "Bekleyen Araç Yok",
+    "SAVE_SEAL_PHOTO": "Mühür ve Fotoğrafı Kaydet",
+    "SEAL_REQUIRED": "Lütfen mühür numarasını giriniz!",
+    "STATUS_KK": "Koridor Kesik (KK)",
+    "STATUS_PARKED": "Parkta",
+    "TAB_PENDING": "Gelenler (Onay)",
+    "TAB_WAITING": "Beklemede",
+    "SEARCH_PLATE": "Plaka ara..."
   },
 
   "Periods": {

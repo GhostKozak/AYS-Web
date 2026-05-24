@@ -3,10 +3,11 @@ import { usePageTitle } from "../../hooks/usePageTitle";
 import { useTrips } from "../../hooks/useTrips";
 import { usePendingTrips } from "../../hooks/usePendingTrips";
 import { useSocketSync } from "../../hooks/useSocketSync";
-import { Badge, Button, Card, Col, Row, Tag, Typography, App, Modal, Input, InputRef, Segmented } from "antd";
+import { Badge, Button, Card, Col, Row, Tag, App, Modal, Input, Segmented } from "antd";
+import type { InputRef } from "antd";
 import {
   CarOutlined, ReloadOutlined, CheckCircleOutlined, CloseCircleOutlined,
-  ExclamationCircleOutlined, CameraOutlined, DeleteOutlined, SwapOutlined,
+  CameraOutlined, DeleteOutlined,
   MoonOutlined, SunOutlined, SearchOutlined, ClockCircleOutlined,
 } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
@@ -17,7 +18,6 @@ import ErrorState from "../../components/common/ErrorState";
 import { formatDateTime, formatTime } from "../../utils";
 import { useAppConfig } from "../../utils/AppConfigProvider";
 
-const { Title, Text } = Typography;
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
 function FieldDashboard() {
@@ -31,7 +31,7 @@ function FieldDashboard() {
   const [debouncedSearch, setDebouncedSearch] = useState("");
 
   const prevUrgentCountRef = useRef(0);
-  const searchTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const searchTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const searchInputRef = useRef<InputRef>(null);
 
   const { message } = App.useApp();
@@ -43,7 +43,6 @@ function FieldDashboard() {
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [sealNumber, setSealNumber] = useState("");
   const [verifying, setVerifying] = useState(false);
-  const [rejecting, setRejecting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [lastSyncAt, setLastSyncAt] = useState(Date.now());
@@ -99,7 +98,7 @@ function FieldDashboard() {
   const handleVerifySubmit = async () => {
     if (!selectedTrip) return;
     if (!sealNumber.trim()) {
-      message.error("Lütfen mühür numarasını giriniz!");
+      message.error(t("FieldOps.SEAL_REQUIRED"));
       return;
     }
     if (!photoFile) {
@@ -123,33 +122,16 @@ function FieldDashboard() {
   };
 
   const handleReject = async (trip: TripType) => {
-    setRejecting(true);
     try {
       await tripApi.update(trip._id, { is_trip_canceled: true });
-      message.success("Araç reddedildi");
+      message.success(t("FieldOps.REJECT_SUCCESS"));
       queryClient.invalidateQueries({ queryKey: ["trips"] });
       queryClient.invalidateQueries({ queryKey: ["pending-trips"] });
     } catch {
       message.error(t("Errors.OPERATION_FAILED"));
-    } finally {
-      setRejecting(false);
     }
   };
 
-  const handleMoveToPark = async (trip: TripType) => {
-    try {
-      await tripApi.update(trip._id, { is_in_temporary_parking_lot: true, unload_status: "WAITING" });
-      message.success("Araç parka alındı");
-      queryClient.invalidateQueries({ queryKey: ["trips"] });
-    } catch {
-      message.error(t("Errors.OPERATION_FAILED"));
-    }
-  };
-
-  ;
-  useEffect(() => {
-    return () => { if (photoPreview) URL.revokeObjectURL(photoPreview); };
-  }, [photoPreview]);
 
   const activeTrips = useMemo(() => trips.filter((t) => !t.is_trip_canceled), [trips]);
 
@@ -159,14 +141,17 @@ function FieldDashboard() {
     activeTrips.filter((t) => t.unload_status === "WAITING"),
   [activeTrips]);
 
-  const searchFilter = (list: TripType[]) => {
-    if (!debouncedSearch) return list;
+  const filteredPending = useMemo(() => {
+    if (!debouncedSearch) return pendingTrips;
     const q = debouncedSearch.toLowerCase();
-    return list.filter((t) => t.vehicle?.licence_plate?.toLowerCase().includes(q));
-  };
+    return pendingTrips.filter((t) => t.vehicle?.licence_plate?.toLowerCase().includes(q));
+  }, [pendingTrips, debouncedSearch]);
 
-  const filteredPending = useMemo(() => searchFilter(pendingTrips), [pendingTrips, debouncedSearch]);
-  const filteredPark = useMemo(() => searchFilter(parkTrips), [parkTrips, debouncedSearch]);
+  const filteredPark = useMemo(() => {
+    if (!debouncedSearch) return parkTrips;
+    const q = debouncedSearch.toLowerCase();
+    return parkTrips.filter((t) => t.vehicle?.licence_plate?.toLowerCase().includes(q));
+  }, [parkTrips, debouncedSearch]);
 
   const newArrivals = useMemo(() => {
     const cutoff = Date.now() - 60 * 60 * 1000;
@@ -180,16 +165,16 @@ function FieldDashboard() {
 
   useEffect(() => {
     if (urgentTrips.length > prevUrgentCountRef.current) {
-      const audio = new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
+      const audio = new Audio("/sounds/beep.ogg");
       audio.play().catch(() => {});
-      message.warning("Boşalan araç var — rampadan çekin!");
+      message.warning(t("FieldOps.RAMP_ALERT"));
     }
     prevUrgentCountRef.current = urgentTrips.length;
-  }, [urgentTrips.length, message]);
+  }, [urgentTrips.length, message, t]);
 
   function syncAge(): string {
     const secs = Math.floor((now - lastSyncAt) / 1000);
-    if (secs < 3) return "az önce";
+    if (secs < 3) return t("FieldOps.JUST_NOW");
     if (secs < 60) return `${secs}sn`;
     const mins = Math.floor(secs / 60);
     return `${mins}dk`;
@@ -236,7 +221,7 @@ function FieldDashboard() {
             <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
               {(trip.is_in_parking_lot || trip.is_in_temporary_parking_lot) && (
                 <Tag color={trip.is_in_temporary_parking_lot ? "orange" : "blue"} style={{ fontSize: 10, borderRadius: 6, lineHeight: "18px" }}>
-                  🅿️ {trip.is_in_temporary_parking_lot ? "Koridor Kesik (KK)" : "Parkta"}
+                  🅿️ {trip.is_in_temporary_parking_lot ? t("FieldOps.STATUS_KK") : t("FieldOps.STATUS_PARKED")}
                 </Tag>
               )}
               {trip.field_photo_path && (
@@ -247,7 +232,7 @@ function FieldDashboard() {
                   onClick={() => {
                     if (trip.field_photo_path) {
                       Modal.info({
-                        title: "Araç Fotoğrafı",
+                        title: t("FieldOps.PHOTO_TITLE"),
                         content: <img src={trip.field_photo_path} alt="" style={{ width: "100%", borderRadius: 8 }} />,
                       });
                     }
@@ -259,43 +244,17 @@ function FieldDashboard() {
         </div>
         <div className="op-card-actions">
           <button className="op-btn op-btn-primary" onClick={() => openVerificationModal(trip)}>
-            <CheckCircleOutlined /> Onayla
+            <CheckCircleOutlined /> {t("FieldOps.DO_VERIFY")}
           </button>
           {waitingLong && (
             <button className="op-btn op-btn-danger" onClick={() => handleReject(trip)}>
-              <CloseCircleOutlined /> Reddet
+              <CloseCircleOutlined /> {t("FieldOps.REJECT")}
             </button>
           )}
         </div>
       </div>
     );
   };
-
-  const renderUrgentCard = (trip: TripType) => (
-    <div key={trip._id} className="op-urgent-card">
-      <div className="op-urgent-body">
-        <ExclamationCircleOutlined className="op-urgent-icon" />
-        <div className="op-urgent-info">
-          <div className="op-plate-sm">{trip.vehicle?.licence_plate || "---"}</div>
-          <div className="op-urgent-label">Boşaltma Tamamlandı — Rampayı Boşaltın</div>
-          <div className="op-meta">{trip.company?.name} {!!trip.has_gps_tracking && <Tag color="green" style={{ fontSize: 10, borderRadius: 6, lineHeight: "18px", marginLeft: 4 }}>🛰️ ATS</Tag>}</div>
-        </div>
-        <div className="op-urgent-time">
-          {trip.arrival_time ? formatTime(trip.arrival_time, { hour: "2-digit", minute: "2-digit" }) : ""}
-        </div>
-      </div>
-      <div className="op-urgent-action">
-        <button className="op-btn op-btn-warning op-btn-lg" onClick={() => handleMoveToPark(trip)}>
-          <SwapOutlined /> Parka Çek
-        </button>
-        <div style={{ textAlign: "center", marginTop: 6 }}>
-          <button className="op-text-btn" onClick={() => openVerificationModal(trip)}>
-            Mühür/Fotoğraf Güncelle
-          </button>
-        </div>
-      </div>
-    </div>
-  );
 
   const renderParkCard = (trip: TripType) => {
     const parked = trip.is_in_temporary_parking_lot || trip.is_in_parking_lot;
@@ -323,7 +282,7 @@ function FieldDashboard() {
             )}
             {parked && (
               <Tag color={trip.is_in_temporary_parking_lot ? "orange" : "blue"} style={{ marginLeft: 4, fontSize: 10, borderRadius: 6, lineHeight: "18px" }}>
-                🅿️ {trip.is_in_temporary_parking_lot ? "Koridor Kesik (KK)" : "Parkta"}
+                🅿️ {trip.is_in_temporary_parking_lot ? t("FieldOps.STATUS_KK") : t("FieldOps.STATUS_PARKED")}
               </Tag>
             )}
           </div>
@@ -335,7 +294,7 @@ function FieldDashboard() {
         </div>
         <div className="op-card-footer">
           <button className="op-text-btn" style={{ width: "100%" }} onClick={() => openVerificationModal(trip)}>
-            Mühür/Fotoğraf Güncelle
+            {t("FieldOps.UPDATE_SEAL_PHOTO")}
           </button>
         </div>
       </div>
@@ -450,10 +409,10 @@ function FieldDashboard() {
         <div className="op-header">
           <div className="op-header-top">
             <div>
-              <div className="op-title">Saha Operasyonu</div>
+              <div className="op-title">{t("FieldOps.TITLE")}</div>
               <div className="op-live">
                 <span className="op-live-dot" />
-                Canlı · {syncAge()}
+                {t("FieldOps.LIVE")} · {syncAge()}
               </div>
             </div>
             <div className="op-header-actions">
@@ -473,7 +432,7 @@ function FieldDashboard() {
                 ref={searchInputRef as React.Ref<HTMLInputElement>}
                 type="text"
                 className="op-search-input"
-                placeholder="Plaka ara..."
+                placeholder={t("FieldOps.SEARCH_PLATE")}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -488,8 +447,8 @@ function FieldDashboard() {
               block
               size="large"
               options={[
-                { label: <span className="tab-label"><span className="tab-text">Gelenler (Onay)</span><Badge count={pendingTrips.length} size="small" color="orange" /></span>, value: "PENDING" },
-                { label: <span className="tab-label"><span className="tab-text">Beklemede</span><Badge count={parkTrips.length} size="small" color="default" /></span>, value: "PARK" },
+                { label: <span className="tab-label"><span className="tab-text">{t("FieldOps.TAB_PENDING")}</span><Badge count={pendingTrips.length} size="small" color="orange" /></span>, value: "PENDING" },
+                { label: <span className="tab-label"><span className="tab-text">{t("FieldOps.TAB_WAITING")}</span><Badge count={parkTrips.length} size="small" color="default" /></span>, value: "PARK" },
               ]}
               value={activeTab}
               onChange={(val) => setActiveTab(val as "PENDING" | "PARK")}
@@ -499,7 +458,7 @@ function FieldDashboard() {
 
         {/* Content */}
         {isLoading || isPendingLoading ? (
-          <div style={{ textAlign: "center", padding: 60, color: "var(--text-secondary)", fontSize: 14 }}>Yükleniyor...</div>
+          <div style={{ textAlign: "center", padding: 60, color: "var(--text-secondary)", fontSize: 14 }}>{t("FieldOps.LOADING")}</div>
         ) : (
           <>
             {activeTab === "PENDING" && (
@@ -507,19 +466,19 @@ function FieldDashboard() {
                 {filteredPending.length === 0 ? (
                   <div className="op-empty">
                     <CheckCircleOutlined style={{ fontSize: 48, color: "var(--green)", marginBottom: 12 }} />
-                    <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 4 }}>Giriş Bekleyen Araç Yok</div>
+                    <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 4 }}>{t("FieldOps.PENDING_EMPTY_TITLE")}</div>
                   </div>
                 ) : (
                   <>
                     {newArrivals.length > 0 && (
                       <div style={{ marginBottom: 12 }}>
-                        <div className="op-section">🆕 Yeni Gelenler — {newArrivals.length} araç</div>
+                        <div className="op-section">{t("FieldOps.NEW_ARRIVALS", { count: newArrivals.length })}</div>
                         {newArrivals.map(renderPendingCard)}
                       </div>
                     )}
                     {awaitingApproval.length > 0 && (
                       <div>
-                        <div className="op-section">⏳ Onay Bekleyenler — {awaitingApproval.length} araç</div>
+                        <div className="op-section">{t("FieldOps.AWAITING_APPROVAL", { count: awaitingApproval.length })}</div>
                         {awaitingApproval.map(renderPendingCard)}
                       </div>
                     )}
@@ -533,7 +492,7 @@ function FieldDashboard() {
                 {filteredPark.length === 0 ? (
                   <div className="op-empty">
                     <CarOutlined style={{ fontSize: 48, color: "var(--text-secondary)", marginBottom: 12 }} />
-                    <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 4 }}>Bekleyen Araç Yok</div>
+                    <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 4 }}>{t("FieldOps.WAITING_EMPTY_TITLE")}</div>
                   </div>
                 ) : (
                   filteredPark.map(renderParkCard)
@@ -545,7 +504,7 @@ function FieldDashboard() {
 
         {/* Verification Modal */}
         <Modal
-          title="Antrepo Araç Kabul / Mühür Doğrulama"
+          title={t("FieldOps.MODAL_TITLE")}
           open={verificationModalOpen}
           onCancel={() => { setVerificationModalOpen(false); clearPhoto(); setSelectedTrip(null); }}
           width={400}
@@ -555,7 +514,7 @@ function FieldDashboard() {
                 {t("Common.CANCEL")}
               </Button>
               <Button block type="primary" icon={<CameraOutlined />} loading={verifying} disabled={!photoFile || !sealNumber.trim()} onClick={handleVerifySubmit} size="large">
-                {verifying ? t("FieldOps.VERIFYING") : "Mühür ve Fotoğrafı Kaydet"}
+                {verifying ? t("FieldOps.VERIFYING") : t("FieldOps.SAVE_SEAL_PHOTO")}
               </Button>
             </div>
           }
@@ -589,7 +548,7 @@ function FieldDashboard() {
 
               <div style={{ marginBottom: 16 }}>
                 <div style={{ fontWeight: 600, marginBottom: 4, color: "var(--text)" }}>
-                  Mühür Numarası <span style={{ color: "var(--red)" }}>*</span>
+                  {t("FieldOps.SEAL_NUMBER")} <span style={{ color: "var(--red)" }}>*</span>
                 </div>
                 <Input placeholder={t("FieldOps.SEAL_PLACEHOLDER")} value={sealNumber} onChange={(e) => setSealNumber(e.target.value)} maxLength={50} size="large" />
               </div>

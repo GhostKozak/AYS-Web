@@ -3,8 +3,25 @@ import { Modal, Checkbox, Radio, Space, Typography, Divider, Button, Input, Tag,
 import { useTranslation } from "react-i18next";
 import type { TableSettings, TableFontSize } from "../types";
 import { useAuth } from "../hooks/useAuth";
+import { shortHash } from "../utils";
 
 const { Text } = Typography;
+
+const SANITIZE_NAME_RE = /[<>"']/g;
+const VALID_FONT_SIZES: TableFontSize[] = ["small", "normal", "large"];
+
+
+
+const isValidPresetItem = (v: unknown): v is { name: string; settings: TableSettings } => {
+  if (typeof v !== "object" || v === null) return false;
+  const item = v as Record<string, unknown>;
+  if (typeof item.name !== "string" || item.name.trim().length === 0) return false;
+  const s = item.settings as Record<string, unknown> | undefined;
+  if (!s || typeof s !== "object") return false;
+  if (s.visibleColumns !== undefined && (!Array.isArray(s.visibleColumns) || !s.visibleColumns.every((c) => typeof c === "string"))) return false;
+  if (s.fontSize !== undefined && !VALID_FONT_SIZES.includes(s.fontSize as TableFontSize)) return false;
+  return true;
+};
 
 type ColumnOption = {
   key: string;
@@ -49,7 +66,7 @@ export default function TableSettingsModal({
   const [newPresetName, setNewPresetName] = useState("");
 
   const storageKey = useMemo(
-    () => `table_presets:${userId ?? "guest"}:${tableId}`,
+    () => `tbl_prsts:${userId ? shortHash(userId) : "g"}:${tableId}`,
     [userId, tableId]
   );
 
@@ -58,13 +75,18 @@ export default function TableSettingsModal({
     setFontSize(settings.fontSize ?? "normal");
   }, [settings, columns]);
 
-  // Load presets
+  // Load presets with schema validation
   useEffect(() => {
     if (typeof window !== "undefined") {
       const stored = localStorage.getItem(storageKey);
       if (stored) {
         try {
-          setPresets(JSON.parse(stored) as PresetItem[]);
+          const raw: unknown[] = JSON.parse(stored);
+          if (Array.isArray(raw)) {
+            setPresets(raw.filter(isValidPresetItem));
+          } else {
+            setPresets([]);
+          }
         } catch {
           setPresets([]);
         }
@@ -75,13 +97,17 @@ export default function TableSettingsModal({
   }, [storageKey]);
 
   const savePreset = () => {
-    const trimmedName = newPresetName.trim();
-    if (!trimmedName) {
+    const raw = newPresetName.trim().replace(SANITIZE_NAME_RE, "");
+    if (!raw) {
       message.error(t("TableSettings.PRESET_NAME_EMPTY", "Preset name cannot be empty"));
       return;
     }
+    if (raw.length > 30) {
+      message.error(t("TableSettings.PRESET_NAME_TOO_LONG", "Preset name must be 30 characters or less"));
+      return;
+    }
 
-    if (presets.some((p) => p.name.toLowerCase() === trimmedName.toLowerCase())) {
+    if (presets.some((p) => p.name.toLowerCase() === raw.toLowerCase())) {
       message.error(
         t("TableSettings.PRESET_ALREADY_EXISTS", "A preset with this name already exists")
       );
@@ -89,7 +115,7 @@ export default function TableSettingsModal({
     }
 
     const newPreset: PresetItem = {
-      name: trimmedName,
+      name: raw,
       settings: {
         visibleColumns: selectedColumns,
         fontSize,
@@ -102,8 +128,8 @@ export default function TableSettingsModal({
     setNewPresetName("");
     message.success(
       t("TableSettings.SAVE_PRESET_SUCCESS", {
-        defaultValue: `Preset "${trimmedName}" saved successfully`,
-        name: trimmedName,
+        defaultValue: `Preset "${raw}" saved successfully`,
+        name: raw,
       })
     );
   };

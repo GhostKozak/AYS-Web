@@ -32,7 +32,7 @@ export default function Profile() {
           lastName: data.lastName,
           email: data.email, // email is readonly usually
         });
-      } catch (err: any) {
+      } catch (_err) {
         notification.error({
           title: t("Common.ERROR", "Error"),
           description: t("Errors.GENERAL_ERROR", "An error occurred."),

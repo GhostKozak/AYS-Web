@@ -1,16 +1,26 @@
-import { useQuery } from "@tanstack/react-query";
-import { companyApi } from "../../api/companyApi";
+import { driverApi } from "../../api/driverApi";
 import CrudPage from "../common/CrudPage";
 import DriverCardList from "./components/DriverCardList";
 import { useDrivers } from "../../hooks/useDrivers";
-import DriverTable, { getDriverTableSettingsOptions } from "./components/DriverTable";
+import { useCompanies } from "../../hooks/useCompanies";
+
+import DriverTable from "./components/DriverTable";
+import type { TFunction } from "i18next";
+
+const getDriverTableSettingsOptions = (t: TFunction) => [
+  { key: "full_name", title: t("Drivers.FULL_NAME") },
+  { key: "phone_number", title: t("Drivers.PHONE_NUMBER") },
+  { key: "tc_number", title: t("Drivers.TC_NUMBER") },
+  { key: "createdAt", title: t("Table.CREATED_AT") },
+  { key: "deleted", title: t("Table.STATUS") },
+  { key: "action", title: t("Table.ACTIONS") },
+];
 import DriverModal from "./components/DriverModal";
 import { exportDriversToExcel } from "../../utils/excel.utils";
 
 function Drivers() {
   const { drivers, total, isLoading, isError, refetch, createDriver, updateDriver, deleteDriver, page, setPage, pageSize, setPageSize, search, setSearch } = useDrivers();
-  const { data: companiesData } = useQuery({ queryKey: ["companies", "all"], queryFn: () => companyApi.getAll({ limit: 10000 }) });
-  const companies = companiesData?.items ?? [];
+  const { companies } = useCompanies();
 
   return (
     <CrudPage
@@ -38,6 +48,10 @@ function Drivers() {
         driver.phone_number.includes(searchText))
       }
       exportFn={exportDriversToExcel}
+      exportAllFn={async (s) => {
+        const res = await driverApi.getAll({ search: s || undefined });
+        exportDriversToExcel(res.items);
+      }}
       onFormSubmit={async (values, selectedRecord) => {
         const payload = {
           full_name: values.full_name,
@@ -57,6 +71,7 @@ function Drivers() {
       getSettingsOptions={getDriverTableSettingsOptions}
       defaultVisibleColumns={["full_name", "phone_number", "company", "createdAt", "updatedAt", "deleted", "action"]}
       settingsKey="drivers"
+      tableExtraProps={{ setSearch }}
     />
   );
 }

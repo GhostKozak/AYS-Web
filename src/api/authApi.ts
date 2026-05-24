@@ -15,12 +15,10 @@ export const authApi = {
    */
   logout: async (): Promise<void> => {
     try {
-      await apiClient.post('/auth/logout');
-    } catch {
-      // Ignore network errors; we still clear local state below
+      await apiClient.post(API_ENDPOINTS.AUTH.LOGOUT);
+    } catch { /* ignore */ 
     } finally {
       clearAuth();
-      // Use React Router history if available, otherwise hard-navigate
       window.location.href = ROUTES.LOGIN;
     }
   },

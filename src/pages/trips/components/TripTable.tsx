@@ -1,38 +1,18 @@
-import { Table, Tag, Popconfirm, Button, Space, Tooltip, Modal, Image } from "antd";
+import { Table, Tag, Popconfirm, Button, Space, Tooltip, Modal, Image, Input } from "antd";
 import { DeleteOutlined, EditOutlined, CameraOutlined } from "@ant-design/icons";
 import { USER_ROLES, type TripType, type TableSettings } from "../../../types";
-import type { TFunction } from "i18next";
 import { Trans, useTranslation } from "react-i18next";
 import {
   formatLicencePlate,
   formatPhoneNumber,
-  formatDate,
   formatDateTime,
   formatTime,
-  getUniqueOptions,
 } from "../../../utils";
 import { useMemo, useState, useEffect, useCallback } from "react";
 import type { ColumnType } from "antd/es/table";
 import type { TableRowSelection } from "antd/es/table/interface";
 import { useAuth } from "../../../hooks/useAuth";
 
-export const getTripTableSettingsOptions = (t: TFunction) => [
-  { key: "time_range", title: t("Trips.ARRIVAL_TIME", "Arrival Time") },
-  { key: "driver", title: t("Trips.FULL_NAME", "Full Name") },
-  { key: "driver_phone", title: t("Trips.PHONE_NUMBER", "Phone Number") },
-  { key: "company", title: t("Trips.COMPANY_NAME", "Company Name") },
-  { key: "vehicle", title: t("Trips.LICENSE_PLATE", "License Plate") },
-  { key: "unload_status", title: t("Trips.UNLOAD_STATUS", "Unload Status") },
-  { key: "has_gps_tracking", title: t("Trips.GPS_TRACKING", "GPS Tracking") },
-  { key: "location", title: t("Trips.IN_PARKING_LOT", "Location") },
-  { key: "status", title: t("Trips.VERIFICATION_STATUS", "Verification Status") },
-  { key: "seal_number", title: t("Trips.SEAL_NUMBER", "Seal Number") },
-  { key: "field_photo_path", title: t("Trips.FIELD_PHOTO", "Field Photo") },
-  { key: "field_verified_at", title: t("Trips.FIELD_VERIFIED_AT", "Verified At") },
-  { key: "createdAt", title: t("Table.CREATED_AT", "Created At") },
-  { key: "updatedAt", title: t("Table.UPDATED_AT", "Updated At") },
-  { key: "action", title: t("Table.ACTIONS", "Actions") },
-];
 
 type Props = {
   items: TripType[];
@@ -45,6 +25,7 @@ type Props = {
   page?: number;
   pageSize?: number;
   onPageChange?: (page: number, pageSize: number) => void;
+  setSearch?: (search: string) => void;
 };
 
 interface AuthenticatedColumnType extends ColumnType<TripType> {
@@ -62,11 +43,46 @@ export default function TripTable({
   page: serverPage,
   pageSize: serverPageSize,
   onPageChange,
+  setSearch,
 }: Props) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const canEdit = user?.role === USER_ROLES.ADMIN || user?.role === USER_ROLES.EDITOR;
   const fontSize = settings?.fontSize ?? "normal";
+  const handleFilterSearch = (value: string) => {
+    if (setSearch) {
+      setSearch(value);
+    }
+  };
+
+  const getCustomFilterProps = (placeholder: string) => ({
+    filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }: any) => (
+      <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
+        <Input.Search
+          placeholder={placeholder}
+          value={selectedKeys[0]}
+          onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+          onSearch={(value) => {
+            handleFilterSearch(value);
+            confirm();
+          }}
+          style={{ width: 188, marginBottom: 8, display: 'block' }}
+        />
+        <Button
+          onClick={() => {
+            clearFilters?.();
+            handleFilterSearch("");
+            confirm();
+          }}
+          size="small"
+          style={{ width: 90 }}
+        >
+          {t("Common.CLEAR", { defaultValue: "Temizle" })}
+        </Button>
+      </div>
+    ),
+  });
+
   const fontSizeMap: Record<string, string> = {
     small: "12px",
     normal: "14px",
@@ -140,34 +156,6 @@ export default function TripTable({
     setPhotoModalOpen(true);
   }, []);
 
-  const filters = useMemo(() => {
-    return {
-      driverName: getUniqueOptions(trips, (t) => t.driver?.full_name),
-      driverPhone: getUniqueOptions(
-        trips,
-        (t) => t.driver?.phone_number,
-        formatPhoneNumber,
-      ),
-      company: getUniqueOptions(trips, (t) => t.company?.name),
-      vehicle: getUniqueOptions(
-        trips,
-        (t) => t.vehicle?.licence_plate,
-        formatLicencePlate,
-      ),
-      arrivalDate: Array.from(
-        new Set(
-          trips
-            .map((t) =>
-              t.arrival_time
-                ? formatDate(t.arrival_time)
-                : null,
-            )
-            .filter((date): date is string => date !== null),
-        ),
-      ).map((date) => ({ text: date, value: date })),
-    };
-  }, [trips]);
-
   const columns = useMemo(() => {
     const allColumns: AuthenticatedColumnType[] = [
       {
@@ -203,18 +191,11 @@ export default function TripTable({
             </div>
           </div>
         ),
-        filters: filters.arrivalDate,
-        onFilter: (value, record) => {
-          if (!record.arrival_time) return false;
-          return formatDate(record.arrival_time) === value;
-        },
-        filterSearch: true,
         width: 140,
         sorter: (a, b) => new Date(a.arrival_time || 0).getTime() - new Date(b.arrival_time || 0).getTime(),
       },
       {
         title: t("Trips.FULL_NAME"),
-        dataIndex: ["driver", "full_name"],
         key: "driver",
         render: (_: string, record) => (
           <div>
@@ -224,38 +205,29 @@ export default function TripTable({
             </div>
           </div>
         ),
-        filters: filters.driverName,
-        onFilter: (value, record) => record.driver?.full_name === value,
-        filterSearch: true,
+        ...getCustomFilterProps(t("Trips.SEARCH_DRIVER", { defaultValue: "Şoför Ara" })),
         width: 180,
-        sorter: (a, b) => (a.driver?.full_name || "").localeCompare(b.driver?.full_name || ""),
       },
       {
         title: t("Trips.PHONE_NUMBER"),
         dataIndex: ["driver", "phone_number"],
         key: "driver_phone",
         render: (phoneNumber: string) => formatPhoneNumber(phoneNumber) || "-",
-        filters: filters.driverPhone,
-        onFilter: (value, record) => record.driver?.phone_number === value,
-        filterSearch: true,
         width: 150,
       },
       {
         title: t("Trips.COMPANY_NAME"),
         dataIndex: ["company", "name"],
         key: "company",
-        filters: filters.company,
-        onFilter: (value, record) => record.company?.name === value,
-        filterSearch: true,
+        ...getCustomFilterProps(t("Trips.SEARCH_COMPANY", { defaultValue: "Firma Ara" })),
+        width: 200,
       },
       {
         title: t("Trips.LICENSE_PLATE"),
         dataIndex: ["vehicle", "licence_plate"],
         key: "vehicle",
         render: (plate: string) => (plate ? formatLicencePlate(plate) : "-"),
-        filters: filters.vehicle,
-        onFilter: (value, record) => record.vehicle?.licence_plate === value,
-        filterSearch: true,
+        ...getCustomFilterProps(t("Trips.SEARCH_VEHICLE", { defaultValue: "Araç Ara" })),
       },
       {
         title: t("Trips.UNLOAD_STATUS"),
@@ -321,7 +293,6 @@ export default function TripTable({
                 {record.parked_at && (
                   <div style={{ fontSize: "0.8em", color: "#888" }}>
                     {formatTime(record.parked_at, { hour: "2-digit", minute: "2-digit" })}
-
                   </div>
                 )}
               </div>
@@ -360,13 +331,7 @@ export default function TripTable({
         key: "seal_number",
         render: (val: string) => val || "-",
         width: 140,
-        filters: trips
-          .filter((t) => t.seal_number)
-          .map((t) => ({ text: t.seal_number as string, value: t.seal_number as string }))
-          .filter((v, i, arr) => arr.findIndex((x) => x.value === v.value) === i),
-        onFilter: (value, record) => record.seal_number === value,
-        filterSearch: true,
-        sorter: (a, b) => (a.seal_number || "").localeCompare(b.seal_number || ""),
+        ...getCustomFilterProps(t("Trips.SEARCH_SEAL", { defaultValue: "Mühür Ara" })),
       },
       {
         title: t("Trips.VERIFICATION_STATUS"),
@@ -528,7 +493,7 @@ export default function TripTable({
       });
     }
     return filtered;
-  }, [t, filters, onEdit, onDelete, canEdit, settings, user]);
+  }, [t, onEdit, onDelete, canEdit, settings, user, openPhotoModal, trips]);
 
   return (
     <div style={{ fontSize: tableFontSize }}>
@@ -544,7 +509,7 @@ export default function TripTable({
         scroll={{ x: 1500 }}
         pagination={serverTotal !== undefined ? {
           current: serverPage ?? 1,
-          pageSize: serverPageSize ?? 10,
+          pageSize: Math.max(serverPageSize ?? 10, trips.length),
           total: serverTotal,
           showSizeChanger: true,
           showQuickJumper: true,

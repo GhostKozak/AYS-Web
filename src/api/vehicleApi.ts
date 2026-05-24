@@ -2,14 +2,11 @@ import apiClient from "./apiClient";
 import { API_ENDPOINTS } from "../constants";
 import type { CreateVehiclePayload, PaginatedResponse, PaginationParams } from "../types";
 
+import { asyncSearch } from "./asyncSearch";
+
 export const vehicleApi = {
   getAll: async (params?: PaginationParams): Promise<PaginatedResponse<any>> => {
-    const response = await apiClient.get(API_ENDPOINTS.VEHICLES, { params });
-    const data = response.data.data ?? response.data;
-    return {
-      items: Array.isArray(data) ? data : [],
-      total: response.data.count ?? (Array.isArray(data) ? data.length : 0),
-    };
+    return asyncSearch("vehicles", params || {});
   },
 
   create: async (payload: CreateVehiclePayload) => {

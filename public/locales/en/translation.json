@@ -149,6 +149,16 @@
     "WIDGET_LOAD_ERROR": "Widget could not be loaded"
   },
 
+  "OfflineQueue": {
+    "QUEUED_TITLE": "Request Queued",
+    "QUEUED_DESC": "Request will be replayed when connection is restored.",
+    "SYNCED_TITLE": "Requests Synced",
+    "SYNCED_DESC": "{{count}} request(s) completed successfully.",
+    "FAILED_TITLE": "Sync Failed",
+    "FAILED_DESC": "{{count}} request(s) could not be processed.",
+    "PENDING": "{{count}} pending request(s)"
+  },
+
   "Validation": {
     "REQUIRED": "This field is required!",
     "PASSWORD_MIN_LENGTH": "Password must be at least 8 characters long.",
@@ -429,7 +439,29 @@
     "PENDING_EMPTY": "No vehicles waiting for entrance verification.",
     "VERIFY_SUBMIT": "Submit Verification",
     "SEAL_OPTIONAL": "(Optional)",
-    "ARRIVAL": "Arrival Time"
+    "ARRIVAL": "Arrival Time",
+    "REJECT": "Reject",
+    "REJECT_SUCCESS": "Rejected",
+    "MOVE_TO_PARK_SUCCESS": "Moved to park",
+    "RAMP_ALERT": "Unloading complete — pull off ramp!",
+    "JUST_NOW": "just now",
+    "PHOTO_TITLE": "Vehicle Photo",
+    "RAMP_DONE": "Unloading Complete — Clear the Ramp",
+    "UPDATE_SEAL_PHOTO": "Update Seal / Photo",
+    "MOVE_TO_PARK": "Pull to Park",
+    "LIVE": "Live",
+    "LOADING": "Loading...",
+    "PENDING_EMPTY_TITLE": "No Vehicles Awaiting Entry",
+    "NEW_ARRIVALS": "🆕 New Arrivals — {{count}} vehicle(s)",
+    "AWAITING_APPROVAL": "⏳ Awaiting Approval — {{count}} vehicle(s)",
+    "WAITING_EMPTY_TITLE": "No Vehicles Waiting",
+    "SAVE_SEAL_PHOTO": "Save Seal & Photo",
+    "SEAL_REQUIRED": "Please enter a seal number!",
+    "STATUS_KK": "Corridor Cut (KK)",
+    "STATUS_PARKED": "Parked",
+    "TAB_PENDING": "Incoming (Approval)",
+    "TAB_WAITING": "Waiting",
+    "SEARCH_PLATE": "Search plate..."
   },
 
   "Periods": {

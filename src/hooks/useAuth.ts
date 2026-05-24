@@ -5,15 +5,17 @@ import {
   clearAuth as clearStoredAuth,
 } from "../utils/auth.utils";
 import { userApi } from "../api/userApi";
+import { authApi } from "../api/authApi";
 import type { User } from "../types";
 import { useNavigate } from "react-router";
 import { ROUTES } from "../constants";
+import { disconnectSocket } from "../utils/socket";
 
 export const useAuth = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
-  const { data: user } = useQuery<User | null>({
+  const { data: user, isLoading } = useQuery<User | null>({
     queryKey: ["currentUser"],
     queryFn: async () => {
       try {
@@ -46,11 +48,18 @@ export const useAuth = () => {
     queryClient.setQueryData(["currentUser"], newUser);
   };
 
-  const logout = () => {
-    clearStoredAuth();
-    queryClient.setQueryData(["currentUser"], null);
-    queryClient.removeQueries(); // Clear all cached data on logout
-    navigate(ROUTES.LOGIN, { replace: true });
+  const logout = async () => {
+    try {
+      await authApi.logout();
+    } catch (error) {
+      console.error("Logout API failed, performing client-side cleanup anyway:", error);
+    } finally {
+      clearStoredAuth();
+      queryClient.setQueryData(["currentUser"], null);
+      queryClient.removeQueries(); // Clear all cached data on logout
+      disconnectSocket();
+      navigate(ROUTES.LOGIN, { replace: true });
+    }
   };
 
   return {
@@ -58,5 +67,6 @@ export const useAuth = () => {
     updateCurrentUser,
     logout,
     isLoggedIn: !!user,
+    isLoading,
   };
 };

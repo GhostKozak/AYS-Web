@@ -6,7 +6,7 @@ import { useIsMobile } from "../../../hooks/useIsMobile";
 import { formatDate } from "../../../utils";
 
 const WeeklyActivityChart = () => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const { data: rawData, isLoading } = useReportTrend("month");
   const { token } = theme.useToken();
   const isMobile = useIsMobile();

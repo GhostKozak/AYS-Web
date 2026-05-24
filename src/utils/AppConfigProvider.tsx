@@ -54,9 +54,9 @@ export const AppConfigProvider: React.FC<{ children: ReactNode }> = ({
     localStorage.setItem("themeMode", themeMode);
   }, [themeMode]);
 
-  const toggleTheme = () => {
+  const toggleTheme = React.useCallback(() => {
     setThemeMode((prev) => (prev === "light" ? "dark" : "light"));
-  };
+  }, []);
 
   const antdTheme = useMemo(
     () => ({
@@ -128,7 +128,7 @@ export const AppConfigProvider: React.FC<{ children: ReactNode }> = ({
 
   const currentLocale = i18n.language.startsWith("en") ? enUS : trTR;
 
-  const contextValue = { themeMode, toggleTheme };
+  const contextValue = useMemo(() => ({ themeMode, toggleTheme }), [themeMode, toggleTheme]);
 
   return (
     <AppConfigContext.Provider value={contextValue}>

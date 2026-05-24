@@ -1,4 +1,4 @@
-import { Modal, Form, Input, Button, Select, Switch, Row, Col, DatePicker, App, Flex } from "antd";
+import { Modal, Form, Input, Button, Switch, Row, Col, DatePicker, App, Flex } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import dayjs from "dayjs";
 import { useCompanies } from "../../../hooks/useCompanies";
@@ -14,6 +14,9 @@ import { useTranslation } from "react-i18next";
 import { calculateDiffs, formatLicencePlate, formatPhoneNumber } from "../../../utils/index";
 import DiffViewer from "../../common/DiffViewer";
 import { COUNTRY_CODES, DEFAULT_COUNTRY_CODE } from "../../../constants/countries";
+
+import { Select } from "antd";
+import { AsyncSelect } from "../../../components/common/AsyncSelect";
 
 interface TripFormValues {
   driver_full_name: string;
@@ -56,17 +59,49 @@ const TripModal = ({
   vehicles,
 }: TripModalProps) => {
   const [form] = Form.useForm();
-  const [companySearch, setCompanySearch] = useState("");
-  const [vehicleSearch, setVehicleSearch] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const { createCompany } = useCompanies();
   const { createDriver } = useDrivers();
   const { createVehicle } = useVehicles();
   const [isNewDriver, setIsNewDriver] = useState(false);
+  const [selectedDriverObj, setSelectedDriverObj] = useState<any | null>(null);
   const { t } = useTranslation();
   const { message } = App.useApp();
 
   const currentValues = Form.useWatch([], form);
+
+  const driverOptions = useMemo(() => {
+    const list = drivers.map(d => ({ label: `${d.full_name} — ${formatPhoneNumber(d.phone_number)}`, value: d._id }));
+    if (selectedRecord?.driver && !list.some(x => x.value === selectedRecord.driver?._id)) {
+      list.push({
+        label: `${selectedRecord.driver.full_name} — ${formatPhoneNumber(selectedRecord.driver.phone_number)}`,
+        value: selectedRecord.driver._id,
+      });
+    }
+    return list;
+  }, [drivers, selectedRecord]);
+
+  const companyOptions = useMemo(() => {
+    const list = companies.map(c => ({ label: c.name, value: c._id }));
+    if (selectedRecord?.company && !list.some(x => x.value === selectedRecord.company?._id)) {
+      list.push({
+        label: selectedRecord.company.name,
+        value: selectedRecord.company._id,
+      });
+    }
+    return list;
+  }, [companies, selectedRecord]);
+
+  const vehicleOptions = useMemo(() => {
+    const list = vehicles.map(v => ({ label: formatLicencePlate(v.licence_plate), value: v._id }));
+    if (selectedRecord?.vehicle && !list.some(x => x.value === selectedRecord.vehicle?._id)) {
+      list.push({
+        label: formatLicencePlate(selectedRecord.vehicle.licence_plate),
+        value: selectedRecord.vehicle._id,
+      });
+    }
+    return list;
+  }, [vehicles, selectedRecord]);
 
   const diffs = useMemo(() => {
     return calculateDiffs(selectedRecord, currentValues, [
@@ -199,43 +234,7 @@ const TripModal = ({
     ]);
   }, [selectedRecord, currentValues, companies, drivers, vehicles, t, isNewDriver]);
 
-  const companyOptions = useMemo(() => {
-    const existing = companies.map((c) => ({ label: c.name, value: c._id }));
-    if (companySearch && !companies.some((c) => c.name === companySearch)) {
-      existing.push({
-        label: t("Trips.CREATE_NEW_COMPANY", { name: companySearch }),
-        value: companySearch,
-      });
-    }
-    return existing;
-  }, [companies, companySearch, t]);
 
-  const vehicleOptions = useMemo(() => {
-    const existing = vehicles.map((v) => ({
-      label: v.licence_plate,
-      value: v._id,
-    }));
-    if (
-      vehicleSearch &&
-      !vehicles.some((v) => v.licence_plate === vehicleSearch)
-    ) {
-      existing.push({
-        label: t("Trips.CREATE_NEW_VEHICLE", { plate: vehicleSearch }),
-        value: vehicleSearch,
-      });
-    }
-    return existing;
-  }, [vehicles, vehicleSearch, t]);
-
-  const driverOptions = useMemo(() => {
-    return drivers.map((d) => ({
-      label: `${d.full_name} — ${formatPhoneNumber(d.phone_number)}`,
-      value: d._id,
-      // Stored separately so filterOption can search phone without parsing label
-      phone: d.phone_number,
-      name: d.full_name,
-    }));
-  }, [drivers]);
 
 
   const hasChanges = diffs.length > 0;
@@ -244,6 +243,7 @@ const TripModal = ({
     if (isOpen) {
       if (selectedRecord) {
         setIsNewDriver(false);
+        setSelectedDriverObj(selectedRecord.driver || null);
         const toInputDate = (iso?: string) => {
           if (!iso) return undefined;
           const d = dayjs(iso);
@@ -294,6 +294,7 @@ const TripModal = ({
           driver_country_code: "TR",
         });
         setIsNewDriver(false);
+        setSelectedDriverObj(null);
       }
     }
   }, [isOpen, selectedRecord, form]);
@@ -313,13 +314,13 @@ const TripModal = ({
 
       // Driver's Company Injection
       if (!isNewDriver) {
-        const selectedDriver = drivers.find((d) => d._id === values.driver);
-        if (selectedDriver && selectedDriver.company) {
-          finalValues.company = selectedDriver.company._id;
+        const selectedDriver = selectedDriverObj || drivers.find((d) => d._id === values.driver) || (selectedRecord?.driver?._id === values.driver ? selectedRecord.driver : null);
+        if (selectedDriver && (selectedDriver as any).company) {
+          finalValues.company = typeof (selectedDriver as any).company === "string" ? (selectedDriver as any).company : (selectedDriver as any).company._id;
         }
       } else {
         // Company Creation
-        const companyExists = companies.some((c) => c._id === values.company);
+        const companyExists = values.company && /^[0-9a-fA-F]{24}$/.test(values.company);
         if (!companyExists && values.company) {
           const res = await createCompany({ name: values.company });
           const newId = extractId(res);
@@ -329,7 +330,7 @@ const TripModal = ({
       }
 
       // Vehicle
-      const vehicleExists = vehicles.some((v) => v._id === values.vehicle);
+      const vehicleExists = values.vehicle && /^[0-9a-fA-F]{24}$/.test(values.vehicle);
       if (!vehicleExists && values.vehicle) {
         const payload = {
           licence_plate: values.vehicle,
@@ -419,19 +420,13 @@ const TripModal = ({
                 name="driver"
                 rules={[{ required: true, message: t("Trips.DRIVER_REQUIRED") }]}
               >
-                <Select
+                <AsyncSelect<DriverType>
+                  moduleName="drivers"
+                  labelKey={(d) => `${d.full_name} — ${formatPhoneNumber(d.phone_number)}`}
+                  valueKey="_id"
                   placeholder={t("Trips.DRIVER_REQUIRED")}
-                  showSearch={{
-                    filterOption: (input, option: any) => {
-                      const q = input.toLowerCase();
-                      const digits = q.replace(/\D/g, "");
-                      const matchesName = option?.name?.toLowerCase().includes(q);
-                      const matchesPhone = digits.length > 0 && option?.phone?.replace(/\D/g, "").includes(digits);
-                      return matchesName || matchesPhone;
-                    },
-                  }}
-                  notFoundContent={null}
-                  options={driverOptions}
+                  defaultOptions={driverOptions}
+                  onItemSelect={(driver) => setSelectedDriverObj(driver)}
                 />
               </Form.Item>
             ) : (
@@ -441,14 +436,14 @@ const TripModal = ({
                   name="company"
                   rules={[{ required: true, message: t("Trips.COMPANY_REQUIRED") }]}
                 >
-                  <Select
+                  <AsyncSelect<CompanyType>
+                    moduleName="companies"
+                    labelKey="name"
+                    valueKey="_id"
                     placeholder={t("Trips.COMPANY_REQUIRED")}
-                    showSearch={{
-                      filterOption: false,
-                    }}
-                    onSearch={(val) => setCompanySearch(val)}
-                    notFoundContent={null}
-                    options={companyOptions}
+                    defaultOptions={companyOptions}
+                    creatable
+                    creatableLabel={(search) => t("Trips.CREATE_NEW_COMPANY", { name: search })}
                   />
                 </Form.Item>
 
@@ -527,12 +522,14 @@ const TripModal = ({
               name="vehicle"
               rules={[{ required: true, message: t("Trips.VEHICLE_REQUIRED", { defaultValue: "Vehicle selection is required" }) }]}
             >
-              <Select
+              <AsyncSelect<VehicleType>
+                moduleName="vehicles"
+                labelKey={(v) => formatLicencePlate(v.licence_plate)}
+                valueKey="_id"
                 placeholder={t("Trips.VEHICLE_REQUIRED")}
-                showSearch={{ filterOption: false }}
-                onSearch={(val) => setVehicleSearch(val)}
-                notFoundContent={null}
-                options={vehicleOptions}
+                defaultOptions={vehicleOptions}
+                creatable
+                creatableLabel={(search) => t("Trips.CREATE_NEW_VEHICLE", { plate: search })}
               />
             </Form.Item>
 

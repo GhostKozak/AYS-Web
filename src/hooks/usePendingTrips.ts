@@ -5,22 +5,18 @@ import { type TripType } from "../types";
 import { socket } from "../utils/socket";
 
 export const usePendingTrips = () => {
-  const [pollingInterval, setPollingInterval] = useState<number | false>(30000);
+  const [pollingInterval, setPollingInterval] = useState<number | false>(
+    socket.connected ? false : 30000,
+  );
 
   useEffect(() => {
     const updateInterval = () => {
-      if (socket.connected) {
-        console.log("[usePendingTrips] WebSocket active: polling disabled");
-        setPollingInterval(false);
-      } else {
-        console.log("[usePendingTrips] WebSocket inactive: polling fallback at 30s");
-        setPollingInterval(30000);
-      }
+      setPollingInterval(socket.connected ? false : 30000);
     };
 
     socket.on("connect", updateInterval);
     socket.on("disconnect", updateInterval);
-    updateInterval(); // Initial check
+    updateInterval();
 
     return () => {
       socket.off("connect", updateInterval);
@@ -28,14 +24,19 @@ export const usePendingTrips = () => {
     };
   }, []);
 
-  const { data = [], isLoading, isError, refetch } = useQuery<TripType[]>({
+  const { data, isLoading, isError, refetch } = useQuery<TripType[]>({
     queryKey: ["pending-trips"],
-    queryFn: tripApi.getPendingVerification,
+    queryFn: async () => {
+      const result = await tripApi.getPendingVerification();
+      return Array.isArray(result) ? result : result?.items ?? [];
+    },
     refetchInterval: pollingInterval,
+    staleTime: 1000 * 60 * 5,
   });
+  const safeData = data ?? [];
 
   return {
-    pendingTrips: data,
+    pendingTrips: safeData,
     isLoading,
     isError,
     refetch,

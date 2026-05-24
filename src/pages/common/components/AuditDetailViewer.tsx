@@ -72,7 +72,7 @@ export default function AuditDetailViewer({ action, details, oldValue, newValue 
       if (details.trim() !== '') {
         parsedDetails = JSON.parse(details);
       }
-    } catch (e: any) {
+    } catch (_e) {
       // ignore
     }
   }
