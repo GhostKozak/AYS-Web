@@ -196,7 +196,6 @@ export default function TripTable({
             </div>
           </div>
         ),
-        width: 130,
         defaultSortOrder: 'descend',
         sorter: (a, b) => new Date(a.arrival_time || 0).getTime() - new Date(b.arrival_time || 0).getTime(),
       },
@@ -212,21 +211,18 @@ export default function TripTable({
           </div>
         ),
         ...getCustomFilterProps(t("Trips.SEARCH_DRIVER", { defaultValue: "Şoför Ara" })),
-        width: 160,
       },
       {
         title: t("Trips.PHONE_NUMBER"),
         dataIndex: ["driver", "phone_number"],
         key: "driver_phone",
         render: (phoneNumber: string) => formatPhoneNumber(phoneNumber) || "-",
-        width: 120,
       },
       {
         title: t("Trips.COMPANY_NAME"),
         dataIndex: ["company", "name"],
         key: "company",
         ...getCustomFilterProps(t("Trips.SEARCH_COMPANY", { defaultValue: "Firma Ara" })),
-        width: 160,
       },
       {
         title: t("Trips.LICENSE_PLATE"),
@@ -320,7 +316,8 @@ export default function TripTable({
           if (value === "canceled") return record.is_trip_canceled;
           return true;
         },
-        width: 120,
+        minWidth: 90,
+        maxWidth: 180,
         sorter: (a, b) => {
           const getOrder = (r: TripType) => {
             if (r.is_trip_canceled) return 0;
@@ -336,7 +333,8 @@ export default function TripTable({
         dataIndex: "seal_number",
         key: "seal_number",
         render: (val: string) => val || "-",
-        width: 110,
+        minWidth: 90,
+        maxWidth: 150,
         ...getCustomFilterProps(t("Trips.SEARCH_SEAL", { defaultValue: "Mühür Ara" })),
       },
       {
@@ -362,7 +360,8 @@ export default function TripTable({
           { text: t("Trips.VERIFY_CANCELED"), value: "CANCELED" },
         ],
         onFilter: (value, record) => record.status === value,
-        width: 130,
+        minWidth: 90,
+        maxWidth: 150,
         sorter: (a, b) => (a.status || "").localeCompare(b.status || ""),
       },
       {
@@ -381,7 +380,8 @@ export default function TripTable({
           ) : (
             "-"
           ),
-        width: 100,
+        minWidth: 60,
+        maxWidth: 120,
         filters: [
           { text: t("Common.YES"), value: true },
           { text: t("Common.NO"), value: false },
@@ -403,7 +403,8 @@ export default function TripTable({
                 minute: "2-digit",
               })
             : "-",
-        width: 130,
+        minWidth: 100,
+        maxWidth: 180,
         filters: [
           { text: t("Common.YES"), value: true },
           { text: t("Common.NO"), value: false },
@@ -426,7 +427,8 @@ export default function TripTable({
                 minute: "2-digit",
               })
             : "-",
-        width: 130,
+        minWidth: 100,
+        maxWidth: 180,
         visible: user?.role === USER_ROLES.ADMIN,
         sorter: (a, b) => new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime(),
       },
@@ -444,7 +446,8 @@ export default function TripTable({
                 minute: "2-digit",
               })
             : "-",
-        width: 130,
+        minWidth: 100,
+        maxWidth: 180,
         visible: user?.role === USER_ROLES.ADMIN,
         sorter: (a, b) => new Date(a.updatedAt || 0).getTime() - new Date(b.updatedAt || 0).getTime(),
       },
@@ -452,7 +455,8 @@ export default function TripTable({
         title: t("Table.ACTIONS"),
         key: "action",
         fixed: "right",
-        width: 200,
+        minWidth: 140,
+        maxWidth: 240,
         visible: canEdit,
         render: (_: any, record: TripType) => (
           <Space>
