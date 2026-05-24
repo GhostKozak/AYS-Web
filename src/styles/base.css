@@ -60,22 +60,8 @@ input:-webkit-autofill:active {
     }
 }
 
-/* PENDING status row - soft yellowish glow */
-.row-pending-glow td {
-    background-color: rgba(250, 173, 20, 0.08) !important;
-    animation: pendingPulse 2.5s infinite ease-in-out;
-}
-
-@keyframes pendingPulse {
-    0% {
-        background-color: rgba(250, 173, 20, 0.06) !important;
-    }
-    50% {
-        background-color: rgba(250, 173, 20, 0.16) !important;
-    }
-    100% {
-        background-color: rgba(250, 173, 20, 0.06) !important;
-    }
+.row-pending-glow td:not(.ant-table-cell-fix) {
+    background-color: rgba(255, 153, 0, 0.03) !important;
 }
 
 /* VERIFIED status transition - fade-out green glow */
