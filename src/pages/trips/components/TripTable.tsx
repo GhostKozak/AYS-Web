@@ -377,7 +377,7 @@ export default function TripTable({
               <Button
                 type="text"
                 icon={<CameraOutlined style={{ color: "#1890ff" }} />}
-                onClick={() => openPhotoPreview(val)}
+                onClick={(e) => { e.stopPropagation(); openPhotoPreview(val); }}
               />
             </Tooltip>
           ) : (
@@ -466,7 +466,7 @@ export default function TripTable({
             <Button
               type="text"
               icon={<EditOutlined />}
-              onClick={() => onEdit(record)}
+              onClick={(e) => { e.stopPropagation(); onEdit(record); }}
             >
               {t("Common.EDIT")}
             </Button>
@@ -488,7 +488,7 @@ export default function TripTable({
               icon={<DeleteOutlined style={{ color: "red" }} />}
               onConfirm={() => onDelete(record)}
             >
-              <Button danger type="text">
+              <Button danger type="text" onClick={(e) => e.stopPropagation()}>
                 {t("Common.DELETE")}
               </Button>
             </Popconfirm>
