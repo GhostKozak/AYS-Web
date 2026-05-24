@@ -438,6 +438,13 @@ const TripModal = ({
                   }
                 }
               }
+              if ('is_in_parking_lot' in changedValues) {
+                if (changedValues.is_in_parking_lot) {
+                  form.setFieldValue("parked_at", dayjs());
+                } else {
+                  form.setFieldValue("parked_at", undefined);
+                }
+              }
             }}
           >
             <Form.Item label={t("Trips.NEW_DRIVER", { defaultValue: "Add New Driver" })} labelCol={{ span: 10 }} wrapperCol={{ span: 14 }}>
@@ -621,15 +628,7 @@ const TripModal = ({
             <Row gutter={16}>
               <Col span={12}>
                 <Form.Item label={t("Trips.IN_PARKING_LOT")} name="is_in_parking_lot" valuePropName="checked" labelCol={{ span: 16 }} wrapperCol={{ span: 8 }}>
-                  <Switch
-                    onChange={(checked) => {
-                      if (checked) {
-                        form.setFieldValue("parked_at", dayjs());
-                      } else {
-                        form.setFieldValue("parked_at", undefined);
-                      }
-                    }}
-                  />
+                  <Switch />
                 </Form.Item>
               </Col>
             </Row>
