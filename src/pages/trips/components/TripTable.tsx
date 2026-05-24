@@ -200,7 +200,6 @@ export default function TripTable({
             </div>
           </div>
         ),
-        defaultSortOrder: 'descend',
         sorter: (a, b) => new Date(a.arrival_time || 0).getTime() - new Date(b.arrival_time || 0).getTime(),
       },
       {

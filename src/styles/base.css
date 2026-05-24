@@ -64,23 +64,42 @@ input:-webkit-autofill:active {
     background-color: rgba(255, 153, 0, 0.03) !important;
 }
 
-/* VERIFIED status transition - fade-out green glow */
-.row-verified-glow td {
-    animation: verifiedGlow 3.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+.row-verified-glow {
+    position: relative;
+    overflow: hidden;
 }
 
-@keyframes verifiedGlow {
+/* .row-verified-glow td.ant-table-cell-fix::after */
+.row-verified-glow::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(82, 196, 26, 0.01) 20%, 
+        rgba(82, 196, 26, 0.1) 50%, 
+        rgba(82, 196, 26, 0.01) 100%, 
+        transparent 100%
+    );
+    background-size: 200% 100%;
+    animation: sweepHighlight 3s linear forwards;
+    pointer-events: none; 
+}
+
+@keyframes sweepHighlight {
     0% {
-        background-color: rgba(82, 196, 26, 0.6) !important;
-        box-shadow: inset 0 0 12px rgba(82, 196, 26, 0.8);
+        background-position: 100% 0;
+        opacity: 1;
     }
-    15% {
-        background-color: rgba(82, 196, 26, 0.7) !important;
-        box-shadow: inset 0 0 16px rgba(82, 196, 26, 1);
+    99% {
+        opacity: 1;
     }
     100% {
-        background-color: rgba(82, 196, 26, 0.0) !important;
-        box-shadow: none;
+        background-position: -100% 0;
+        opacity: 0; /* 3. turun sonunda tamamen görünmez olur */
     }
 }
 
