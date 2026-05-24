@@ -116,3 +116,17 @@ export const shortHash = (str: string): string => {
   }
   return Math.abs(hash).toString(36);
 };
+
+export const safeErrorMessage = (err: any, fallback: string): string => {
+  const msg = err?.response?.data?.message ?? err?.message ?? fallback;
+  if (typeof msg === "string") return msg;
+  if (Array.isArray(msg)) {
+    return msg.map((m: any) => {
+      if (typeof m === "string") return m;
+      if (m?.constraints) return Object.values(m.constraints).join(", ");
+      if (m?.property) return m.property;
+      return JSON.stringify(m);
+    }).join("; ");
+  }
+  return JSON.stringify(msg);
+};

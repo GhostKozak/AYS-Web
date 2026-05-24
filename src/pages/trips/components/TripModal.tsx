@@ -11,7 +11,7 @@ import {
   type VehicleType,
 } from "../../../types";
 import { useTranslation } from "react-i18next";
-import { calculateDiffs, formatLicencePlate, formatPhoneNumber } from "../../../utils/index";
+import { calculateDiffs, formatLicencePlate, formatPhoneNumber, safeErrorMessage } from "../../../utils/index";
 import DiffViewer from "../../common/DiffViewer";
 import { COUNTRY_CODES, DEFAULT_COUNTRY_CODE } from "../../../constants/countries";
 
@@ -65,6 +65,7 @@ const TripModal = ({
   const { createVehicle } = useVehicles();
   const [isNewDriver, setIsNewDriver] = useState(false);
   const [selectedDriverObj, setSelectedDriverObj] = useState<any | null>(null);
+  const [extraCompanyOptions, setExtraCompanyOptions] = useState<{ label: string; value: string }[]>([]);
   const { t } = useTranslation();
   const { message } = App.useApp();
 
@@ -89,8 +90,13 @@ const TripModal = ({
         value: selectedRecord.company._id,
       });
     }
+    for (const extra of extraCompanyOptions) {
+      if (!list.some(x => x.value === extra.value)) {
+        list.push(extra);
+      }
+    }
     return list;
-  }, [companies, selectedRecord]);
+  }, [companies, selectedRecord, extraCompanyOptions]);
 
   const vehicleOptions = useMemo(() => {
     const list = vehicles.map(v => ({ label: formatLicencePlate(v.licence_plate), value: v._id }));
@@ -295,6 +301,7 @@ const TripModal = ({
         });
         setIsNewDriver(false);
         setSelectedDriverObj(null);
+        setExtraCompanyOptions([]);
       }
     }
   }, [isOpen, selectedRecord, form]);
@@ -312,11 +319,15 @@ const TripModal = ({
     try {
       const finalValues: any = { ...values };
 
-      // Driver's Company Injection
+      // Company — use form value first, fallback to driver's company
       if (!isNewDriver) {
-        const selectedDriver = selectedDriverObj || drivers.find((d) => d._id === values.driver) || (selectedRecord?.driver?._id === values.driver ? selectedRecord.driver : null);
-        if (selectedDriver && (selectedDriver as any).company) {
-          finalValues.company = typeof (selectedDriver as any).company === "string" ? (selectedDriver as any).company : (selectedDriver as any).company._id;
+        if (finalValues.company) {
+          // User selected a company explicitly — keep it
+        } else {
+          const selectedDriver = selectedDriverObj || drivers.find((d) => d._id === values.driver) || (selectedRecord?.driver?._id === values.driver ? selectedRecord.driver : null);
+          if (selectedDriver && (selectedDriver as any).company) {
+            finalValues.company = typeof (selectedDriver as any).company === "string" ? (selectedDriver as any).company : (selectedDriver as any).company._id;
+          }
         }
       } else {
         // Company Creation
@@ -373,8 +384,7 @@ const TripModal = ({
       await onFinish(submissionData);
       onCreated?.();
     } catch (error: any) {
-      const errMsg = error?.response?.data?.message || error?.message || t("Errors.OPERATION_FAILED");
-      message.error(errMsg);
+      message.error(safeErrorMessage(error, t("Errors.OPERATION_FAILED")));
     } finally {
       setSubmitting(false);
     }
@@ -409,12 +419,33 @@ const TripModal = ({
               is_trip_canceled: false,
               unload_status: "WAITING",
             }}
+            onValuesChange={(changedValues) => {
+              if ('driver' in changedValues) {
+                const driver = drivers.find((d) => d._id === changedValues.driver);
+                if (driver) {
+                  setSelectedDriverObj(driver as any);
+                  const driverCompany = (driver as any).company;
+                  if (driverCompany) {
+                    const companyId = typeof driverCompany === "string" ? driverCompany : driverCompany._id;
+                    const companyName = typeof driverCompany === "string" ? undefined : driverCompany.name;
+                    if (companyName) {
+                      setExtraCompanyOptions(prev => {
+                        if (prev.some(x => x.value === companyId)) return prev;
+                        return [...prev, { label: companyName, value: companyId }];
+                      });
+                    }
+                    form.setFieldsValue({ company: companyId });
+                  }
+                }
+              }
+            }}
           >
             <Form.Item label={t("Trips.NEW_DRIVER", { defaultValue: "Add New Driver" })} labelCol={{ span: 10 }} wrapperCol={{ span: 14 }}>
               <Switch checked={isNewDriver} onChange={(checked) => setIsNewDriver(checked)} />
             </Form.Item>
 
             {!isNewDriver ? (
+              <>
               <Form.Item
                 label={t("Trips.FULL_NAME")}
                 name="driver"
@@ -426,9 +457,33 @@ const TripModal = ({
                   valueKey="_id"
                   placeholder={t("Trips.DRIVER_REQUIRED")}
                   defaultOptions={driverOptions}
-                  onItemSelect={(driver) => setSelectedDriverObj(driver)}
+                  onItemSelect={(driver) => {
+                    setSelectedDriverObj(driver as any);
+                    const driverCompany = (driver as any).company;
+                    if (driverCompany) {
+                      const companyId = typeof driverCompany === "string" ? driverCompany : driverCompany._id;
+                      const companyName = typeof driverCompany === "string" ? undefined : driverCompany.name;
+                      if (companyName) {
+                        setExtraCompanyOptions(prev => {
+                          if (prev.some(x => x.value === companyId)) return prev;
+                          return [...prev, { label: companyName, value: companyId }];
+                        });
+                      }
+                      form.setFieldsValue({ company: companyId });
+                    }
+                  }}
                 />
               </Form.Item>
+              <Form.Item label={t("Trips.COMPANY_NAME")} name="company">
+                <AsyncSelect<CompanyType>
+                  moduleName="companies"
+                  labelKey="name"
+                  valueKey="_id"
+                  placeholder={t("Trips.COMPANY_REQUIRED")}
+                  defaultOptions={companyOptions}
+                />
+              </Form.Item>
+              </>
             ) : (
               <>
                 <Form.Item

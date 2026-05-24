@@ -9,6 +9,7 @@ import { usePageTitle } from "../../hooks/usePageTitle";
 import { useIsMobile } from "../../hooks/useIsMobile";
 import { useTableSettings } from "../../hooks/useTableSettings";
 import { useAuth } from "../../hooks/useAuth";
+import { safeErrorMessage } from "../../utils";
 import TableSettingsModal from "../../components/TableSettingsModal";
 import { RoleGuard } from "../../components/auth/RoleGuard";
 import ErrorState from "../../components/common/ErrorState";
@@ -255,10 +256,7 @@ function CrudPage<T extends { _id: string }>({
       }
       setIsModalOpen(false);
     } catch (error: any) {
-      const errMsg =
-        error?.response?.data?.message ||
-        error?.message ||
-        t("Errors.OPERATION_FAILED");
+      const errMsg = safeErrorMessage(error, t("Errors.OPERATION_FAILED"));
       notification.error({
         title: t("Common.ERROR"),
         description: errMsg,

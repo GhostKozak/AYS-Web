@@ -6,6 +6,7 @@ import {
 } from "@tanstack/react-query";
 import { App } from "antd";
 import type { PaginatedResponse, PaginationParams } from "../types";
+import { safeErrorMessage } from "../utils";
 
 interface CrudApi<T, CreatePayload> {
   getAll: (params?: PaginationParams) => Promise<PaginatedResponse<T>>;
@@ -64,7 +65,7 @@ export const useCrud = <T, CreatePayload>(
     mutationFn: (data: CreatePayload) => api.create(data),
     onSuccess: invalidate,
     onError: (err: any) => {
-      message.error(err?.response?.data?.message || err.message || "An error occurred during the operation");
+      message.error(safeErrorMessage(err, "An error occurred during the operation"));
     },
   });
 
@@ -76,7 +77,7 @@ export const useCrud = <T, CreatePayload>(
       api.update(id, payload as Partial<CreatePayload>),
     onSuccess: invalidate,
     onError: (err: any) => {
-      message.error(err?.response?.data?.message || err.message || "An error occurred during update");
+      message.error(safeErrorMessage(err, "An error occurred during update"));
     },
   });
 
@@ -86,7 +87,7 @@ export const useCrud = <T, CreatePayload>(
       queryClient.invalidateQueries({ queryKey });
     },
     onError: (err: any) => {
-      message.error(err?.response?.data?.message || err.message || "An error occurred during delete");
+      message.error(safeErrorMessage(err, "An error occurred during delete"));
     },
   });
 

@@ -26,6 +26,7 @@ export function AsyncSelect<T>({
   onItemSelect,
   creatable,
   creatableLabel,
+  onChange,
   ...props
 }: AsyncSelectProps<T>) {
   const [fetching, setFetching] = useState(false);
@@ -92,11 +93,12 @@ export function AsyncSelect<T>({
   }, [defaultOptions]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleChange = (value: any, option: any) => {
-    if (props.onChange) {
-      props.onChange(value, option);
+    if (onChange) {
+      onChange(value, option);
     }
     if (onItemSelect) {
-      const selectedItem = items.find((item: any) => item[valueKey] === value);
+      const selectedItem = items.find((item: any) => item[valueKey] === value)
+        ?? (defaultOptions as any[]).find((opt: any) => opt[valueKey] === value);
       if (selectedItem) {
         onItemSelect(selectedItem);
       }

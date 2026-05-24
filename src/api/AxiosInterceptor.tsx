@@ -8,6 +8,7 @@ import { CheckCircleOutlined, DisconnectOutlined, CloudUploadOutlined } from "@a
 import { clearAuth } from "../utils/auth.utils";
 import { addToQueue, getQueue, removeFromQueue, queueSize } from "../utils/offlineQueue";
 import { disconnectSocket } from "../utils/socket";
+import { safeErrorMessage } from "../utils";
 
 const MUTATING_METHODS = new Set(["post", "put", "patch", "delete"]);
 
@@ -137,8 +138,7 @@ export const AxiosInterceptor = () => {
             notification.error({
               key: "500-server-error",
               title: tRef.current("Common.ERROR"),
-              description:
-                error.response?.data?.message || tRef.current("Errors.SERVER_ERROR_DESC"),
+              description: safeErrorMessage(error, tRef.current("Errors.SERVER_ERROR_DESC")),
             });
           }
         } else if (error.code === "ERR_NETWORK") {
