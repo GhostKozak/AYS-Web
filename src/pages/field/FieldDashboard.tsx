@@ -3,7 +3,7 @@ import { usePageTitle } from "../../hooks/usePageTitle";
 import { useTrips } from "../../hooks/useTrips";
 import { usePendingTrips } from "../../hooks/usePendingTrips";
 import { useSocketSync } from "../../hooks/useSocketSync";
-import { Badge, Button, Card, Col, Row, Tag, App, Modal, Input, Segmented, Switch } from "antd";
+import { Badge, Button, Card, Col, Row, Tag, App, Modal, Input, Segmented } from "antd";
 import type { InputRef } from "antd";
 import {
   CarOutlined, ReloadOutlined, CheckCircleOutlined, CloseCircleOutlined,
@@ -44,8 +44,6 @@ function FieldDashboard() {
   const [sealNumber, setSealNumber] = useState("");
   const [verifying, setVerifying] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const devMode = import.meta.env.DEV;
-  const [devSkipPhoto, setDevSkipPhoto] = useState(false);
 
   const [lastSyncAt, setLastSyncAt] = useState(Date.now());
   const [now, setNow] = useState(Date.now());
@@ -103,13 +101,13 @@ function FieldDashboard() {
       message.error(t("FieldOps.SEAL_REQUIRED"));
       return;
     }
-    if (!devSkipPhoto && !photoFile) {
+    if (!photoFile) {
       message.error(t("FieldOps.PHOTO_REQUIRED"));
       return;
     }
     setVerifying(true);
     try {
-      await tripApi.fieldVerify(selectedTrip._id, devSkipPhoto ? null : photoFile, sealNumber || undefined);
+      await tripApi.fieldVerify(selectedTrip._id, photoFile, sealNumber || undefined);
       message.success(t("FieldOps.VERIFY_SUCCESS"));
       setVerificationModalOpen(false);
       clearPhoto();
@@ -515,7 +513,7 @@ function FieldDashboard() {
               <Button block onClick={() => { setVerificationModalOpen(false); clearPhoto(); setSelectedTrip(null); }}>
                 {t("Common.CANCEL")}
               </Button>
-              <Button block type="primary" icon={<CameraOutlined />} loading={verifying} disabled={(!devSkipPhoto && !photoFile) || !sealNumber.trim()} onClick={handleVerifySubmit} size="large">
+              <Button block type="primary" icon={<CameraOutlined />} loading={verifying} disabled={!photoFile || !sealNumber.trim()} onClick={handleVerifySubmit} size="large">
                 {verifying ? t("FieldOps.VERIFYING") : t("FieldOps.SAVE_SEAL_PHOTO")}
               </Button>
             </div>
@@ -555,15 +553,6 @@ function FieldDashboard() {
                 <Input placeholder={t("FieldOps.SEAL_PLACEHOLDER")} value={sealNumber} onChange={(e) => setSealNumber(e.target.value)} maxLength={50} size="large" />
               </div>
 
-              {devMode && (
-                <div style={{ marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
-                  <Switch checked={devSkipPhoto} onChange={setDevSkipPhoto} size="small" />
-                  <span style={{ fontSize: 13, color: "var(--text-secondary)" }}>
-                    {t("FieldOps.SKIP_PHOTO_DEV") || "Fotoğrafı Atla (Dev)"}
-                  </span>
-                </div>
-              )}
-              {!devSkipPhoto && (
               <div style={{ marginBottom: 16 }}>
                 <div style={{ fontWeight: 600, marginBottom: 4, color: "var(--text)" }}>
                   {t("FieldOps.PHOTO_UPLOAD")} <span style={{ color: "var(--red)" }}>*</span>
@@ -581,9 +570,8 @@ function FieldDashboard() {
                   </div>
                 )}
               </div>
-            )}
-          </div>
-        )}
+            </div>
+          )}
         </Modal>
       </div>
     </>
