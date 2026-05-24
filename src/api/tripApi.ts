@@ -29,9 +29,9 @@ export const tripApi = {
     return response.data.data ?? response.data;
   },
 
-  fieldVerify: async (id: string, photo: File, sealNumber?: string) => {
+  fieldVerify: async (id: string, photo: File | null, sealNumber?: string) => {
     const formData = new FormData();
-    formData.append("photo", photo);
+    if (photo) formData.append("photo", photo);
     if (sealNumber) {
       formData.append("seal_number", sealNumber);
     }
