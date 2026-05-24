@@ -173,6 +173,7 @@ export default function TripTable({
               <span>
                 {record.arrival_time
                   ? formatDateTime(record.arrival_time, {
+                      year: "numeric",
                       month: "2-digit",
                       day: "2-digit",
                       hour: "2-digit",
@@ -186,6 +187,7 @@ export default function TripTable({
               <span style={{ color: record.departure_time ? "inherit" : "#888" }}>
                 {record.departure_time
                   ? formatDateTime(record.departure_time, {
+                      year: "numeric",
                       month: "2-digit",
                       day: "2-digit",
                       hour: "2-digit",
