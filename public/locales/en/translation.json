@@ -1,6 +1,5 @@
 {
   "HELLO": "HELLO WORLD",
-
   "Breadcrumbs": {
     "HOMEPAGE": "Homepage",
     "DASHBOARD": "Dashboard",
@@ -13,7 +12,6 @@
     "AUDIT": "Audit Logs",
     "USERS": "User Management"
   },
-
   "Header": {
     "ACCOUNT_SETTINGS": "Account Settings",
     "SUBSCRIPTION": "Subscription Info",
@@ -29,7 +27,6 @@
     "MESSAGE": "Message",
     "MENU": "Menu"
   },
-
   "Stats": {
     "TOTAL_COMPANY": "Total Companies",
     "TOTAL_DRIVER": "Total Drivers",
@@ -38,7 +35,6 @@
     "TOTAL_TRIPS_TODAY": "Total Trips Today",
     "WAITING_TO_UNLOAD": "Waiting to Unload"
   },
-
   "Login": {
     "TITLE": "Login",
     "EMAIL_PLACEHOLDER": "Email",
@@ -51,7 +47,6 @@
     "EMAIL_INVALID": "Please enter a valid email address!",
     "BUTTON": "Log In"
   },
-
   "Common": {
     "ADD": "Add",
     "SEND": "Send",
@@ -102,7 +97,6 @@
     "RETRY": "Try Again",
     "EMPTY": "(Empty)"
   },
-
   "TableSettings": {
     "TITLE": "Table Settings",
     "SHOW_HIDE_COLUMNS": "Show / hide columns",
@@ -122,7 +116,6 @@
     "PRESET_ALREADY_EXISTS": "A preset with this name already exists",
     "PRESET_NAME_EMPTY": "Preset name cannot be empty"
   },
-
   "Table": {
     "CREATED_AT": "Created At",
     "UPDATED_AT": "Updated At",
@@ -130,7 +123,6 @@
     "ACTIONS": "Actions",
     "NO_DATA": "No data available"
   },
-
   "Errors": {
     "OPERATION_FAILED": "Operation Failed",
     "UNEXPECTED_ERROR": "An unexpected error occurred.",
@@ -148,7 +140,6 @@
     "CONNECTION_RESTORED": "Internet connection restored.",
     "WIDGET_LOAD_ERROR": "Widget could not be loaded"
   },
-
   "OfflineQueue": {
     "QUEUED_TITLE": "Request Queued",
     "QUEUED_DESC": "Request will be replayed when connection is restored.",
@@ -158,7 +149,6 @@
     "FAILED_DESC": "{{count}} request(s) could not be processed.",
     "PENDING": "{{count}} pending request(s)"
   },
-
   "Validation": {
     "REQUIRED": "This field is required!",
     "PASSWORD_MIN_LENGTH": "Password must be at least 8 characters long.",
@@ -168,7 +158,6 @@
     "PASSWORD_COMPLEXITY": "Password must contain at least one uppercase letter, one lowercase letter, and one special character.",
     "PASSWORDS_DO_NOT_MATCH": "Passwords do not match!"
   },
-
   "Audit": {
     "TITLE": "Audit Logs",
     "DATE": "Date",
@@ -185,7 +174,6 @@
     "DELETED_RECORD": "Deleted Record",
     "SHOW_ONLY_CHANGES": "Show Only Changes"
   },
-
   "Profile": {
     "TITLE": "Profile",
     "EDIT_INFO": "Edit Personal Info",
@@ -196,7 +184,6 @@
     "INFO_UPDATE_SUCCESS": "Personal info updated successfully.",
     "PASSWORD_UPDATE_SUCCESS": "Password updated successfully."
   },
-
   "Users": {
     "TITLE": "User Management",
     "USERNAME": "Username",
@@ -211,7 +198,6 @@
     "DELETE_SUCCESS": "User deleted successfully.",
     "LAST_LOGIN": "Last Login"
   },
-
   "Dashboard": {
     "TITLE": "Dashboard",
     "TOP_COMPANIES": "Top Companies",
@@ -231,7 +217,6 @@
     "LAST_7_DAYS": "Last 7 Days",
     "TRIP_COUNT": "Trip Count"
   },
-
   "Companies": {
     "COMPANY_NAME": "Company Name",
     "SEARCH": "Search companies...",
@@ -249,7 +234,6 @@
     "NAME_TOO_SHORT": "Company name must be at least 2 characters",
     "NAME_TOO_LONG": "Company name must be at most 100 characters"
   },
-
   "Drivers": {
     "FULL_NAME": "Full Name",
     "PHONE_NUMBER": "Phone Number",
@@ -269,7 +253,6 @@
     "TOTAL": "total drivers",
     "PHONE_FORMAT_ERROR": "Please enter a valid phone number"
   },
-
   "Vehicles": {
     "LICENSE_PLATE": "License Plate",
     "VEHICLE_TYPE": "Vehicle Type",
@@ -292,7 +275,6 @@
     "PLATE_TOO_SHORT": "Plate must be at least 5 characters",
     "PLATE_TOO_LONG": "Plate must be at most 10 characters"
   },
-
   "Trips": {
     "ARRIVAL_TIME": "Arrival Time",
     "DEPARTURE_TIME": "Departure Time",
@@ -342,13 +324,15 @@
     "FIELD_VERIFIED_AT": "Verified At",
     "VERIFY_PENDING": "Pending",
     "VERIFY_CONFIRMED": "Verified",
-    "VERIFY_CANCELED": "Canceled"
+    "VERIFY_CANCELED": "Canceled",
+    "TIME_RANGE": "Time Range",
+    "DRIVER": "Driver",
+    "LOCATION": "Location",
+    "STATUS": "Status"
   },
-
   "Other": {
     "FAQ": "Frequently Asked Questions"
   },
-
   "Excel": {
     "fileNames": {
       "TRIPS": "Trip_Report",
@@ -398,7 +382,6 @@
       "TRAILER": "Trailer"
     }
   },
-
   "FieldOps": {
     "BUTTON": "Field Mode",
     "TITLE": "Field Operations",
@@ -463,7 +446,6 @@
     "TAB_WAITING": "Waiting",
     "SEARCH_PLATE": "Search plate..."
   },
-
   "Periods": {
     "TODAY": "Today",
     "THIS_MONTH": "This Month",

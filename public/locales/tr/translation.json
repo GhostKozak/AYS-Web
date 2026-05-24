@@ -1,6 +1,5 @@
 {
   "HELLO": "Merhaba Dünya",
-
   "Breadcrumbs": {
     "HOMEPAGE": "Ana Sayfa",
     "DASHBOARD": "Gösterge Paneli",
@@ -13,7 +12,6 @@
     "AUDIT": "Denetim Kayıtları",
     "USERS": "Kullanıcı Yönetimi"
   },
-
   "Header": {
     "ACCOUNT_SETTINGS": "Hesap Ayarları",
     "SUBSCRIPTION": "Abonelik Bilgileri",
@@ -29,7 +27,6 @@
     "MESSAGE": "Mesajınız",
     "MENU": "Menü"
   },
-
   "Stats": {
     "TOTAL_COMPANY": "Toplam Firma",
     "TOTAL_DRIVER": "Toplam Sürücü",
@@ -38,7 +35,6 @@
     "TOTAL_TRIPS_TODAY": "Bugün Toplam Sefer",
     "WAITING_TO_UNLOAD": "Boşaltma Bekleyen"
   },
-
   "Login": {
     "TITLE": "Giriş Yap",
     "EMAIL_PLACEHOLDER": "E-posta",
@@ -51,7 +47,6 @@
     "EMAIL_INVALID": "Geçerli bir e-posta adresi giriniz!",
     "BUTTON": "Giriş Yap"
   },
-
   "Common": {
     "ADD": "Ekle",
     "SEND": "Gönder",
@@ -102,7 +97,6 @@
     "RETRY": "Tekrar Dene",
     "EMPTY": "(Boş)"
   },
-
   "TableSettings": {
     "TITLE": "Tablo Ayarları",
     "SHOW_HIDE_COLUMNS": "Sütunları göster/gizle",
@@ -122,7 +116,6 @@
     "PRESET_ALREADY_EXISTS": "Bu isimde bir hazır ayar zaten mevcut",
     "PRESET_NAME_EMPTY": "Hazır ayar adı boş olamaz"
   },
-
   "Table": {
     "CREATED_AT": "Oluşturulma Tarihi",
     "UPDATED_AT": "Güncellenme Tarihi",
@@ -130,7 +123,6 @@
     "ACTIONS": "İşlemler",
     "NO_DATA": "Veri bulunamadı"
   },
-
   "Errors": {
     "OPERATION_FAILED": "İşlem Başarısız",
     "UNEXPECTED_ERROR": "Beklenmedik bir hata oluştu.",
@@ -148,7 +140,6 @@
     "CONNECTION_RESTORED": "İnternet bağlantısı sağlandı.",
     "WIDGET_LOAD_ERROR": "Widget yüklenemedi"
   },
-
   "OfflineQueue": {
     "QUEUED_TITLE": "İstek Kuyruğa Alındı",
     "QUEUED_DESC": "Bağlantı sağlandığında istek tekrar gönderilecek.",
@@ -158,7 +149,6 @@
     "FAILED_DESC": "{{count}} istek işlenemedi.",
     "PENDING": "{{count}} bekleyen istek"
   },
-
   "Validation": {
     "REQUIRED": "Bu alan zorunludur!",
     "PASSWORD_MIN_LENGTH": "Şifre en az 8 karakter olmalıdır.",
@@ -168,7 +158,6 @@
     "PASSWORD_COMPLEXITY": "Şifre en az bir büyük harf, bir küçük harf ve bir özel karakter içermelidir.",
     "PASSWORDS_DO_NOT_MATCH": "Şifreler birbiriyle eşleşmiyor!"
   },
-
   "Audit": {
     "TITLE": "Denetim Kayıtları",
     "DATE": "Tarih",
@@ -185,7 +174,6 @@
     "DELETED_RECORD": "Silinen Kayıt",
     "SHOW_ONLY_CHANGES": "Sadece Değişimleri Göster"
   },
-
   "Profile": {
     "TITLE": "Profil",
     "EDIT_INFO": "Kişisel Bilgileri Düzenle",
@@ -196,7 +184,6 @@
     "INFO_UPDATE_SUCCESS": "Kişisel bilgiler başarıyla güncellendi.",
     "PASSWORD_UPDATE_SUCCESS": "Şifre başarıyla güncellendi."
   },
-
   "Users": {
     "TITLE": "Kullanıcı Yönetimi",
     "USERNAME": "Kullanıcı Adı",
@@ -211,7 +198,6 @@
     "DELETE_SUCCESS": "Kullanıcı başarıyla silindi.",
     "LAST_LOGIN": "Son Giriş"
   },
-
   "Dashboard": {
     "TITLE": "Gösterge Paneli",
     "TOP_COMPANIES": "En Çok Gelen Firmalar",
@@ -231,7 +217,6 @@
     "LAST_7_DAYS": "Son 7 Gün",
     "TRIP_COUNT": "Sefer Sayısı"
   },
-
   "Companies": {
     "COMPANY_NAME": "Firma Adı",
     "SEARCH": "Firma Ara...",
@@ -249,7 +234,6 @@
     "NAME_TOO_SHORT": "Şirket adı en az 2 karakter olmalıdır",
     "NAME_TOO_LONG": "Şirket adı en fazla 100 karakter olabilir"
   },
-
   "Drivers": {
     "FULL_NAME": "Ad Soyad",
     "PHONE_NUMBER": "Telefon Numarası",
@@ -269,7 +253,6 @@
     "TOTAL": "adet sürücü",
     "PHONE_FORMAT_ERROR": "Geçerli bir numara giriniz"
   },
-
   "Vehicles": {
     "LICENSE_PLATE": "Plaka",
     "VEHICLE_TYPE": "Araç Tipi",
@@ -292,7 +275,6 @@
     "PLATE_TOO_SHORT": "Plaka en az 5 karakter olmalıdır",
     "PLATE_TOO_LONG": "Plaka en fazla 10 karakter olabilir"
   },
-
   "Trips": {
     "ARRIVAL_TIME": "Varış Zamanı",
     "DEPARTURE_TIME": "Çıkış Zamanı",
@@ -342,13 +324,15 @@
     "FIELD_VERIFIED_AT": "Doğrulama Zamanı",
     "VERIFY_PENDING": "Onay Bekliyor",
     "VERIFY_CONFIRMED": "Doğrulandı",
-    "VERIFY_CANCELED": "İptal Edildi"
+    "VERIFY_CANCELED": "İptal Edildi",
+    "TIME_RANGE": "Zaman Aralığı",
+    "DRIVER": "Sürücü",
+    "LOCATION": "Konum",
+    "STATUS": "Durum"
   },
-
   "Other": {
     "FAQ": "Sıkça Sorulan Sorular"
   },
-
   "Excel": {
     "fileNames": {
       "TRIPS": "Sefer_Raporu",
@@ -398,7 +382,6 @@
       "TRAILER": "Dorse"
     }
   },
-
   "FieldOps": {
     "BUTTON": "Saha Modu",
     "TITLE": "Saha Operasyon",
@@ -463,7 +446,6 @@
     "TAB_WAITING": "Beklemede",
     "SEARCH_PLATE": "Plaka ara..."
   },
-
   "Periods": {
     "TODAY": "Bugün",
     "THIS_MONTH": "Bu Ay",
