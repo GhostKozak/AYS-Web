@@ -114,8 +114,9 @@ function FieldDashboard() {
       setSelectedTrip(null);
       queryClient.invalidateQueries({ queryKey: ["trips"] });
       queryClient.invalidateQueries({ queryKey: ["pending-trips"] });
-    } catch {
-      message.error(t("Errors.OPERATION_FAILED"));
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || err?.message || t("Errors.OPERATION_FAILED");
+      message.error(typeof msg === "string" ? msg : t("Errors.OPERATION_FAILED"));
     } finally {
       setVerifying(false);
     }
@@ -127,8 +128,9 @@ function FieldDashboard() {
       message.success(t("FieldOps.REJECT_SUCCESS"));
       queryClient.invalidateQueries({ queryKey: ["trips"] });
       queryClient.invalidateQueries({ queryKey: ["pending-trips"] });
-    } catch {
-      message.error(t("Errors.OPERATION_FAILED"));
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || err?.message || t("Errors.OPERATION_FAILED");
+      message.error(typeof msg === "string" ? msg : t("Errors.OPERATION_FAILED"));
     }
   };
 

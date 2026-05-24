@@ -38,11 +38,6 @@ export const tripApi = {
     const response = await apiClient.post(
       `${API_ENDPOINTS.TRIPS}/${id}/field-verify`,
       formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
     );
     return response.data;
   }
