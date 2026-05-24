@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from "react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { authApi } from "../../api/authApi";
 import { connectSocket } from "../../utils/socket";
-import { ROUTES, STORAGE_KEYS } from "../../constants";
+import { ROUTES } from "../../constants";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { setUser } from "../../utils/auth.utils";
@@ -33,8 +33,7 @@ function LoginPage() {
       // Normalize the user object (backend returns `id`, app expects `_id`)
       const frontendUser = { ...data.user, _id: data.user.id };
 
-      // 1. Persist to localStorage so useAuth initialData hydrates immediately
-      localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, data.access_token);
+      // Persist user info to localStorage so useAuth initialData hydrates immediately
       setUser(frontendUser as any);
 
       // 2. Set cache synchronously — AuthGuard will unblock on next render
