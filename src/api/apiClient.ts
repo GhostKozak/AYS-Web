@@ -6,9 +6,6 @@ import { CONFIG } from '../constants';
 const apiClient = axios.create({
   baseURL: CONFIG.API_BASE_URL,
   withCredentials: true,
-  headers: {
-    'Content-Type': 'application/json',
-  },
 });
 
 export default apiClient;
