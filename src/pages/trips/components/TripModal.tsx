@@ -1,4 +1,4 @@
-import { Modal, Form, Input, Button, Switch, Row, Col, DatePicker, App, Flex } from "antd";
+import { Modal, Form, Input, Button, Switch, Row, Col, DatePicker, App, Flex, Space } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import dayjs from "dayjs";
 import { useCompanies } from "../../../hooks/useCompanies";
@@ -457,62 +457,64 @@ const TripModal = ({
                   <Input placeholder={t("Trips.FULL_NAME")} autoComplete="new-password" />
                 </Form.Item>
 
-                <Form.Item
-                  label={t("Trips.PHONE_NUMBER")}
-                  name="driver_phone_number"
-                  rules={[
-                    { required: true, message: t("Drivers.PHONE_REQUIRED") },
-                    {
-                      validator: (_, value) => {
-                        if (!value) return Promise.resolve();
-                      const countryCode = form.getFieldValue("driver_country_code");
-                      const country = COUNTRY_CODES.find(c => c.code === countryCode);
-                      if (country?.value === "+90") {
-                        if (/^5\d{9}$/.test(value)) return Promise.resolve();
-                        return Promise.reject(t("Drivers.PHONE_FORMAT_ERROR", { defaultValue: "Enter a valid number (5XXXXXXXXX)" }));
-                      }
-                      if (/^\d{6,14}$/.test(value)) return Promise.resolve();
-                      return Promise.reject(t("Drivers.PHONE_FORMAT_ERROR", { defaultValue: "Enter a valid number" }));
-                      }
-                    },
-                  ]}
-                >
-                  <Input 
-                    addonBefore={
-                      <Form.Item name="driver_country_code" noStyle>
-                        <Select
-                          style={{ width: 90 }}
-                          showSearch
-                          optionFilterProp="title"
-                          optionLabelProp="label"
-                          dropdownStyle={{ minWidth: 200 }}
-                        >
-                          {COUNTRY_CODES.map((c) => {
-                            const translatedName = t(`Countries.${c.name}`);
-                            return (
-                              <Select.Option
-                                key={c.code}
-                                value={c.code}
-                                label={c.value}
-                                title={`${translatedName} ${c.value} ${c.code}`}
-                              >
-                                <Flex justify="space-between" align="center">
-                                  <Flex vertical>
-                                    <span style={{ fontWeight: 500 }}>{translatedName}</span>
-                                    <span style={{ fontSize: '0.8em', color: '#999' }}>{c.code}</span>
-                                  </Flex>
-                                  <span style={{ fontWeight: 600, color: '#1677ff' }}>{c.value}</span>
+                <Form.Item label={t("Trips.PHONE_NUMBER")}>
+                  <Space.Compact>
+                    <Form.Item name="driver_country_code" noStyle>
+                      <Select
+                        style={{ width: 90 }}
+                        showSearch
+                        optionFilterProp="title"
+                        optionLabelProp="label"
+                        styles={{ popup: { root: { minWidth: 200 } } }}
+                      >
+                        {COUNTRY_CODES.map((c) => {
+                          const translatedName = t(`Countries.${c.name}`);
+                          return (
+                            <Select.Option
+                              key={c.code}
+                              value={c.code}
+                              label={c.value}
+                              title={`${translatedName} ${c.value} ${c.code}`}
+                            >
+                              <Flex justify="space-between" align="center">
+                                <Flex vertical>
+                                  <span style={{ fontWeight: 500 }}>{translatedName}</span>
+                                  <span style={{ fontSize: '0.8em', color: '#999' }}>{c.code}</span>
                                 </Flex>
-                              </Select.Option>
-                            );
-                          })}
-                        </Select>
-                      </Form.Item>
-                    }
-                    placeholder="5XX XXX XX XX" 
-                    autoComplete="new-password" 
-                    maxLength={15} 
-                  />
+                                <span style={{ fontWeight: 600, color: '#1677ff' }}>{c.value}</span>
+                              </Flex>
+                            </Select.Option>
+                          );
+                        })}
+                      </Select>
+                    </Form.Item>
+                    <Form.Item
+                      name="driver_phone_number"
+                      noStyle
+                      rules={[
+                        { required: true, message: t("Drivers.PHONE_REQUIRED") },
+                        {
+                          validator: (_, value) => {
+                            if (!value) return Promise.resolve();
+                            const countryCode = form.getFieldValue("driver_country_code");
+                            const country = COUNTRY_CODES.find(c => c.code === countryCode);
+                            if (country?.value === "+90") {
+                              if (/^5\d{9}$/.test(value)) return Promise.resolve();
+                              return Promise.reject(t("Drivers.PHONE_FORMAT_ERROR", { defaultValue: "Enter a valid number (5XXXXXXXXX)" }));
+                            }
+                            if (/^\d{6,14}$/.test(value)) return Promise.resolve();
+                            return Promise.reject(t("Drivers.PHONE_FORMAT_ERROR", { defaultValue: "Enter a valid number" }));
+                          }
+                        },
+                      ]}
+                    >
+                      <Input
+                        placeholder="5XX XXX XX XX"
+                        autoComplete="new-password"
+                        maxLength={15}
+                      />
+                    </Form.Item>
+                  </Space.Compact>
                 </Form.Item>
               </>
             )}
