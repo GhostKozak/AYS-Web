@@ -196,7 +196,8 @@ export default function TripTable({
             </div>
           </div>
         ),
-        width: 140,
+        width: 130,
+        defaultSortOrder: 'descend',
         sorter: (a, b) => new Date(a.arrival_time || 0).getTime() - new Date(b.arrival_time || 0).getTime(),
       },
       {
@@ -211,21 +212,21 @@ export default function TripTable({
           </div>
         ),
         ...getCustomFilterProps(t("Trips.SEARCH_DRIVER", { defaultValue: "Şoför Ara" })),
-        width: 180,
+        width: 160,
       },
       {
         title: t("Trips.PHONE_NUMBER"),
         dataIndex: ["driver", "phone_number"],
         key: "driver_phone",
         render: (phoneNumber: string) => formatPhoneNumber(phoneNumber) || "-",
-        width: 150,
+        width: 120,
       },
       {
         title: t("Trips.COMPANY_NAME"),
         dataIndex: ["company", "name"],
         key: "company",
         ...getCustomFilterProps(t("Trips.SEARCH_COMPANY", { defaultValue: "Firma Ara" })),
-        width: 200,
+        width: 160,
       },
       {
         title: t("Trips.LICENSE_PLATE"),
@@ -335,7 +336,7 @@ export default function TripTable({
         dataIndex: "seal_number",
         key: "seal_number",
         render: (val: string) => val || "-",
-        width: 140,
+        width: 110,
         ...getCustomFilterProps(t("Trips.SEARCH_SEAL", { defaultValue: "Mühür Ara" })),
       },
       {
@@ -402,7 +403,7 @@ export default function TripTable({
                 minute: "2-digit",
               })
             : "-",
-        width: 150,
+        width: 130,
         filters: [
           { text: t("Common.YES"), value: true },
           { text: t("Common.NO"), value: false },
@@ -425,7 +426,7 @@ export default function TripTable({
                 minute: "2-digit",
               })
             : "-",
-        width: 150,
+        width: 130,
         visible: user?.role === USER_ROLES.ADMIN,
         sorter: (a, b) => new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime(),
       },
@@ -443,7 +444,7 @@ export default function TripTable({
                 minute: "2-digit",
               })
             : "-",
-        width: 150,
+        width: 130,
         visible: user?.role === USER_ROLES.ADMIN,
         sorter: (a, b) => new Date(a.updatedAt || 0).getTime() - new Date(b.updatedAt || 0).getTime(),
       },
@@ -511,7 +512,7 @@ export default function TripTable({
         rowKey="_id"
         rowSelection={rowSelection}
         rowClassName={getRowClassName}
-        scroll={{ x: 1500 }}
+        scroll={{ x: 'max-content' }}
         pagination={serverTotal !== undefined ? {
           current: serverPage ?? 1,
           pageSize: serverPageSize ?? 10,

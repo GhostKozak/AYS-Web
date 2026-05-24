@@ -253,7 +253,7 @@ export default function DriverTable({
         loading={isLoading}
         rowKey="_id"
         rowSelection={rowSelection}
-        scroll={{ x: 1000 }}
+        scroll={{ x: 'max-content' }}
         pagination={serverTotal !== undefined ? {
           current: serverPage ?? 1,
           pageSize: serverPageSize ?? 10,

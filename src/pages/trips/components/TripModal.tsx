@@ -388,7 +388,7 @@ const TripModal = ({
       open={isOpen}
       onCancel={onClose}
       footer={null}
-      destroyOnClose
+      destroyOnHidden
       width={hasChanges ? 950 : 750}
       styles={{ body: { transition: "all 0.3s ease" } }}
     >
