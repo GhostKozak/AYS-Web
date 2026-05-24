@@ -1,4 +1,4 @@
-import { Table, Tag, Popconfirm, Button, Space, Tooltip, Modal, Image, Input } from "antd";
+import { Table, Tag, Popconfirm, Button, Space, Tooltip, Image, Input } from "antd";
 import { DeleteOutlined, EditOutlined, CameraOutlined } from "@ant-design/icons";
 import { USER_ROLES, type TripType, type TableSettings } from "../../../types";
 import { Trans, useTranslation } from "react-i18next";
@@ -90,8 +90,9 @@ export default function TripTable({
   };
   const tableFontSize = fontSizeMap[fontSize] ?? fontSizeMap.normal;
 
-  const [photoModalOpen, setPhotoModalOpen] = useState(false);
-  const [selectedPhoto, setSelectedPhoto] = useState<string>("");
+  const [previewVisible, setPreviewVisible] = useState(false);
+  const [currentPreview, setCurrentPreview] = useState(0);
+  const [previewImages, setPreviewImages] = useState<string[]>([]);
   const [glowingRowIds, setGlowingRowIds] = useState<Set<string>>(new Set());
 
   const tableComponents = useMemo(() => ({
@@ -156,9 +157,10 @@ export default function TripTable({
     return classes.join(" ");
   }, [glowingRowIds]);
 
-  const openPhotoModal = useCallback((photoUrl: string) => {
-    setSelectedPhoto(photoUrl);
-    setPhotoModalOpen(true);
+  const openPhotoPreview = useCallback((photoUrl: string) => {
+    setPreviewImages([photoUrl]);
+    setCurrentPreview(0);
+    setPreviewVisible(true);
   }, []);
 
   const columns = useMemo(() => {
@@ -376,7 +378,7 @@ export default function TripTable({
               <Button
                 type="text"
                 icon={<CameraOutlined style={{ color: "#1890ff" }} />}
-                onClick={() => openPhotoModal(val)}
+                onClick={() => openPhotoPreview(val)}
               />
             </Tooltip>
           ) : (
@@ -505,7 +507,7 @@ export default function TripTable({
       });
     }
     return filtered;
-  }, [t, onEdit, onDelete, canEdit, settings, user, openPhotoModal]);
+  }, [t, onEdit, onDelete, canEdit, settings, user, openPhotoPreview]);
 
   return (
     <div style={{ fontSize: tableFontSize }}>
@@ -555,20 +557,17 @@ export default function TripTable({
         }}
       />
 
-      <Modal
-        title={t("Trips.FIELD_PHOTO_TITLE")}
-        open={photoModalOpen}
-        onCancel={() => setPhotoModalOpen(false)}
-        footer={null}
-        width="auto"
+      <Image.PreviewGroup
+        preview={{
+          current: currentPreview,
+          visible: previewVisible,
+          onVisibleChange: (vis) => setPreviewVisible(vis),
+        }}
       >
-        <Image
-          src={selectedPhoto}
-          alt={t("Trips.FIELD_PHOTO")}
-          style={{ width: "100%", maxHeight: "80vh", objectFit: "contain" }}
-          preview={false}
-        />
-      </Modal>
+        {previewImages.map((src, idx) => (
+          <Image key={idx} src={src} style={{ display: "none" }} />
+        ))}
+      </Image.PreviewGroup>
     </div>
   );
 }
