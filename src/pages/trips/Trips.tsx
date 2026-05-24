@@ -11,11 +11,18 @@ import type { TFunction } from "i18next";
 const getTripTableSettingsOptions = (t: TFunction) => [
   { key: "time_range", title: t("Trips.TIME_RANGE") },
   { key: "driver", title: t("Trips.DRIVER") },
+  { key: "driver_phone", title: t("Trips.PHONE_NUMBER") },
   { key: "company", title: t("Trips.COMPANY_NAME") },
   { key: "vehicle", title: t("Trips.LICENSE_PLATE") },
   { key: "unload_status", title: t("Trips.UNLOAD_STATUS") },
+  { key: "has_gps_tracking", title: t("Trips.GPS_TRACKING") },
   { key: "location", title: t("Trips.LOCATION") },
-  { key: "status", title: t("Trips.STATUS") },
+  { key: "seal_number", title: t("Trips.SEAL_NUMBER") },
+  { key: "status", title: t("Trips.VERIFICATION_STATUS") },
+  { key: "field_photo_path", title: t("Trips.FIELD_PHOTO") },
+  { key: "field_verified_at", title: t("Trips.FIELD_VERIFIED_AT") },
+  { key: "createdAt", title: t("Table.CREATED_AT") },
+  { key: "updatedAt", title: t("Table.UPDATED_AT") },
   { key: "action", title: t("Table.ACTIONS") },
 ];
 import TripModal from "./components/TripModal";
@@ -84,7 +91,7 @@ function Trips() {
       ModalComponent={TripModal}
       modalExtraProps={{ companies, drivers, vehicles } as any}
       getSettingsOptions={getTripTableSettingsOptions}
-      defaultVisibleColumns={["time_range", "driver", "company", "vehicle", "unload_status", "location", "status", "action"]}
+      defaultVisibleColumns={["time_range", "driver", "company", "vehicle", "unload_status", "location", "action"]}
       settingsKey="trips"
       mobileBreakpoint={1024}
       tableExtraProps={{
