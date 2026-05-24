@@ -1,5 +1,6 @@
 import { STORAGE_KEYS } from "../constants";
 import type { UserRole, User } from "../types";
+import { clearQueue } from "./offlineQueue";
 
 // ---------------------------------------------------------------------------
 // User (localStorage) — used as a cache/initialData for useAuth's useQuery
@@ -32,8 +33,8 @@ export const setUser = (user: User): void => {
 
 export const clearAuth = (): void => {
   localStorage.removeItem(STORAGE_KEYS.USER);
-  // ACCESS_TOKEN key kept for safety (no-op if it doesn't exist)
   localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
+  clearQueue();
 };
 
 // ---------------------------------------------------------------------------

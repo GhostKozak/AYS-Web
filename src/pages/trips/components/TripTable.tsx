@@ -122,22 +122,27 @@ export default function TripTable({
   }), [tableFontSize]);
 
   useEffect(() => {
+    const timers: ReturnType<typeof setTimeout>[] = [];
     const handleTripVerified = (event: Event) => {
       const tripId = (event as CustomEvent<string>).detail;
       if (tripId) {
         setGlowingRowIds((prev) => new Set(prev).add(tripId));
-        setTimeout(() => {
+        const timer = setTimeout(() => {
           setGlowingRowIds((prev) => {
             const next = new Set(prev);
             next.delete(tripId);
             return next;
           });
         }, 3500);
+        timers.push(timer);
       }
     };
 
     window.addEventListener("trip-verified", handleTripVerified);
-    return () => window.removeEventListener("trip-verified", handleTripVerified);
+    return () => {
+      window.removeEventListener("trip-verified", handleTripVerified);
+      timers.forEach(clearTimeout);
+    };
   }, []);
 
   const getRowClassName = useCallback((record: TripType) => {
@@ -493,7 +498,7 @@ export default function TripTable({
       });
     }
     return filtered;
-  }, [t, onEdit, onDelete, canEdit, settings, user, openPhotoModal, trips]);
+  }, [t, onEdit, onDelete, canEdit, settings, user, openPhotoModal]);
 
   return (
     <div style={{ fontSize: tableFontSize }}>
@@ -509,7 +514,7 @@ export default function TripTable({
         scroll={{ x: 1500 }}
         pagination={serverTotal !== undefined ? {
           current: serverPage ?? 1,
-          pageSize: Math.max(serverPageSize ?? 10, trips.length),
+          pageSize: serverPageSize ?? 10,
           total: serverTotal,
           showSizeChanger: true,
           showQuickJumper: true,

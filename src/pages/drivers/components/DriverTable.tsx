@@ -256,7 +256,7 @@ export default function DriverTable({
         scroll={{ x: 1000 }}
         pagination={serverTotal !== undefined ? {
           current: serverPage ?? 1,
-          pageSize: Math.max(serverPageSize ?? 10, drivers.length),
+          pageSize: serverPageSize ?? 10,
           total: serverTotal,
           showSizeChanger: true,
           showQuickJumper: true,

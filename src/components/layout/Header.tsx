@@ -386,7 +386,8 @@ function Header() {
         onOk={() => {
           form
             .validateFields()
-            .then(() => {
+            .then((values) => {
+              console.warn('Feedback submitted (not implemented):', values);
               form.resetFields();
               setIsModalOpen(false);
             })

@@ -18,8 +18,19 @@ const saveAsExcel = async (data: any[], fileNameKey: string, sheetName: string, 
     }));
     worksheet.columns = columns;
 
-    // Verileri ekle
-    worksheet.addRows(data);
+    // Verileri ekle - sanitize against Excel formula injection
+    const sanitizedData = data.map(row => {
+      const sanitized: Record<string, unknown> = {};
+      for (const [key, value] of Object.entries(row)) {
+        if (typeof value === 'string' && /^[=+\-@]/.test(value)) {
+          sanitized[key] = `'${value}`;
+        } else {
+          sanitized[key] = value;
+        }
+      }
+      return sanitized;
+    });
+    worksheet.addRows(sanitizedData);
 
     // Genel Stil Ayarları (Font: Calibri, 11pt)
     worksheet.getRows(1, worksheet.rowCount)?.forEach(row => {

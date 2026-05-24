@@ -12,10 +12,6 @@ export const socket: Socket = io(socketUrl, {
 
 export const connectSocket = (): void => {
   if (!socket.connected) {
-    const token = localStorage.getItem("access_token");
-    if (token) {
-      socket.auth = { token };
-    }
     socket.connect();
   }
 };

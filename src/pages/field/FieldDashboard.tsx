@@ -154,14 +154,14 @@ function FieldDashboard() {
   }, [parkTrips, debouncedSearch]);
 
   const newArrivals = useMemo(() => {
-    const cutoff = Date.now() - 60 * 60 * 1000;
+    const cutoff = now - 60 * 60 * 1000;
     return filteredPending.filter((t) => new Date(t.arrival_time).getTime() > cutoff);
-  }, [filteredPending]);
+  }, [filteredPending, now]);
 
   const awaitingApproval = useMemo(() => {
-    const cutoff = Date.now() - 60 * 60 * 1000;
+    const cutoff = now - 60 * 60 * 1000;
     return filteredPending.filter((t) => new Date(t.arrival_time).getTime() <= cutoff);
-  }, [filteredPending]);
+  }, [filteredPending, now]);
 
   useEffect(() => {
     if (urgentTrips.length > prevUrgentCountRef.current) {

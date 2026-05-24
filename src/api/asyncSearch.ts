@@ -13,12 +13,13 @@ export const asyncSearch = async <T>(
 
   try {
     // 1. Send POST request to initiate async search
+    const { search, limit, offset, ...extraFilters } = params;
     const response = await apiClient.post('/search/async', {
       module: moduleName,
-      search: params.search,
-      limit: params.limit ?? 10,
-      offset: params.offset ?? 0,
-      ...params, // Pass any other module-specific filters like companyId or status
+      search,
+      limit: limit ?? 10,
+      offset: offset ?? 0,
+      ...extraFilters,
     });
 
     const jobId = response.data.jobId;

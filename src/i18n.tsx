@@ -18,7 +18,7 @@ i18n
       lookupLocalStorage: "lang",
     },
     interpolation: {
-      escapeValue: false
+      escapeValue: true,
     },
   });
 
