@@ -158,7 +158,9 @@ const TripModal = ({
         getNewValue: (f) => {
           if (!f.driver) return "-";
           const found = drivers.find((d) => d._id === f.driver);
-          return found ? found.full_name : f.driver;
+          if (found) return found.full_name;
+          if (selectedRecord?.driver?._id === f.driver) return selectedRecord.driver.full_name;
+          return f.driver;
         },
       },
       {
@@ -172,8 +174,9 @@ const TripModal = ({
         getNewValue: (f) => {
           if (!f.vehicle) return "-";
           const v = vehicles.find((v) => v._id === f.vehicle);
-          const val = v ? v.licence_plate : f.vehicle;
-          return val ? formatLicencePlate(val) : "-";
+          if (v) return formatLicencePlate(v.licence_plate);
+          if (selectedRecord?.vehicle?._id === f.vehicle) return formatLicencePlate(selectedRecord.vehicle.licence_plate);
+          return f.vehicle;
         },
       },
       {
@@ -182,13 +185,11 @@ const TripModal = ({
         formKey: "company",
         getOldValue: (r) => r.company?.name || "-",
         getNewValue: (f) => {
-          if (!isNewDriver) {
-            const selectedDriver = drivers.find((d) => d._id === f.driver);
-            return selectedDriver?.company?.name || "-";
-          }
           if (!f.company) return "-";
           const c = companies.find((c) => c._id === f.company);
-          return c ? c.name : f.company;
+          if (c) return c.name;
+          if (selectedRecord?.company?._id === f.company) return selectedRecord.company.name;
+          return f.company;
         },
       },
       {
@@ -238,7 +239,7 @@ const TripModal = ({
         getNewValue: (f) => f.notes || "-",
       },
     ]);
-  }, [selectedRecord, currentValues, companies, drivers, vehicles, t, isNewDriver]);
+  }, [selectedRecord, currentValues, companies, drivers, vehicles, t]);
 
 
 
