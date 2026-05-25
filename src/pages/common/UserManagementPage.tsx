@@ -39,11 +39,13 @@ function UserManagementPage() {
       setIsModalOpen(false);
     },
     onError: (error: any) => {
-      if (error.response?.status && [400, 409, 422].includes(error.response.status)) {
+      if (error.response?.status && [400, 403, 409, 422].includes(error.response.status)) {
         notification.error({
           message: t("Common.ERROR"),
           description: error.response?.data?.message || t("Errors.OPERATION_FAILED"),
         });
+      } else {
+        message.error(t("Errors.OPERATION_FAILED"));
       }
     },
   });
@@ -62,11 +64,13 @@ function UserManagementPage() {
       setIsModalOpen(false);
     },
     onError: (error: any) => {
-      if (error.response?.status && [400, 409, 422].includes(error.response.status)) {
+      if (error.response?.status && [400, 403, 409, 422].includes(error.response.status)) {
         notification.error({
           message: t("Common.ERROR"),
           description: error.response?.data?.message || t("Errors.OPERATION_FAILED"),
         });
+      } else {
+        message.error(t("Errors.OPERATION_FAILED"));
       }
     },
   });
@@ -78,11 +82,13 @@ function UserManagementPage() {
       message.success(t("Users.DELETE_SUCCESS"));
     },
     onError: (error: any) => {
-      if (error.response?.status && [400, 409, 422].includes(error.response.status)) {
+      if (error.response?.status && [400, 403, 409, 422].includes(error.response.status)) {
         notification.error({
           message: t("Common.ERROR"),
           description: error.response?.data?.message || t("Errors.OPERATION_FAILED"),
         });
+      } else {
+        message.error(t("Errors.OPERATION_FAILED"));
       }
     },
   });

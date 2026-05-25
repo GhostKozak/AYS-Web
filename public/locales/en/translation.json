@@ -30,8 +30,6 @@
   "Stats": {
     "TOTAL_COMPANY": "Total Companies",
     "TOTAL_DRIVER": "Total Drivers",
-    "TOTAL_VEHICLE": "Total Vehicles",
-    "ACTIVE_TRIP": "Active Trips",
     "TOTAL_TRIPS_TODAY": "Total Trips Today",
     "WAITING_TO_UNLOAD": "Waiting to Unload"
   },

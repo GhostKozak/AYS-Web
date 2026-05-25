@@ -22,7 +22,7 @@ function StatsOverview() {
   return (
     <Row gutter={[16, 16]}>
       <Col xs={12} sm={12} md={6}>
-        <Card size={isMobile ? "small" : "medium"} style={{ height: '100%' }}>
+        <Card size={isMobile ? "small" : "default"} style={{ height: '100%' }}>
           <Skeleton loading={isLoading} active paragraph={{ rows: 1 }}>
             <Statistic
               title={<span style={{ fontSize: isMobile ? '12px' : '14px' }}>{t("Stats.TOTAL_TRIPS_TODAY")}</span>}
@@ -34,7 +34,7 @@ function StatsOverview() {
         </Card>
       </Col>
       <Col xs={12} sm={12} md={6}>
-        <Card size={isMobile ? "small" : "medium"} style={{ height: '100%' }}>
+        <Card size={isMobile ? "small" : "default"} style={{ height: '100%' }}>
           <Skeleton loading={isLoading} active paragraph={{ rows: 1 }}>
             <Statistic
               title={<span style={{ fontSize: isMobile ? '12px' : '14px' }}>{t("Stats.WAITING_TO_UNLOAD")}</span>}
@@ -46,7 +46,7 @@ function StatsOverview() {
         </Card>
       </Col>
       <Col xs={12} sm={12} md={6}>
-        <Card size={isMobile ? "small" : "medium"} style={{ height: '100%' }}>
+        <Card size={isMobile ? "small" : "default"} style={{ height: '100%' }}>
           <Skeleton loading={isLoading} active paragraph={{ rows: 1 }}>
             <Statistic
               title={<span style={{ fontSize: isMobile ? '12px' : '14px' }}>{t("Stats.TOTAL_COMPANY")}</span>}
@@ -58,7 +58,7 @@ function StatsOverview() {
         </Card>
       </Col>
       <Col xs={12} sm={12} md={6}>
-        <Card size={isMobile ? "small" : "medium"} style={{ height: '100%' }}>
+        <Card size={isMobile ? "small" : "default"} style={{ height: '100%' }}>
           <Skeleton loading={isLoading} active paragraph={{ rows: 1 }}>
             <Statistic
               title={<span style={{ fontSize: isMobile ? '12px' : '14px' }}>{t("Stats.TOTAL_DRIVER")}</span>}

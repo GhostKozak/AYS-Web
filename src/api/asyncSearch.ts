@@ -83,7 +83,7 @@ const httpFallback = async <T>(
     },
   });
   return {
-    items: response.data.data ?? response.data.items ?? [],
-    total: response.data.count ?? response.data.total ?? 0,
+    items: response.data.data ?? [],
+    total: response.data.count ?? 0,
   };
 };

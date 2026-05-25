@@ -44,39 +44,39 @@ export interface ParkingLotStats {
 export const reportApi = {
   getTopCompanies: async (period: ReportPeriod = 'month'): Promise<CompanyStat[]> => {
     const response = await apiClient.get(API_ENDPOINTS.REPORTS.TOP_COMPANIES, { params: { period } });
-    return response.data.data ?? response.data ?? [];
+    return response.data ?? [];
   },
 
   getUnloadWaiting: async (period: ReportPeriod = 'month') => {
     const response = await apiClient.get(API_ENDPOINTS.REPORTS.UNLOAD_WAITING, { params: { period } });
-    return response.data.data ?? response.data;
+    return response.data;
   },
 
   getStatusDistribution: async (period: ReportPeriod = 'month', excludeStatus?: string | string[]): Promise<StatusDistributionResponse> => {
     const response = await apiClient.get(API_ENDPOINTS.REPORTS.STATUS_DISTRIBUTION, { 
       params: { period, excludeStatus } 
     });
-    return response.data.data ?? response.data;
+    return response.data;
   },
 
   getAverageTurnaround: async (period: ReportPeriod = 'month') => {
     const response = await apiClient.get(API_ENDPOINTS.REPORTS.AVERAGE_TURNAROUND, { params: { period } });
-    return response.data.data ?? response.data;
+    return response.data;
   },
 
   getTrend: async (period: ReportPeriod = 'month', year?: number): Promise<TrendStat[]> => {
     const response = await apiClient.get(API_ENDPOINTS.REPORTS.TREND, { params: { period, year } });
-    return response.data.data ?? response.data ?? [];
+    return response.data ?? [];
   },
 
   getDashboardSummary: async (): Promise<DashboardSummary> => {
     const response = await apiClient.get(API_ENDPOINTS.REPORTS.DASHBOARD_SUMMARY);
-    return response.data.data ?? response.data;
+    return response.data;
   },
 
   getParkingLotDashboard: async (totalCapacity: number = 100): Promise<ParkingLotStats> => {
     const response = await apiClient.get(API_ENDPOINTS.REPORTS.PARKING_LOT, { params: { totalCapacity } });
-    return response.data.data ?? response.data;
+    return response.data;
   },
 
   exportExcel: async (period: ReportPeriod = 'month', onProgress?: (progressEvent: AxiosProgressEvent) => void) => {

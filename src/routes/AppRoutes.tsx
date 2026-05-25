@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router";
+import { createBrowserRouter, Navigate } from "react-router";
 import { lazy, Suspense } from "react";
 import App from "../App";
 import LoginPage from "../pages/auth/LoginPage";
@@ -48,11 +48,7 @@ function AppRoutes() {
         },
         {
           path: ROUTES.DASHBOARD,
-          element: (
-            <Suspense fallback={<PageLoader />}>
-              <DashboardPage />
-            </Suspense>
-          ),
+          element: <Navigate to="/" replace />,
         },
         {
           path: ROUTES.COMPANIES,

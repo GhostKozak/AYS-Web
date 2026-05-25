@@ -30,8 +30,6 @@
   "Stats": {
     "TOTAL_COMPANY": "Toplam Firma",
     "TOTAL_DRIVER": "Toplam Sürücü",
-    "TOTAL_VEHICLE": "Toplam Araç",
-    "ACTIVE_TRIP": "Aktif Sefer",
     "TOTAL_TRIPS_TODAY": "Bugün Toplam Sefer",
     "WAITING_TO_UNLOAD": "Boşaltma Bekleyen"
   },

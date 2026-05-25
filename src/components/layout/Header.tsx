@@ -387,7 +387,6 @@ function Header() {
           form
             .validateFields()
             .then((values) => {
-              console.warn('Feedback submitted (not implemented):', values);
               form.resetFields();
               setIsModalOpen(false);
             })
