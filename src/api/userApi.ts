@@ -5,21 +5,20 @@ import type { PaginatedResponse, PaginationParams } from "../types";
 export const userApi = {
   getAll: async (params?: PaginationParams): Promise<PaginatedResponse<any>> => {
     const response = await apiClient.get(API_ENDPOINTS.USERS, { params });
-    const data = response.data.data ?? response.data;
     return {
-      items: Array.isArray(data) ? data : [],
-      total: response.data.count ?? (Array.isArray(data) ? data.length : 0),
+      items: response.data.data ?? [],
+      total: response.data.count ?? 0,
     };
   },
 
   getById: async (id: string) => {
     const response = await apiClient.get(`${API_ENDPOINTS.USERS}/${id}`);
-    return response.data.data ?? response.data;
+    return response.data;
   },
 
   getMe: async () => {
     const response = await apiClient.get(`${API_ENDPOINTS.USERS}/me`);
-    return response.data.data ?? response.data;
+    return response.data;
   },
 
   updateMe: async (data: any) => {

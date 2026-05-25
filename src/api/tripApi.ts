@@ -26,7 +26,7 @@ export const tripApi = {
 
   getPendingVerification: async () => {
     const response = await apiClient.get(`${API_ENDPOINTS.TRIPS}/pending-verification`);
-    return response.data.data ?? response.data;
+    return response.data.data ?? [];
   },
 
   fieldVerify: async (id: string, photo: File, sealNumber?: string) => {
