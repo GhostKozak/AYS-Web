@@ -266,39 +266,52 @@ function FieldDashboard() {
     return (
       <div key={trip._id} className="op-card">
         <div className="op-card-body">
-          <div className="op-card-row" style={{ alignItems: "flex-start" }}>
-            <div className="op-plate-sm">{trip.vehicle?.licence_plate || "---"}</div>
-            {parked && trip.parked_at && (
-              <Tag className="op-duration-tag">
-                {formatDuration(trip.parked_at)}
-              </Tag>
-            )}
-          </div>
-          <div className="op-meta" style={{ marginTop: 2 }}>
-            <ClockCircleOutlined style={{ fontSize: 12 }} />
-            {trip.arrival_time ? formatDateTime(trip.arrival_time) : "-"}
-          </div>
-          <div className="op-meta" style={{ marginTop: 2 }}>
+          <div className="op-plate">{trip.vehicle?.licence_plate || "---"}</div>
+          <div className="op-meta">
             <CarOutlined /> {trip.company?.name || "-"}
-            {!!trip.has_gps_tracking && (
-              <Tag color="green" style={{ marginLeft: 8, fontSize: 10, borderRadius: 6, lineHeight: "18px" }}>
-                🛰️ ATS
-              </Tag>
-            )}
-            {parked && (
-              <Tag color={trip.is_in_temporary_parking_lot ? "orange" : "blue"} style={{ marginLeft: 4, fontSize: 10, borderRadius: 6, lineHeight: "18px" }}>
-                🅿️ {trip.is_in_temporary_parking_lot ? t("FieldOps.STATUS_KK") : t("FieldOps.STATUS_PARKED")}
-              </Tag>
-            )}
+            {!!trip.has_gps_tracking && <Tag color="green" style={{ marginLeft: 8, fontSize: 10, borderRadius: 6, lineHeight: "18px" }}>🛰️ ATS</Tag>}
           </div>
-          {trip.driver?.full_name && (
-            <div className="op-meta" style={{ fontSize: 11, marginTop: 2 }}>
-              {trip.driver.full_name}
+          <div className="op-card-row">
+            <div>
+              <div className="op-meta">
+                <ClockCircleOutlined style={{ fontSize: 12 }} />
+                {trip.arrival_time ? formatTime(trip.arrival_time, { hour: "2-digit", minute: "2-digit" }) : "-"}
+                {parked && trip.parked_at && (
+                  <Tag className="op-duration-tag" style={{ marginLeft: 6 }}>
+                    {formatDuration(trip.parked_at)}
+                  </Tag>
+                )}
+              </div>
+              {trip.driver?.full_name && (
+                <div className="op-meta" style={{ marginTop: 2 }}>{trip.driver.full_name}</div>
+              )}
             </div>
-          )}
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
+              {parked && (
+                <Tag color={trip.is_in_temporary_parking_lot ? "orange" : "blue"} style={{ fontSize: 10, borderRadius: 6, lineHeight: "18px" }}>
+                  🅿️ {trip.is_in_temporary_parking_lot ? t("FieldOps.STATUS_KK") : t("FieldOps.STATUS_PARKED")}
+                </Tag>
+              )}
+              {trip.field_photo_path && (
+                <img
+                  src={trip.field_photo_path}
+                  alt=""
+                  className="op-thumb"
+                  onClick={() => {
+                    if (trip.field_photo_path) {
+                      Modal.info({
+                        title: t("FieldOps.PHOTO_TITLE"),
+                        content: <img src={trip.field_photo_path} alt="" style={{ width: "100%", borderRadius: 8 }} />,
+                      });
+                    }
+                  }}
+                />
+              )}
+            </div>
+          </div>
         </div>
-        <div className="op-card-footer">
-          <button className="op-text-btn" style={{ width: "100%" }} onClick={() => openVerificationModal(trip)}>
+        <div className="op-card-actions">
+          <button className="op-btn op-btn-primary" onClick={() => openVerificationModal(trip)}>
             {t("FieldOps.UPDATE_SEAL_PHOTO")}
           </button>
         </div>
