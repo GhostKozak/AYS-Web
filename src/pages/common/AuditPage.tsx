@@ -79,7 +79,7 @@ function AuditPage() {
           const displayName = `${first} ${last}`.trim() || full || u.email;
           if (displayName) return displayName;
         }
-        return record.userEmail || "-";
+        return record.userLabel || "-";
       },
     },
     {
@@ -106,7 +106,7 @@ function AuditPage() {
     },
     {
       title: t("Audit.DETAILS"),
-      dataIndex: "details",
+      key: "details",
       key: "details",
       render: (_: any, record: AuditType) => (
         <Button size="small" type="dashed" onClick={() => handleViewDetails(record)}>
@@ -187,7 +187,6 @@ function AuditPage() {
         {selectedAudit && (
           <AuditDetailViewer
             action={selectedAudit.action}
-            details={selectedAudit.details}
             oldValue={selectedAudit.oldValue}
             newValue={selectedAudit.newValue}
           />

@@ -203,12 +203,14 @@ export interface User {
 export interface AuditType {
   _id: string;
   user: Pick<User, 'firstName' | 'lastName' | 'email' | 'role'> | null;
-  userEmail: string; // Fallback for legacy or unpopulated
+  userLabel?: string;
   action: string;
   entity: string;
-  entityId?: string;
-  details?: any; // legacy
+  entityId: string;
   oldValue?: any;
   newValue?: any;
+  ipAddress?: string;
+  userAgent?: string;
   createdAt: string;
+  updatedAt: string;
 }
