@@ -65,6 +65,7 @@
     "BACK_HOME": "Ana Sayfaya Dön",
     "ARE_YOU_SURE": "Emin misiniz?",
     "SEARCH_IN_FILTERS": "Filtrelerde ara",
+    "SEARCH_PLACEHOLDER": "{{field}} ara...",
     "CLEAR_FILTERS": "Filtreleri Temizle",
     "APP_SUBTITLE": "Araç Yönetim Sistemi",
     "APP_ABBREVIATION": "AYS",

@@ -77,7 +77,7 @@ export default function TripTable({
           size="small"
           style={{ width: 90 }}
         >
-          {t("Common.CLEAR", { defaultValue: "Temizle" })}
+          {t("Common.CLEAR_FILTERS")}
         </Button>
       </div>
     ),

@@ -55,7 +55,7 @@ export default function CompaniesTable({
       filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }: any) => (
         <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
           <Input
-            placeholder={`${placeholder} ara...`}
+            placeholder={t("Common.SEARCH_PLACEHOLDER", { field: placeholder })}
             value={selectedKeys[0]}
             onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
             onPressEnter={() => {
