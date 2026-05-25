@@ -106,8 +106,7 @@ function DashboardPage() {
 
       setExportProgress(100);
       setExportStatus('success');
-    } catch (error) {
-      console.error(error);
+    } catch {
       setExportStatus('error');
     }
   };

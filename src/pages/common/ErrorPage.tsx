@@ -8,8 +8,6 @@ const ErrorPage = () => {
   const error: any = useRouteError();
   const { t } = useTranslation();
 
-  console.error(error);
-
   return (
     <div
       style={{

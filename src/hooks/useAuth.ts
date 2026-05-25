@@ -51,8 +51,8 @@ export const useAuth = () => {
   const logout = async () => {
     try {
       await authApi.logout();
-    } catch (error) {
-      console.error("Logout API failed, performing client-side cleanup anyway:", error);
+    } catch {
+      // client-side cleanup will run regardless
     } finally {
       clearStoredAuth();
       queryClient.setQueryData(["currentUser"], null);

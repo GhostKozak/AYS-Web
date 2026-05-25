@@ -32,7 +32,6 @@ export const asyncSearch = async <T>(
     return new Promise((resolve, reject) => {
       const timeoutId = setTimeout(() => {
         cleanup();
-        console.warn(`Socket search timed out for ${moduleName}, falling back to HTTP GET`);
         httpFallback<T>(moduleName, params).then(resolve).catch(reject);
       }, 3000);
 
@@ -49,7 +48,6 @@ export const asyncSearch = async <T>(
       const onError = (err: any) => {
         if (err.jobId === jobId) {
           cleanup();
-          console.warn(`Socket search error for ${moduleName}, falling back to HTTP GET:`, err);
           httpFallback<T>(moduleName, params).then(resolve).catch(reject);
         }
       };
@@ -63,8 +61,7 @@ export const asyncSearch = async <T>(
       socket.on('search_result', onResult);
       socket.on('search_error', onError);
     });
-  } catch (error) {
-    console.warn(`Async search POST failed, falling back to HTTP GET for ${moduleName}:`, error);
+  } catch {
     return httpFallback<T>(moduleName, params);
   }
 };
