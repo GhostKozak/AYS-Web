@@ -3,11 +3,11 @@ import { usePageTitle } from "../../hooks/usePageTitle";
 import { useTrips } from "../../hooks/useTrips";
 import { usePendingTrips } from "../../hooks/usePendingTrips";
 import { useSocketSync } from "../../hooks/useSocketSync";
-import { Badge, Button, Card, Col, Row, Tag, App, Modal, Input, Segmented } from "antd";
+import { Badge, Button, Card, Col, Row, Tag, App, Modal, Input, Segmented, Image } from "antd";
 import type { InputRef } from "antd";
 import {
   CarOutlined, ReloadOutlined, CheckCircleOutlined, CloseCircleOutlined,
-  CameraOutlined, DeleteOutlined,
+  CameraOutlined, DeleteOutlined, UserOutlined,
   MoonOutlined, SunOutlined, SearchOutlined, ClockCircleOutlined,
 } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
@@ -47,6 +47,16 @@ function FieldDashboard() {
 
   const [lastSyncAt, setLastSyncAt] = useState(Date.now());
   const [now, setNow] = useState(Date.now());
+
+  const [previewVisible, setPreviewVisible] = useState(false);
+  const [currentPreview, setCurrentPreview] = useState(0);
+  const [previewImages, setPreviewImages] = useState<string[]>([]);
+
+  const openPhotoPreview = useCallback((photoUrl: string) => {
+    setPreviewImages([photoUrl]);
+    setCurrentPreview(0);
+    setPreviewVisible(true);
+  }, []);
 
   useEffect(() => {
     const id = setInterval(() => setNow(Date.now()), 1000);
@@ -205,43 +215,41 @@ function FieldDashboard() {
 
   const renderPendingCard = (trip: TripType) => {
     const waitingLong = Date.now() - new Date(trip.arrival_time).getTime() > 60 * 60 * 1000;
+    const parked = trip.is_in_parking_lot || trip.is_in_temporary_parking_lot;
     return (
       <div key={trip._id} className="op-card">
         <div className="op-card-body">
-          <div className="op-plate">{trip.vehicle?.licence_plate || "---"}</div>
-          <div className="op-meta">
-            <CarOutlined /> {trip.company?.name || "-"}
-            {!!trip.has_gps_tracking && <Tag color="green" style={{ marginLeft: 8, fontSize: 10, borderRadius: 6, lineHeight: "18px" }}>🛰️ ATS</Tag>}
+          <div className="op-card-row" style={{ marginBottom: 6 }}>
+            <div className="op-plate">{trip.vehicle?.licence_plate || "---"}</div>
+            <div style={{ display: "flex", alignItems: "center", gap: 4, flexShrink: 0 }}>
+              {!!trip.has_gps_tracking && <Tag color="green" style={{ fontSize: 10, borderRadius: 6, lineHeight: "18px" }}>🛰️ ATS</Tag>}
+              {parked && (
+                <Tag color={trip.is_in_temporary_parking_lot ? "orange" : "blue"} style={{ fontSize: 10, borderRadius: 6, lineHeight: "18px" }}>
+                  🅿️ {trip.is_in_temporary_parking_lot ? t("FieldOps.STATUS_KK") : t("FieldOps.STATUS_PARKED")}
+                </Tag>
+              )}
+            </div>
           </div>
           <div className="op-card-row">
-            <div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+              <div className="op-meta" style={{ marginBottom: 4 }}>
+                <CarOutlined /> {trip.company?.name || "-"}
+              </div>
               <div className="op-meta">
                 <ClockCircleOutlined style={{ fontSize: 12 }} />
                 {trip.arrival_time ? formatTime(trip.arrival_time, { hour: "2-digit", minute: "2-digit" }) : "-"}
               </div>
               {trip.driver?.full_name && (
-                <div className="op-meta" style={{ marginTop: 2 }}>{trip.driver.full_name}</div>
+                <div className="op-meta"><UserOutlined style={{ fontSize: 12 }} /> {trip.driver.full_name}</div>
               )}
             </div>
             <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
-              {(trip.is_in_parking_lot || trip.is_in_temporary_parking_lot) && (
-                <Tag color={trip.is_in_temporary_parking_lot ? "orange" : "blue"} style={{ fontSize: 10, borderRadius: 6, lineHeight: "18px" }}>
-                  🅿️ {trip.is_in_temporary_parking_lot ? t("FieldOps.STATUS_KK") : t("FieldOps.STATUS_PARKED")}
-                </Tag>
-              )}
               {trip.field_photo_path && (
                 <img
                   src={trip.field_photo_path}
                   alt=""
                   className="op-thumb"
-                  onClick={() => {
-                    if (trip.field_photo_path) {
-                      Modal.info({
-                        title: t("FieldOps.PHOTO_TITLE"),
-                        content: <img src={trip.field_photo_path} alt="" style={{ width: "100%", borderRadius: 8 }} />,
-                      });
-                    }
-                  }}
+                  onClick={() => openPhotoPreview(trip.field_photo_path!)}
                 />
               )}
             </div>
@@ -266,13 +274,23 @@ function FieldDashboard() {
     return (
       <div key={trip._id} className="op-card">
         <div className="op-card-body">
-          <div className="op-plate">{trip.vehicle?.licence_plate || "---"}</div>
-          <div className="op-meta">
-            <CarOutlined /> {trip.company?.name || "-"}
-            {!!trip.has_gps_tracking && <Tag color="green" style={{ marginLeft: 8, fontSize: 10, borderRadius: 6, lineHeight: "18px" }}>🛰️ ATS</Tag>}
+          <div className="op-card-row" style={{ marginBottom: 6 }}>
+            <div className="op-plate">{trip.vehicle?.licence_plate || "---"}</div>
+            <div style={{ display: "flex", alignItems: "center", gap: 4, flexShrink: 0 }}>
+              {!!trip.has_gps_tracking && <Tag color="green" style={{ fontSize: 10, borderRadius: 6, lineHeight: "18px" }}>🛰️ ATS</Tag>}
+              {parked && (
+                <Tag color={trip.is_in_temporary_parking_lot ? "orange" : "blue"} style={{ fontSize: 10, borderRadius: 6, lineHeight: "18px" }}>
+                  🅿️ {trip.is_in_temporary_parking_lot ? t("FieldOps.STATUS_KK") : t("FieldOps.STATUS_PARKED")}
+                </Tag>
+              )}
+            </div>
           </div>
+          
           <div className="op-card-row">
-            <div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+              <div className="op-meta" style={{ marginBottom: 4 }}>
+                <CarOutlined /> {trip.company?.name || "-"}
+              </div>
               <div className="op-meta">
                 <ClockCircleOutlined style={{ fontSize: 12 }} />
                 {trip.arrival_time ? formatTime(trip.arrival_time, { hour: "2-digit", minute: "2-digit" }) : "-"}
@@ -283,28 +301,16 @@ function FieldDashboard() {
                 )}
               </div>
               {trip.driver?.full_name && (
-                <div className="op-meta" style={{ marginTop: 2 }}>{trip.driver.full_name}</div>
+                <div className="op-meta"><UserOutlined style={{ fontSize: 12 }} /> {trip.driver.full_name}</div>
               )}
             </div>
             <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
-              {parked && (
-                <Tag color={trip.is_in_temporary_parking_lot ? "orange" : "blue"} style={{ fontSize: 10, borderRadius: 6, lineHeight: "18px" }}>
-                  🅿️ {trip.is_in_temporary_parking_lot ? t("FieldOps.STATUS_KK") : t("FieldOps.STATUS_PARKED")}
-                </Tag>
-              )}
               {trip.field_photo_path && (
                 <img
                   src={trip.field_photo_path}
                   alt=""
                   className="op-thumb"
-                  onClick={() => {
-                    if (trip.field_photo_path) {
-                      Modal.info({
-                        title: t("FieldOps.PHOTO_TITLE"),
-                        content: <img src={trip.field_photo_path} alt="" style={{ width: "100%", borderRadius: 8 }} />,
-                      });
-                    }
-                  }}
+                  onClick={() => openPhotoPreview(trip.field_photo_path!)}
                 />
               )}
             </div>
@@ -591,6 +597,18 @@ function FieldDashboard() {
             </div>
           )}
         </Modal>
+
+        <Image.PreviewGroup
+          preview={{
+            current: currentPreview,
+            open: previewVisible,
+            onOpenChange: (vis) => setPreviewVisible(vis),
+          }}
+        >
+          {previewImages.map((src, idx) => (
+            <Image key={idx} src={src} style={{ display: "none" }} />
+          ))}
+        </Image.PreviewGroup>
       </div>
     </>
   );

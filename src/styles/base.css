@@ -130,3 +130,5 @@ input:-webkit-autofill:active {
     left: 125%;
     opacity: 1;
 }
+
+.ant-image-preview-mask { backdrop-filter: blur(4px) !important; }
