@@ -44,7 +44,7 @@ export interface TripType {
   _id: string;
   driver: Pick<DriverType, '_id' | 'full_name' | 'phone_number'> | null;
   company: Pick<CompanyType, '_id' | 'name'>;
-  vehicle: Pick<VehicleType, '_id' | 'licence_plate'>;
+  vehicle: Pick<VehicleType, '_id' | 'licence_plate' | 'vehicle_type'>;
   departure_time: string;
   arrival_time: string;
   unload_status: TripStatus;
