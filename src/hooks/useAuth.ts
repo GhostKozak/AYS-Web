@@ -56,7 +56,7 @@ export const useAuth = () => {
     } finally {
       clearStoredAuth();
       queryClient.setQueryData(["currentUser"], null);
-      queryClient.removeQueries(); // Clear all cached data on logout
+      queryClient.removeQueries({ queryKey: ["currentUser"] });
       disconnectSocket();
       navigate(ROUTES.LOGIN, { replace: true });
     }
