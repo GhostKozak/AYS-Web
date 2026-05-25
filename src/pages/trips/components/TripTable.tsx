@@ -243,12 +243,11 @@ export default function TripTable({
 
           const colorMap: Record<string, string> = {
             WAITING: "warning",
-            IN_PROGRESS: "processing",
             UNLOADING: "processing",
             UNLOADED: "success",
             COMPLETED: "success",
             CANCELED: "error",
-            PENDING: "warning",
+            UNKNOWN: "default",
           };
 
           return (
@@ -259,12 +258,11 @@ export default function TripTable({
         },
         filters: [
           { text: t("Trips.STATUS_WAITING"), value: "WAITING" },
-          { text: t("Trips.STATUS_IN_PROGRESS"), value: "IN_PROGRESS" },
           { text: t("Trips.STATUS_UNLOADING"), value: "UNLOADING" },
           { text: t("Trips.STATUS_UNLOADED"), value: "UNLOADED" },
           { text: t("Trips.STATUS_COMPLETED"), value: "COMPLETED" },
           { text: t("Trips.STATUS_CANCELED"), value: "CANCELED" },
-          { text: t("Trips.STATUS_PENDING"), value: "PENDING" },
+          { text: t("Trips.STATUS_UNKNOWN"), value: "UNKNOWN" },
         ],
         onFilter: (value, record) => record.unload_status === value,
       },

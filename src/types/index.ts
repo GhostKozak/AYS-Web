@@ -38,7 +38,7 @@ export const VehicleValues: VehicleTypeEnum[] = [
 ];
 
 
-export type TripStatus = 'WAITING' | 'UNLOADING' | 'UNLOADED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELED' | 'PENDING';
+export type TripStatus = 'WAITING' | 'UNLOADING' | 'UNLOADED' | 'COMPLETED' | 'CANCELED' | 'UNKNOWN';
 
 export interface TripType {
   _id: string;

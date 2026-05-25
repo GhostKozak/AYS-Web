@@ -6,13 +6,12 @@ import { useTranslation } from "react-i18next";
 import { useIsMobile } from "../../../hooks/useIsMobile";
 
 const STATUS_COLORS: Record<string, string> = {
-  WAITING: "#faad14", // Sarı
-  UNLOADING: "#1890ff", // Mavi
-  UNLOADED: "#52c41a", // Yeşil
-  IN_PROGRESS: "#13c2c2", // Camgöbeği (Cyan)
-  COMPLETED: "#389e0d", // Koyu Yeşil
-  CANCELED: "#ff4d4f", // Kırmızı
-  UNKNOWN: "#d9d9d9", // Gri
+  WAITING: "#faad14",
+  UNLOADING: "#1890ff",
+  UNLOADED: "#52c41a",
+  COMPLETED: "#389e0d",
+  CANCELED: "#ff4d4f",
+  UNKNOWN: "#d9d9d9",
 };
 
 function UnloadedStatus() {
