@@ -67,11 +67,14 @@ export interface TripType {
 }
 
 export interface CreateTripPayload {
-  company: string; // ID
-  vehicle: string; // ID
+  company?: string; // ID (optional if company_name provided)
+  vehicle?: string; // ID (optional if licence_plate provided)
   driver?: string; // ID
-  driver_full_name: string;
-  driver_phone_number: string;
+  driver_full_name?: string;
+  driver_phone_number?: string;
+  company_name?: string;
+  licence_plate?: string;
+  vehicle_type?: VehicleTypeEnum;
   departure_time?: string;
   arrival_time?: string;
   unload_status?: string;
