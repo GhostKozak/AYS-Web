@@ -1,5 +1,5 @@
 import apiClient from './apiClient';
-import { API_ENDPOINTS, ROUTES } from '../constants';
+import { API_ENDPOINTS } from '../constants';
 import type { LoginPayload, LoginResponse } from '../types';
 import { clearAuth } from '../utils/auth.utils';
 
@@ -19,7 +19,6 @@ export const authApi = {
     } catch { /* ignore */ 
     } finally {
       clearAuth();
-      window.location.href = ROUTES.LOGIN;
     }
   },
 };
