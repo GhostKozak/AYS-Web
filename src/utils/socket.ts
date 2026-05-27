@@ -22,12 +22,9 @@ export const disconnectSocket = (): void => {
   }
 };
 
-if (typeof window !== "undefined") {
+if (import.meta.env.DEV && typeof window !== "undefined") {
   (window as any).__connectSocket = connectSocket;
   (window as any).__disconnectSocket = disconnectSocket;
-}
-
-if (import.meta.env.DEV && typeof window !== "undefined") {
   (window as any)._socket = socket;
 }
 
