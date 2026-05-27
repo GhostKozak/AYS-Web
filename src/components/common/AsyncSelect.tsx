@@ -33,18 +33,18 @@ export function AsyncSelect<T>({
   const [options, setOptions] = useState<any[]>(defaultOptions);
   const [items, setItems] = useState<T[]>([]);
   const fetchRef = useRef(0);
+  // Only recreate debounce when extraFilters deep content changes
+  const extraFiltersKey = JSON.stringify(extraFilters);
 
   const fetchOptions = useMemo(
     () =>
       debounce((searchQuery: string) => {
-        fetchRef.current += 1;
-        const fetchId = fetchRef.current;
-        setOptions([]);
+        const fetchId = ++fetchRef.current;
+
         setFetching(true);
 
         asyncSearch<T>(moduleName, {
           [searchKey]: searchQuery,
-          limit: 20,
           ...extraFilters,
         })
           .then((res) => {
@@ -80,7 +80,7 @@ export function AsyncSelect<T>({
             setFetching(false);
           });
       }, 500),
-    [moduleName, labelKey, valueKey, searchKey, JSON.stringify(extraFilters), creatable, creatableLabel]
+    [moduleName, labelKey, valueKey, searchKey, extraFiltersKey, creatable, creatableLabel]
   );
 
   useEffect(() => {

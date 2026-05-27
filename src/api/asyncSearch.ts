@@ -59,7 +59,7 @@ export const asyncSearch = async <T>(
         .then((response) => {
           if (!response.data.jobId) {
             cleanup();
-            reject(new Error('Arama başlatılamadı: jobId bulunamadı'));
+            reject(new Error('Search could not be started: job ID not found'));
             return;
           }
           jobId = response.data.jobId;
