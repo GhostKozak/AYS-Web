@@ -103,6 +103,7 @@ function DashboardPage() {
       document.body.appendChild(link);
       link.click();
       link.remove();
+      window.URL.revokeObjectURL(url);
 
       setExportProgress(100);
       setExportStatus('success');

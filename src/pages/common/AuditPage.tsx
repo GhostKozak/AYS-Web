@@ -49,8 +49,8 @@ function AuditPage() {
   };
 
   const { data: auditData, isLoading, isError, refetch } = useQuery<PaginatedResponse<AuditType>>({
-    queryKey: ["audit", filters],
-    queryFn: () => auditApi.getAll(filters),
+    queryKey: ["audit", filters, "p", page, pageSize],
+    queryFn: () => auditApi.getAll({ ...filters, limit: pageSize, offset: (page - 1) * pageSize }),
   });
   const data = auditData?.items ?? [];
 
