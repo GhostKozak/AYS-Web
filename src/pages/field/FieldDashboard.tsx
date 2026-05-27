@@ -21,6 +21,21 @@ import "./FieldDashboard.css";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
+function SyncAge({ lastSyncAt }: { lastSyncAt: number }) {
+  const { t } = useTranslation();
+  const [now, setNow] = useState(Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, []);
+  const secs = Math.floor((now - lastSyncAt) / 1000);
+  let label: string;
+  if (secs < 3) label = t("FieldOps.JUST_NOW");
+  else if (secs < 60) label = `${secs}sn`;
+  else label = `${Math.floor(secs / 60)}dk`;
+  return <>{t("FieldOps.LIVE")} · {label}</>;
+}
+
 function FieldDashboard() {
   const { t } = useTranslation();
   const { themeMode, toggleTheme } = useAppConfig();
@@ -47,7 +62,6 @@ function FieldDashboard() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [lastSyncAt, setLastSyncAt] = useState(Date.now());
-  const [now, setNow] = useState(Date.now());
 
   const [previewVisible, setPreviewVisible] = useState(false);
   const [currentPreview, setCurrentPreview] = useState(0);
@@ -57,11 +71,6 @@ function FieldDashboard() {
     setPreviewImages([photoUrl]);
     setCurrentPreview(0);
     setPreviewVisible(true);
-  }, []);
-
-  useEffect(() => {
-    const id = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(id);
   }, []);
 
   useSocketSync(() => setLastSyncAt(Date.now()));
@@ -170,14 +179,14 @@ function FieldDashboard() {
   }, [parkTrips, debouncedSearch]);
 
   const newArrivals = useMemo(() => {
-    const cutoff = now - 60 * 60 * 1000;
+    const cutoff = Date.now() - 60 * 60 * 1000;
     return filteredPending.filter((t) => new Date(t.arrival_time).getTime() > cutoff);
-  }, [filteredPending, now]);
+  }, [filteredPending]);
 
   const awaitingApproval = useMemo(() => {
-    const cutoff = now - 60 * 60 * 1000;
+    const cutoff = Date.now() - 60 * 60 * 1000;
     return filteredPending.filter((t) => new Date(t.arrival_time).getTime() <= cutoff);
-  }, [filteredPending, now]);
+  }, [filteredPending]);
 
   useEffect(() => {
     if (urgentTrips.length > prevUrgentCountRef.current) {
@@ -187,14 +196,6 @@ function FieldDashboard() {
     }
     prevUrgentCountRef.current = urgentTrips.length;
   }, [urgentTrips.length, message, t]);
-
-  function syncAge(): string {
-    const secs = Math.floor((now - lastSyncAt) / 1000);
-    if (secs < 3) return t("FieldOps.JUST_NOW");
-    if (secs < 60) return `${secs}sn`;
-    const mins = Math.floor(secs / 60);
-    return `${mins}dk`;
-  }
 
   function formatDuration(parkedAt: string): string {
     const diff = Date.now() - new Date(parkedAt).getTime();
@@ -335,7 +336,7 @@ function FieldDashboard() {
               <div className="op-title">{t("FieldOps.TITLE")}</div>
               <div className="op-live">
                 <span className="op-live-dot" />
-                {t("FieldOps.LIVE")} · {syncAge()}
+                <SyncAge lastSyncAt={lastSyncAt} />
               </div>
             </div>
             <div className="op-header-actions">
