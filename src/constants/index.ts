@@ -21,6 +21,7 @@ export const API_ENDPOINTS = {
   },
   AUDIT: '/audit',
   USERS: '/users',
+  FEEDBACK: '/feedback',
 } as const;
 
 // Route Paths

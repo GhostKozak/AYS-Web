@@ -14,7 +14,8 @@ import {
   theme,
 } from "antd";
 import { Link, useLocation, useNavigate } from "react-router";
-import { CONFIG, ROUTES } from "../../constants";
+import { CONFIG, ROUTES, API_ENDPOINTS } from "../../constants";
+import apiClient from "../../api/apiClient";
 import {
   LoginOutlined,
   MenuOutlined,
@@ -387,6 +388,7 @@ function Header() {
           form
             .validateFields()
             .then((values) => {
+              apiClient.post(API_ENDPOINTS.FEEDBACK, values).catch(() => {});
               form.resetFields();
               setIsModalOpen(false);
             })
