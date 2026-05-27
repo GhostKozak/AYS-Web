@@ -208,26 +208,29 @@ function CrudPage<T extends { _id: string }>({
 
   const handleBulkDelete = async () => {
     setIsBulkDeleting(true);
-    try {
-      const results = await Promise.allSettled(
-        selectedRowKeys.map((id) => onDeleteItem(id.toString())),
-      );
-      const successCount = results.filter(
-        (r) => r.status === "fulfilled",
-      ).length;
+    const results = await Promise.allSettled(
+      selectedRowKeys.map((id) => onDeleteItem(id.toString())),
+    );
+    const successCount = results.filter(
+      (r) => r.status === "fulfilled",
+    ).length;
+    const failCount = results.filter((r) => r.status === "rejected").length;
+    if (failCount > 0) {
+      notification.warning({
+        title: t("Common.WARNING"),
+        description: t("Common.BULK_DELETE_PARTIAL", {
+          success: successCount,
+          failed: failCount,
+        }),
+      });
+    } else {
       notification.success({
         title: t("Common.SUCCESS"),
         description: t("Common.BULK_DELETE_SUCCESS", { count: successCount }),
       });
-      setSelectedRowKeys([]);
-    } catch {
-      notification.error({
-        title: t("Common.ERROR"),
-        description: t("Errors.DELETE_FAILED"),
-      });
-    } finally {
-      setIsBulkDeleting(false);
     }
+    setSelectedRowKeys([]);
+    setIsBulkDeleting(false);
   };
 
   const handleAdd = () => {

@@ -10,6 +10,7 @@ import { ConfigProvider, theme } from "antd";
 import { useTranslation } from "react-i18next";
 import trTR from "antd/locale/tr_TR";
 import enUS from "antd/locale/en_US";
+import { STORAGE_KEYS } from "../constants";
 
 type ThemeMode = "light" | "dark";
 
@@ -34,7 +35,7 @@ export const useAppConfig = (): AppConfigContext => {
 const getInitialTheme = (): ThemeMode => {
   if (typeof window === "undefined") return "light";
   try {
-    const stored = localStorage.getItem("themeMode");
+    const stored = localStorage.getItem(STORAGE_KEYS.THEME);
     if (stored === "light" || stored === "dark") return stored;
     return window.matchMedia("(prefers-color-scheme: dark)").matches
       ? "dark"
@@ -51,7 +52,7 @@ export const AppConfigProvider: React.FC<{ children: ReactNode }> = ({
   const { i18n } = useTranslation();
 
   useEffect(() => {
-    localStorage.setItem("themeMode", themeMode);
+    localStorage.setItem(STORAGE_KEYS.THEME, themeMode);
   }, [themeMode]);
 
   const toggleTheme = React.useCallback(() => {

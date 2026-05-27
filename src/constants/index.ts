@@ -43,6 +43,7 @@ export const ROUTES = {
 export const STORAGE_KEYS = {
   ACCESS_TOKEN: 'access_token',
   USER: 'user',
+  THEME: 'themeMode',
 } as const;
 
 // Environment-based constants
