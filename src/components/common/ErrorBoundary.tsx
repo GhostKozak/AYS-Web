@@ -1,52 +1,37 @@
-import React from "react";
-import { Button, Result } from "antd";
+import { Component, type ErrorInfo, type ReactNode } from "react";
+import ErrorState from "./ErrorState";
 
 interface ErrorBoundaryProps {
-  children: React.ReactNode;
-  fallback?: React.ReactNode;
-  onError?: (error: Error, errorInfo: React.ErrorInfo) => void;
+  children: ReactNode;
+  onRetry?: () => void;
 }
 
 interface ErrorBoundaryState {
   hasError: boolean;
-  error: Error | null;
 }
 
-class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   constructor(props: ErrorBoundaryProps) {
     super(props);
-    this.state = { hasError: false, error: null };
+    this.state = { hasError: false };
   }
 
-  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
-    return { hasError: true, error };
+  static getDerivedStateFromError(): ErrorBoundaryState {
+    return { hasError: true };
   }
 
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    this.props.onError?.(error, errorInfo);
+  componentDidCatch(error: Error, _errorInfo: ErrorInfo) {
+    console.error("ErrorBoundary caught:", error);
   }
 
   handleRetry = () => {
-    this.setState({ hasError: false, error: null });
+    this.setState({ hasError: false });
+    this.props.onRetry?.();
   };
 
   render() {
     if (this.state.hasError) {
-      if (this.props.fallback) {
-        return this.props.fallback;
-      }
-      return (
-        <Result
-          status="500"
-          title="Something went wrong"
-          subTitle={this.state.error?.message}
-          extra={
-            <Button type="primary" onClick={this.handleRetry}>
-              Try Again
-            </Button>
-          }
-        />
-      );
+      return <ErrorState onRetry={this.handleRetry} />;
     }
     return this.props.children;
   }

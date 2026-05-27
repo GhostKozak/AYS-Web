@@ -9,6 +9,7 @@ import { usePageTitle } from "../../hooks/usePageTitle";
 import AuditDetailViewer from "./components/AuditDetailViewer";
 import { useIsMobile } from "../../hooks/useIsMobile";
 import ErrorState from "../../components/common/ErrorState";
+import ErrorBoundary from "../../components/common/ErrorBoundary";
 
 import type { AuditType, PaginatedResponse } from "../../types";
 
@@ -185,11 +186,13 @@ function AuditPage() {
         width={800}
       >
         {selectedAudit && (
-          <AuditDetailViewer
-            action={selectedAudit.action}
-            oldValue={selectedAudit.oldValue}
-            newValue={selectedAudit.newValue}
-          />
+          <ErrorBoundary>
+            <AuditDetailViewer
+              action={selectedAudit.action}
+              oldValue={selectedAudit.oldValue}
+              newValue={selectedAudit.newValue}
+            />
+          </ErrorBoundary>
         )}
       </Modal>
     </Layout>
