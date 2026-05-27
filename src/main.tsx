@@ -56,13 +56,7 @@ createRoot(rootEl).render(
   </ErrorBoundary>
 );
 
-declare global {
-  interface Window {
-    __TANSTACK_QUERY_CLIENT__: import("@tanstack/query-core").QueryClient;
-  }
-}
-
 // React Query Devtools global client for development
 if (import.meta.env.DEV) {
-  window.__TANSTACK_QUERY_CLIENT__ = queryClient;
+  (window as Record<string, unknown>).__TANSTACK_QUERY_CLIENT__ = queryClient;
 }
