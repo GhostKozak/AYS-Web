@@ -110,7 +110,13 @@ function UserManagementPage() {
 
   const handleEdit = (user: User) => {
     setEditingUser(user);
-    form.setFieldsValue(user);
+    form.setFieldsValue({
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      role: user.role,
+      isActive: user.isActive,
+    });
     setIsModalOpen(true);
   };
 

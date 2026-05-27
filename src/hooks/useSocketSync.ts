@@ -38,9 +38,7 @@ export const useSocketSync = (onTripVerified?: (tripId: string) => void) => {
       queryClient.setQueryData<TripType[]>(["pending-trips"], (oldPending) => {
         if (!oldPending) return oldPending;
 
-        const isStillPending =
-          updatedTrip.unload_status === "PENDING" &&
-          !updatedTrip.is_trip_canceled;
+        const isStillPending = updatedTrip.status === "PENDING";
 
         if (isStillPending) {
           return oldPending.map((trip) =>
@@ -52,7 +50,7 @@ export const useSocketSync = (onTripVerified?: (tripId: string) => void) => {
       });
 
       // 3. Trigger visual glow effect on table row via window custom event
-      if (updatedTrip.unload_status !== "PENDING") {
+      if (updatedTrip.status !== "PENDING") {
         window.dispatchEvent(
           new CustomEvent("trip-verified", { detail: updatedTrip._id })
         );
