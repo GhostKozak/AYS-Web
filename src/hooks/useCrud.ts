@@ -54,8 +54,12 @@ export const useCrud = <T, CreatePayload>(
     ...queryOpts,
   });
 
-  const items = rawData?.items ?? [];
-  const total = pagination ? (rawData?.total ?? items.length) : items.length;
+  // Normalize: API layer already maps {data,count} -> {items,total},
+  // but be defensive in case of raw backend shape leaking through.
+  const items = (rawData as any)?.data ?? rawData?.items ?? [];
+  const total = pagination
+    ? ((rawData as any)?.count ?? rawData?.total ?? items.length)
+    : items.length;
 
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey });
