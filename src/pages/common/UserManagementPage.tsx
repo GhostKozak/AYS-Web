@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { userApi } from "../../api/userApi";
 import { useTranslation } from "react-i18next";
 import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import dayjs from "dayjs";
 import { usePageTitle } from "../../hooks/usePageTitle";
@@ -25,11 +25,20 @@ function UserManagementPage() {
   const [form] = Form.useForm();
   const isMobile = useIsMobile();
 
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(50);
+
   const { data: usersData, isLoading } = useQuery<PaginatedResponse<User>>({
-    queryKey: ["users"],
-    queryFn: () => userApi.getAll({ limit: 1000 }),
+    queryKey: ["users", "p", page, pageSize],
+    queryFn: () => userApi.getAll({ page, limit: pageSize }),
   });
   const users = usersData?.items ?? [];
+  const total = usersData?.total ?? 0;
+
+  const handlePageChange = useCallback((p: number, ps: number) => {
+    setPage(p);
+    setPageSize(ps);
+  }, []);
 
   const createMutation = useMutation({
     mutationFn: (payload: CreateUserPayload) => userApi.create(payload),
@@ -199,6 +208,14 @@ function UserManagementPage() {
         loading={isLoading}
         rowKey="_id"
         scroll={{ x: "max-content" }}
+        pagination={{
+          current: page,
+          pageSize,
+          total,
+          showSizeChanger: true,
+          pageSizeOptions: ["50", "100", "200"],
+          onChange: handlePageChange,
+        }}
       />
 
       <Modal
