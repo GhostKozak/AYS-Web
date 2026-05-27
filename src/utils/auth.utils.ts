@@ -33,7 +33,6 @@ export const setUser = (user: User): void => {
 
 export const clearAuth = (): void => {
   localStorage.removeItem(STORAGE_KEYS.USER);
-  localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
   clearQueue();
 };
 
