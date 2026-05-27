@@ -7,6 +7,7 @@ import { ROUTES } from "../constants";
 import { CheckCircleOutlined, DisconnectOutlined, CloudUploadOutlined } from "@ant-design/icons";
 import { clearAuth } from "../utils/auth.utils";
 import { addToQueue, getQueue, removeFromQueue, queueSize } from "../utils/offlineQueue";
+import { getUser } from "../utils/auth.utils";
 import { disconnectSocket } from "../utils/socket";
 import { safeErrorMessage } from "../utils";
 
@@ -24,10 +25,18 @@ export const AxiosInterceptor = () => {
     const items = getQueue();
     if (items.length === 0) return;
 
+    const currentUser = getUser();
+    const currentUserId = currentUser?._id;
+
     let success = 0;
     let failed = 0;
 
     for (const item of items) {
+      // Belongs to a different user session — drop safely
+      if (item.userId && item.userId !== currentUserId) {
+        removeFromQueue(item.id);
+        continue;
+      }
       try {
         await apiClient({
           method: item.method,
@@ -144,6 +153,10 @@ export const AxiosInterceptor = () => {
         } else if (error.code === "ERR_NETWORK") {
           setIsOffline(true);
 
+          // Only queue authenticated requests — reject unauthenticated mutations
+          const currentUser = getUser();
+          if (!currentUser?._id) return Promise.reject(error);
+
           // Queue mutating requests for replay when connection returns
           const method = error.config?.method?.toLowerCase();
           if (method && MUTATING_METHODS.has(method)) {
@@ -162,6 +175,7 @@ export const AxiosInterceptor = () => {
               method.toUpperCase() as "POST" | "PUT" | "PATCH" | "DELETE",
               url,
               data,
+              currentUser._id,
             );
             setPendingCount(queueSize());
 

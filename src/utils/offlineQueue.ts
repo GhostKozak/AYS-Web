@@ -8,6 +8,7 @@ export interface QueuedRequest {
   url: string;
   data?: unknown;
   timestamp: number;
+  userId?: string;
 }
 
 export const getQueue = (): QueuedRequest[] => {
@@ -40,6 +41,7 @@ export const addToQueue = (
   method: QueuedRequest["method"],
   url: string,
   data?: unknown,
+  userId?: string,
 ): void => {
   const queue = getQueue();
   if (queue.length >= MAX_QUEUE_SIZE) {
@@ -51,6 +53,7 @@ export const addToQueue = (
     url,
     data,
     timestamp: Date.now(),
+    userId,
   });
   localStorage.setItem(QUEUE_KEY, JSON.stringify(queue));
 };
