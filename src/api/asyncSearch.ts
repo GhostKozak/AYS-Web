@@ -12,24 +12,13 @@ export const asyncSearch = async <T>(
   }
 
   try {
-    // 1. Send POST request to initiate async search
     const { search, limit, offset, ...extraFilters } = params;
-    const response = await apiClient.post('/search/async', {
-      module: moduleName,
-      search,
-      limit: limit ?? 10,
-      offset: offset ?? 0,
-      ...extraFilters,
-    });
 
-    const jobId = response.data.jobId;
+    // 1. Register socket listeners BEFORE the POST request
+    //    to avoid missing events on fast responses (cache hits).
+    const result = await new Promise<PaginatedResponse<T>>((resolve, reject) => {
+      let jobId: string | undefined;
 
-    if (!jobId) {
-      throw new Error("Arama başlatılamadı: jobId bulunamadı");
-    }
-
-    // 2. Wait for the socket event with a fail-fast timeout (3s)
-    return new Promise((resolve, reject) => {
       const timeoutId = setTimeout(() => {
         cleanup();
         httpFallback<T>(moduleName, params).then(resolve).catch(reject);
@@ -38,10 +27,7 @@ export const asyncSearch = async <T>(
       const onResult = (res: any) => {
         if (res.jobId === jobId) {
           cleanup();
-          resolve({
-            items: res.data,
-            total: res.count,
-          });
+          resolve({ items: res.data, total: res.count });
         }
       };
 
@@ -60,7 +46,31 @@ export const asyncSearch = async <T>(
 
       socket.on('search_result', onResult);
       socket.on('search_error', onError);
+
+      // 2. Send POST request to initiate async search
+      apiClient
+        .post('/search/async', {
+          module: moduleName,
+          search,
+          limit: limit ?? 10,
+          offset: offset ?? 0,
+          ...extraFilters,
+        })
+        .then((response) => {
+          if (!response.data.jobId) {
+            cleanup();
+            reject(new Error('Arama başlatılamadı: jobId bulunamadı'));
+            return;
+          }
+          jobId = response.data.jobId;
+        })
+        .catch((err) => {
+          cleanup();
+          reject(err);
+        });
     });
+
+    return result;
   } catch {
     return httpFallback<T>(moduleName, params);
   }
