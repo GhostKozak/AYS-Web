@@ -443,7 +443,9 @@
     "STATUS_PARKED": "Parked",
     "TAB_PENDING": "Incoming (Approval)",
     "TAB_WAITING": "Waiting",
-    "SEARCH_PLATE": "Search plate..."
+    "SEARCH_PLATE": "Search plate...",
+    "LIMIT_WARNING_TITLE": "⚠️ Pending Vehicle Limit Exceeded",
+    "LIMIT_WARNING_DESC": "{{count}} vehicles pending, showing only the latest {{limit}}."
   },
   "Periods": {
     "TODAY": "Today",

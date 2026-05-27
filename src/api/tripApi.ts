@@ -1,6 +1,6 @@
 import apiClient from "./apiClient";
 import { API_ENDPOINTS } from "../constants";
-import type { CreateTripPayload, PaginatedResponse, PaginationParams } from "../types";
+import type { CreateTripPayload, PaginatedResponse, PaginationParams, TripType } from "../types";
 
 import { asyncSearch } from "./asyncSearch";
 
@@ -24,9 +24,9 @@ export const tripApi = {
     return response.data;
   },
 
-  getPendingVerification: async () => {
+  getPendingVerification: async (): Promise<{ data: TripType[]; count: number }> => {
     const response = await apiClient.get(`${API_ENDPOINTS.TRIPS}/pending-verification`);
-    return response.data.data ?? [];
+    return { data: response.data.data ?? [], count: response.data.count ?? 0 };
   },
 
   fieldVerify: async (id: string, photo: File, sealNumber?: string) => {

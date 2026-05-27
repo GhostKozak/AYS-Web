@@ -4,7 +4,18 @@ import { tripApi } from "../api/tripApi";
 import { type TripType } from "../types";
 import { socket } from "../utils/socket";
 
-export const usePendingTrips = () => {
+const PENDING_LIMIT = 200;
+
+interface PendingTripsData {
+  pendingTrips: TripType[];
+  totalCount: number;
+  hasMore: boolean;
+  isLoading: boolean;
+  isError: boolean;
+  refetch: () => void;
+}
+
+export const usePendingTrips = (): PendingTripsData => {
   const [pollingInterval, setPollingInterval] = useState<number | false>(
     socket.connected ? false : 30000,
   );
@@ -24,19 +35,21 @@ export const usePendingTrips = () => {
     };
   }, []);
 
-  const { data, isLoading, isError, refetch } = useQuery<TripType[]>({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["pending-trips"],
     queryFn: async () => {
       const result = await tripApi.getPendingVerification();
-      return Array.isArray(result) ? result : result?.items ?? [];
+      return result;
     },
     refetchInterval: pollingInterval,
     staleTime: 1000 * 60 * 5,
   });
-  const safeData = data ?? [];
+  const safeData = data ?? { data: [], count: 0 };
 
   return {
-    pendingTrips: safeData,
+    pendingTrips: safeData.data,
+    totalCount: safeData.count,
+    hasMore: safeData.count > PENDING_LIMIT,
     isLoading,
     isError,
     refetch,

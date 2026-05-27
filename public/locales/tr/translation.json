@@ -443,7 +443,9 @@
     "STATUS_PARKED": "Parkta",
     "TAB_PENDING": "Gelenler (Onay)",
     "TAB_WAITING": "Beklemede",
-    "SEARCH_PLATE": "Plaka ara..."
+    "SEARCH_PLATE": "Plaka ara...",
+    "LIMIT_WARNING_TITLE": "⚠️ Bekleyen Araç Sayısı Sınırı Aşıldı",
+    "LIMIT_WARNING_DESC": "Toplam {{count}} araç bekliyor, yalnızca son {{limit}} tanesi gösteriliyor."
   },
   "Periods": {
     "TODAY": "Bugün",

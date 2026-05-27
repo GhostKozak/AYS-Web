@@ -3,7 +3,7 @@ import { usePageTitle } from "../../hooks/usePageTitle";
 import { useTrips } from "../../hooks/useTrips";
 import { usePendingTrips } from "../../hooks/usePendingTrips";
 import { useSocketSync } from "../../hooks/useSocketSync";
-import { Badge, Button, Card, Col, Row, Tag, App, Modal, Input, Segmented, Image } from "antd";
+import { Badge, Button, Card, Col, Row, Tag, App, Modal, Input, Segmented, Image, notification } from "antd";
 import type { InputRef } from "antd";
 import {
   CarOutlined, ReloadOutlined, CheckCircleOutlined, CloseCircleOutlined,
@@ -41,7 +41,7 @@ function FieldDashboard() {
   const { themeMode, toggleTheme } = useAppConfig();
   usePageTitle(t("FieldOps.TITLE"));
   const { trips, isLoading, isError: isTripsError, refetch: refetchTrips } = useTrips();
-  const { pendingTrips, isLoading: isPendingLoading, isError: isPendingError, refetch: refetchPending } = usePendingTrips();
+  const { pendingTrips, totalCount, hasMore, isLoading: isPendingLoading, isError: isPendingError, refetch: refetchPending } = usePendingTrips();
   const [activeTab, setActiveTab] = useState<"PENDING" | "PARK">("PENDING");
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -74,6 +74,16 @@ function FieldDashboard() {
   }, []);
 
   useSocketSync(() => setLastSyncAt(Date.now()));
+
+  useEffect(() => {
+    if (hasMore) {
+      notification.warning({
+        message: t("FieldOps.LIMIT_WARNING_TITLE"),
+        description: t("FieldOps.LIMIT_WARNING_DESC", { count: totalCount, limit: 200 }),
+        duration: 8,
+      });
+    }
+  }, [hasMore, totalCount, t]);
 
   useEffect(() => {
     if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
