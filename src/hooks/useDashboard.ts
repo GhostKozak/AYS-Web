@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import type { DailyStat, TripType } from "../types";
 import { useTranslation } from "react-i18next";
-import { getNow, isSameDay, isSameMonth, getLast7Days } from "../utils/date.utils";
+import { getNow, isSameDay, isSameMonth, getLast7Days, toLocalDateString } from "../utils/date.utils";
 
 export const useDashboardMetrics = (trips: TripType[]) => {
   const { t } = useTranslation();
@@ -38,7 +38,7 @@ export const useDashboardMetrics = (trips: TripType[]) => {
 
       if (!trip.arrival_time) return;
       const arrivalDate = new Date(trip.arrival_time);
-      const dateStr = arrivalDate.toISOString().split("T")[0];
+      const dateStr = toLocalDateString(arrivalDate);
 
       // 2. Monthly Company Stats
       if (isSameMonth(arrivalDate, now)) {

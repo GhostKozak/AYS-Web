@@ -70,12 +70,11 @@ function AuditPage() {
       title: t("Audit.USER"),
       key: "user",
       render: (_: any, record: AuditType) => {
-        const u = record.user;
+        const u = record.user as Record<string, unknown> | null;
         if (u && typeof u === 'object') {
-          // Both camelCase and snake_case support for flexibility
-          const first = u.firstName || (u as any).first_name || "";
-          const last = u.lastName || (u as any).last_name || "";
-          const full = (u as any).full_name || "";
+          const first = (u.firstName as string) || (u.first_name as string) || "";
+          const last = (u.lastName as string) || (u.last_name as string) || "";
+          const full = u.full_name as string || "";
 
           const displayName = `${first} ${last}`.trim() || full || u.email;
           if (displayName) return displayName;
