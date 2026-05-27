@@ -58,5 +58,5 @@ createRoot(rootEl).render(
 
 // React Query Devtools global client for development
 if (import.meta.env.DEV) {
-  (window as Record<string, unknown>).__TANSTACK_QUERY_CLIENT__ = queryClient;
+  (window as any).__TANSTACK_QUERY_CLIENT__ = queryClient;
 }

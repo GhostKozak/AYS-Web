@@ -30,6 +30,8 @@ type Props = {
 
 interface AuthenticatedColumnType extends ColumnType<TripType> {
   visible?: boolean;
+  minWidth?: number;
+  maxWidth?: number;
 }
 
 export default function TripTable({

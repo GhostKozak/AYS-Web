@@ -30,7 +30,7 @@ function UserManagementPage() {
 
   const { data: usersData, isLoading } = useQuery<PaginatedResponse<User>>({
     queryKey: ["users", "p", page, pageSize],
-    queryFn: () => userApi.getAll({ page, limit: pageSize }),
+    queryFn: () => userApi.getAll({ limit: pageSize, offset: (page - 1) * pageSize }),
   });
   const users = usersData?.items ?? [];
   const total = usersData?.total ?? 0;

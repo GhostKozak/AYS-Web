@@ -168,12 +168,12 @@ function FieldDashboard() {
   };
 
 
-  const activeTrips = useMemo(() => trips.filter((t) => !t.is_trip_canceled), [trips]);
+  const activeTrips = useMemo(() => trips.filter((t: TripType) => !t.is_trip_canceled), [trips]);
 
-  const urgentTrips = useMemo(() => activeTrips.filter((t) => t.unload_status === "UNLOADED"), [activeTrips]);
+  const urgentTrips = useMemo(() => activeTrips.filter((t: TripType) => t.unload_status === "UNLOADED"), [activeTrips]);
 
   const parkTrips = useMemo(() =>
-    activeTrips.filter((t) => t.unload_status === "WAITING"),
+    activeTrips.filter((t: TripType) => t.unload_status === "WAITING"),
   [activeTrips]);
 
   const filteredPending = useMemo(() => {
@@ -185,7 +185,7 @@ function FieldDashboard() {
   const filteredPark = useMemo(() => {
     if (!debouncedSearch) return parkTrips;
     const q = debouncedSearch.toLowerCase();
-    return parkTrips.filter((t) => t.vehicle?.licence_plate?.toLowerCase().includes(q));
+    return parkTrips.filter((t: TripType) => t.vehicle?.licence_plate?.toLowerCase().includes(q));
   }, [parkTrips, debouncedSearch]);
 
   const newArrivals = useMemo(() => {

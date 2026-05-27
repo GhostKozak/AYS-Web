@@ -3,6 +3,7 @@ import ErrorState from "./ErrorState";
 
 interface ErrorBoundaryProps {
   children: ReactNode;
+  fallback?: ReactNode;
   onRetry?: () => void;
 }
 
@@ -31,6 +32,9 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
 
   render() {
     if (this.state.hasError) {
+      if (this.props.fallback) {
+        return this.props.fallback;
+      }
       return <ErrorState onRetry={this.handleRetry} />;
     }
     return this.props.children;

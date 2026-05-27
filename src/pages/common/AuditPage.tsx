@@ -107,7 +107,6 @@ function AuditPage() {
     {
       title: t("Audit.DETAILS"),
       key: "details",
-      key: "details",
       render: (_: any, record: AuditType) => (
         <Button size="small" type="dashed" onClick={() => handleViewDetails(record)}>
           {t("Audit.VIEW_DETAILS", "View Details")}

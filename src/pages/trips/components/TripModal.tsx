@@ -159,7 +159,7 @@ const TripModal = ({
           if (!f.driver) return "-";
           const found = drivers.find((d) => d._id === f.driver);
           if (found) return found.full_name;
-          if (selectedRecord?.driver?._id === f.driver) return selectedRecord.driver.full_name;
+          if (selectedRecord?.driver?._id === f.driver) return selectedRecord?.driver?.full_name || "-";
           return f.driver;
         },
       },
@@ -175,7 +175,7 @@ const TripModal = ({
           if (!f.vehicle) return "-";
           const v = vehicles.find((v) => v._id === f.vehicle);
           if (v) return formatLicencePlate(v.licence_plate);
-          if (selectedRecord?.vehicle?._id === f.vehicle) return formatLicencePlate(selectedRecord.vehicle.licence_plate);
+          if (selectedRecord?.vehicle?._id === f.vehicle) return formatLicencePlate(selectedRecord?.vehicle?.licence_plate || "");
           return f.vehicle;
         },
       },
@@ -188,7 +188,7 @@ const TripModal = ({
           if (!f.company) return "-";
           const c = companies.find((c) => c._id === f.company);
           if (c) return c.name;
-          if (selectedRecord?.company?._id === f.company) return selectedRecord.company.name;
+          if (selectedRecord?.company?._id === f.company) return selectedRecord?.company?.name || "-";
           return f.company;
         },
       },
