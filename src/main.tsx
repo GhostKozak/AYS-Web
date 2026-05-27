@@ -6,7 +6,8 @@ import "./styles/base.css";
 import { AppConfigProvider } from "./utils/AppConfigProvider";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { App as AntdApp } from "antd";
+import { App as AntdApp, Button, Result } from "antd";
+import ErrorBoundary from "./components/common/ErrorBoundary";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -19,20 +20,40 @@ const queryClient = new QueryClient({
 });
 const router = AppRoutes();
 
-createRoot(document.getElementById("root")!).render(
-  <AppConfigProvider>
-    <AntdApp notification={{ top: 70 }} message={{ top: 70 }}>
-      <QueryClientProvider client={queryClient}>
-        <RouterProvider router={router} />
-        {import.meta.env.DEV && (
-          <ReactQueryDevtools
-            initialIsOpen={false}
-            buttonPosition="bottom-left"
-          />
-        )}
-      </QueryClientProvider>
-    </AntdApp>
-  </AppConfigProvider>
+const rootEl = document.getElementById("root");
+if (!rootEl) {
+  throw new Error("Root element '#root' not found in index.html");
+}
+
+createRoot(rootEl).render(
+  <ErrorBoundary
+    fallback={
+      <Result
+        status="500"
+        title="Uygulama Hatası"
+        subTitle="Beklenmeyen bir hata oluştu. Lütfen sayfayı yenileyin."
+        extra={
+          <Button type="primary" onClick={() => window.location.reload()}>
+            Sayfayı Yenile
+          </Button>
+        }
+      />
+    }
+  >
+    <AppConfigProvider>
+      <AntdApp notification={{ top: 70 }} message={{ top: 70 }}>
+        <QueryClientProvider client={queryClient}>
+          <RouterProvider router={router} />
+          {import.meta.env.DEV && (
+            <ReactQueryDevtools
+              initialIsOpen={false}
+              buttonPosition="bottom-left"
+            />
+          )}
+        </QueryClientProvider>
+      </AntdApp>
+    </AppConfigProvider>
+  </ErrorBoundary>
 );
 
 declare global {
