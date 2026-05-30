@@ -142,7 +142,7 @@ function Header() {
           <Link to={ROUTES.PROFILE}>{t("Header.ACCOUNT_SETTINGS")}</Link>
         ),
       },
-      { key: "2", label: <a onClick={() => notification.info({ message: t("Header.SUBSCRIPTION"), description: t("Common.COMING_SOON") })}>{t("Header.SUBSCRIPTION")}</a> },
+      { key: "2", label: <a onClick={() => message.info(t("Common.COMING_SOON"))}>{t("Header.SUBSCRIPTION")}</a> },
       {
         key: "3",
         label: <a onClick={showModal}>{t("Header.SEND_FEEDBACK")}</a>,

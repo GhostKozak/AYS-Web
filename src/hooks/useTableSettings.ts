@@ -56,10 +56,14 @@ export const readTableSettings = <T extends TableSettings>(
   fallback: T,
 ): T => {
   if (typeof window === "undefined") return fallback;
-  return parseSettings<T>(
-    localStorage.getItem(getStorageKey(userId, tableId)),
-    fallback,
-  );
+  try {
+    return parseSettings<T>(
+      localStorage.getItem(getStorageKey(userId, tableId)),
+      fallback,
+    );
+  } catch {
+    return fallback;
+  }
 };
 
 export const writeTableSettings = (
@@ -68,15 +72,23 @@ export const writeTableSettings = (
   settings: TableSettings,
 ) => {
   if (typeof window === "undefined") return;
-  localStorage.setItem(
-    getStorageKey(userId, tableId),
-    JSON.stringify(settings),
-  );
+  try {
+    localStorage.setItem(
+      getStorageKey(userId, tableId),
+      JSON.stringify(settings),
+    );
+  } catch {
+    // localStorage not available
+  }
 };
 
 export const removeTableSettings = (userId: string | null, tableId: string) => {
   if (typeof window === "undefined") return;
-  localStorage.removeItem(getStorageKey(userId, tableId));
+  try {
+    localStorage.removeItem(getStorageKey(userId, tableId));
+  } catch {
+    // localStorage not available
+  }
 };
 
 export const useTableSettings = (

@@ -77,22 +77,20 @@ export default function TableSettingsModal({
 
   // Load presets with schema validation
   useEffect(() => {
-    if (typeof window !== "undefined") {
+    try {
       const stored = localStorage.getItem(storageKey);
       if (stored) {
-        try {
-          const raw: unknown[] = JSON.parse(stored);
-          if (Array.isArray(raw)) {
-            setPresets(raw.filter(isValidPresetItem));
-          } else {
-            setPresets([]);
-          }
-        } catch {
+        const raw: unknown[] = JSON.parse(stored);
+        if (Array.isArray(raw)) {
+          setPresets(raw.filter(isValidPresetItem));
+        } else {
           setPresets([]);
         }
       } else {
         setPresets([]);
       }
+    } catch {
+      setPresets([]);
     }
   }, [storageKey]);
 
@@ -124,7 +122,11 @@ export default function TableSettingsModal({
 
     const updatedPresets = [...presets, newPreset];
     setPresets(updatedPresets);
-    localStorage.setItem(storageKey, JSON.stringify(updatedPresets));
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(updatedPresets));
+    } catch {
+      // localStorage not available
+    }
     setNewPresetName("");
     message.success(
       t("TableSettings.SAVE_PRESET_SUCCESS", {
@@ -137,7 +139,11 @@ export default function TableSettingsModal({
   const deletePreset = (nameToDelete: string) => {
     const updatedPresets = presets.filter((p) => p.name !== nameToDelete);
     setPresets(updatedPresets);
-    localStorage.setItem(storageKey, JSON.stringify(updatedPresets));
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(updatedPresets));
+    } catch {
+      // localStorage not available
+    }
     message.success(
       t("TableSettings.DELETE_PRESET_SUCCESS", {
         defaultValue: `Preset "${nameToDelete}" deleted successfully`,
