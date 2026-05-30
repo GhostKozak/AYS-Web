@@ -27,6 +27,11 @@ export const AxiosInterceptor = () => {
 
     const currentUser = getUser();
     const currentUserId = currentUser?._id;
+    // No authenticated session — drop all queued requests silently
+    if (!currentUserId) {
+      items.forEach((item) => removeFromQueue(item.id));
+      return;
+    }
 
     let success = 0;
     let failed = 0;
@@ -37,6 +42,8 @@ export const AxiosInterceptor = () => {
         removeFromQueue(item.id);
         continue;
       }
+      // Session was cleared during earlier queue processing — stop
+      if (!getUser()) break;
       try {
         await apiClient({
           method: item.method,
@@ -47,7 +54,9 @@ export const AxiosInterceptor = () => {
         success++;
       } catch (err: unknown) {
         const status = (err as { response?: { status?: number } })?.response?.status;
-        // 4xx client errors won't succeed on retry — drop them
+        // Session expired — stop processing and let the 401 handler redirect
+        if (status === 401) break;
+        // 4xx client errors (other than 401) won't succeed on retry — drop them
         if (status && status >= 400 && status < 500) {
           removeFromQueue(item.id);
           failed++;
