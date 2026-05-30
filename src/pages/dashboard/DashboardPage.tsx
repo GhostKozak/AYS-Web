@@ -320,9 +320,9 @@ function DashboardPage() {
         title={t("Common.EXPORTING")}
         open={exportStatus !== 'idle'}
         closable={exportStatus !== 'downloading'}
+        maskClosable={false}
         onCancel={closeExportModal}
         footer={null}
-        mask={{ closable: false }}
         centered
       >
         <Flex vertical align="center" justify="center" gap="middle" style={{ padding: '20px 0' }}>
