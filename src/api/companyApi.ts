@@ -1,11 +1,11 @@
 import apiClient from "./apiClient";
 import { API_ENDPOINTS } from "../constants";
-import type { CreateCompanyPayload, PaginatedResponse, PaginationParams } from "../types";
+import type { CompanyType, CreateCompanyPayload, PaginatedResponse, PaginationParams } from "../types";
 
 import { asyncSearch } from "./asyncSearch";
 
 export const companyApi = {
-  getAll: async (params?: PaginationParams): Promise<PaginatedResponse<any>> => {
+  getAll: async (params?: PaginationParams): Promise<PaginatedResponse<CompanyType>> => {
     return asyncSearch("companies", params || {});
   },
 

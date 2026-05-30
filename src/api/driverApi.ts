@@ -1,11 +1,11 @@
 import apiClient from "./apiClient";
 import { API_ENDPOINTS } from "../constants";
-import type { CreateDriverPayload, PaginatedResponse, PaginationParams } from "../types";
+import type { CreateDriverPayload, DriverType, PaginatedResponse, PaginationParams } from "../types";
 
 import { asyncSearch } from "./asyncSearch";
 
 export const driverApi = {
-  getAll: async (params?: PaginationParams): Promise<PaginatedResponse<any>> => {
+  getAll: async (params?: PaginationParams): Promise<PaginatedResponse<DriverType>> => {
     return asyncSearch("drivers", params || {});
   },
 

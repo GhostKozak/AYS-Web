@@ -5,7 +5,7 @@ import type { CreateTripPayload, PaginatedResponse, PaginationParams, TripType }
 import { asyncSearch } from "./asyncSearch";
 
 export const tripApi = {
-  getAll: async (params?: PaginationParams): Promise<PaginatedResponse<any>> => {
+  getAll: async (params?: PaginationParams): Promise<PaginatedResponse<TripType>> => {
     return asyncSearch("trips", params || {});
   },
 

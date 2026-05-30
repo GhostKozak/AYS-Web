@@ -1,11 +1,11 @@
 import apiClient from "./apiClient";
 import { API_ENDPOINTS } from "../constants";
-import type { CreateVehiclePayload, PaginatedResponse, PaginationParams } from "../types";
+import type { CreateVehiclePayload, PaginatedResponse, PaginationParams, VehicleType } from "../types";
 
 import { asyncSearch } from "./asyncSearch";
 
 export const vehicleApi = {
-  getAll: async (params?: PaginationParams): Promise<PaginatedResponse<any>> => {
+  getAll: async (params?: PaginationParams): Promise<PaginatedResponse<VehicleType>> => {
     return asyncSearch("vehicles", params || {});
   },
 
