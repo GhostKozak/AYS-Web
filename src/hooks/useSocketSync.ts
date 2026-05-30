@@ -35,7 +35,7 @@ export const useSocketSync = (onTripVerified?: (tripId: string) => void) => {
       });
 
       // 2. Update pending verification trips cache
-      queryClient.setQueryData<any>(["pending-trips"], (oldPending) => {
+      queryClient.setQueryData<any>(["pending-trips"], (oldPending: any) => {
         if (!oldPending) return oldPending;
 
         const currentData = Array.isArray(oldPending) ? oldPending : (oldPending.data || []);

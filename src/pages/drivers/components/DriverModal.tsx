@@ -226,6 +226,7 @@ const DriverModal = ({
                             if (re.test(value)) return Promise.resolve();
                             return Promise.reject(t("Drivers.PHONE_FORMAT_ERROR", { defaultValue: "Enter a valid number" }));
                           } catch (_e) {
+                            // Ignore regex compilation errors
                           }
                         }
                         if (/^\d{6,14}$/.test(value)) return Promise.resolve();
