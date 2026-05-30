@@ -3,7 +3,7 @@ import { usePageTitle } from "../../hooks/usePageTitle";
 import { useTrips } from "../../hooks/useTrips";
 import { usePendingTrips } from "../../hooks/usePendingTrips";
 import { useSocketSync } from "../../hooks/useSocketSync";
-import { Badge, Button, Card, Col, Row, Tag, App, Modal, Input, Segmented, Image, notification } from "antd";
+import { Badge, Button, Card, Col, Row, Tag, App, Modal, Input, Segmented, Image } from "antd";
 import type { InputRef } from "antd";
 import {
   CarOutlined, ReloadOutlined, CheckCircleOutlined, CloseCircleOutlined,
@@ -37,6 +37,14 @@ function SyncAge({ lastSyncAt }: { lastSyncAt: number }) {
   return <>{t("FieldOps.LIVE")} · {label}</>;
 }
 
+function formatDuration(parkedAt: string): string {
+  const diff = Date.now() - new Date(parkedAt).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 60) return `${mins}dk`;
+  const hrs = Math.floor(mins / 60);
+  return `${hrs}s ${mins % 60}dk`;
+}
+
 function FieldDashboard() {
   const { t } = useTranslation();
   const { themeMode, toggleTheme } = useAppConfig();
@@ -50,8 +58,9 @@ function FieldDashboard() {
   const prevUrgentCountRef = useRef(0);
   const searchTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const searchInputRef = useRef<InputRef>(null);
+  const hasShownWarningRef = useRef(false);
 
-  const { message } = App.useApp();
+  const { message, notification } = App.useApp();
   const queryClient = useQueryClient();
 
   const [verificationModalOpen, setVerificationModalOpen] = useState(false);
@@ -77,14 +86,17 @@ function FieldDashboard() {
   useSocketSync(() => setLastSyncAt(Date.now()));
 
   useEffect(() => {
-    if (hasMore) {
+    if (hasMore && !hasShownWarningRef.current) {
       notification.warning({
         message: t("FieldOps.LIMIT_WARNING_TITLE"),
         description: t("FieldOps.LIMIT_WARNING_DESC", { count: totalCount, limit: 200 }),
         duration: 8,
       });
+      hasShownWarningRef.current = true;
+    } else if (!hasMore) {
+      hasShownWarningRef.current = false;
     }
-  }, [hasMore, totalCount, t]);
+  }, [hasMore, totalCount, t, notification]);
 
   useEffect(() => {
     if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
@@ -218,13 +230,7 @@ function FieldDashboard() {
     prevUrgentCountRef.current = urgentTrips.length;
   }, [urgentTrips.length, message, t]);
 
-  function formatDuration(parkedAt: string): string {
-    const diff = Date.now() - new Date(parkedAt).getTime();
-    const mins = Math.floor(diff / 60000);
-    if (mins < 60) return `${mins}dk`;
-    const hrs = Math.floor(mins / 60);
-    return `${hrs}s ${mins % 60}dk`;
-  }
+  // formatDuration was moved outside component body
 
   if (isTripsError || isPendingError) {
     return (
@@ -525,8 +531,8 @@ function FieldDashboard() {
             onOpenChange: (vis) => setPreviewVisible(vis),
           }}
         >
-          {previewImages.map((src, idx) => (
-            <Image key={idx} src={src} style={{ display: "none" }} />
+          {previewImages.map((src) => (
+            <Image key={src} src={src} style={{ display: "none" }} />
           ))}
         </Image.PreviewGroup>
       </div>

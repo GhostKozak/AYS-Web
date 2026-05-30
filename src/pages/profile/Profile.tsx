@@ -59,12 +59,12 @@ export default function Profile() {
       });
 
       notification.success({
-        title: t("Common.SUCCESS", "Success"),
+        message: t("Common.SUCCESS", "Success"),
         description: t("Users.UPDATE_SUCCESS", "User updated successfully."),
       });
     } catch (err: any) {
       notification.error({
-        title: t("Common.ERROR", "Error"),
+        message: t("Common.ERROR", "Error"),
         description: err?.response?.data?.message || t("Errors.OPERATION_FAILED", "Operation Failed"),
       });
     } finally {
@@ -79,14 +79,14 @@ export default function Profile() {
         password: values.password,
       });
       notification.success({
-        title: t("Common.SUCCESS", "Success"),
+        message: t("Common.SUCCESS", "Success"),
         description: t("Profile.PASSWORD_UPDATE_SUCCESS", "Password updated successfully."),
       });
       passwordForm.resetFields();
     } catch (err: any) {
       notification.error({
-        title: t("Common.ERROR", "Error"),
-        description: err?.message || t("Errors.OPERATION_FAILED", "Operation Failed"),
+        message: t("Common.ERROR", "Error"),
+        description: err?.response?.data?.message || t("Errors.OPERATION_FAILED", "Operation Failed"),
       });
     } finally {
       setLoadingConfig(prev => ({ ...prev, password: false }));

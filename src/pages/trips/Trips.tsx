@@ -7,6 +7,8 @@ import { useCompanies } from "../../hooks/useCompanies";
 import { useDrivers } from "../../hooks/useDrivers";
 import { useVehicles } from "../../hooks/useVehicles";
 import type { TFunction } from "i18next";
+import TripModal from "./components/TripModal";
+import { exportTripsToExcel } from "../../utils/excel.utils";
 
 const getTripTableSettingsOptions = (t: TFunction) => [
   { key: "time_range", title: t("Trips.TIME_RANGE") },
@@ -25,8 +27,6 @@ const getTripTableSettingsOptions = (t: TFunction) => [
   { key: "updatedAt", title: t("Table.UPDATED_AT") },
   { key: "action", title: t("Table.ACTIONS") },
 ];
-import TripModal from "./components/TripModal";
-import { exportTripsToExcel } from "../../utils/excel.utils";
 
 function Trips() {
   const { trips, total, isLoading, isError, refetch, createTrip, updateTrip, deleteTrip, page, setPage, pageSize, setPageSize, search, setSearch } = useTrips({ paginated: true, pageSize: 10 });

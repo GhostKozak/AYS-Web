@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Table, Tag, Space, Input, Button, Modal, Layout, Flex } from "antd";
 import { useQuery } from "@tanstack/react-query";
 import { auditApi } from "../../api/auditApi";
@@ -31,10 +31,10 @@ function AuditPage() {
     setIsModalOpen(true);
   };
 
-  const filters = {
+  const filters = useMemo(() => ({
     entity: searchParams.get("entity") || undefined,
     entityId: searchParams.get("entityId") || undefined,
-  };
+  }), [searchParams]);
 
   const setFilters = (newFilters: { entity?: string; entityId?: string }) => {
     const next = new URLSearchParams(searchParams);

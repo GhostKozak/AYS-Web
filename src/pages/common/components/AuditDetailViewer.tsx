@@ -7,11 +7,13 @@ import { useAppConfig } from "../../../utils/AppConfigProvider";
 
 const { Text } = Typography;
 
+type AuditValue = Record<string, unknown> | string | number | boolean | null | undefined;
+
 interface AuditDetailViewerProps {
   action: string;
-  details?: any;
-  oldValue?: any;
-  newValue?: any;
+  details?: AuditValue;
+  oldValue?: AuditValue;
+  newValue?: AuditValue;
 }
 
 function getDiff(oldObj: any, newObj: any): { oldDiff: any; newDiff: any; hasChanges: boolean } {
@@ -109,12 +111,13 @@ export default function AuditDetailViewer({ action, details, oldValue, newValue 
 
   // UPDATE Action or fallback Diff
   const hasDirectDiff = oldValue !== undefined || newValue !== undefined;
-  const hasBeforeAfter = !hasDirectDiff && typeof parsedDetails === 'object' && parsedDetails !== null && ('before' in parsedDetails || 'after' in parsedDetails);
-  const hasOldNew = !hasDirectDiff && typeof parsedDetails === 'object' && parsedDetails !== null && ('old' in parsedDetails || 'new' in parsedDetails);
+  const detailsObj = (typeof parsedDetails === 'object' && parsedDetails !== null) ? (parsedDetails as Record<string, any>) : null;
+  const hasBeforeAfter = !hasDirectDiff && detailsObj !== null && ('before' in detailsObj || 'after' in detailsObj);
+  const hasOldNew = !hasDirectDiff && detailsObj !== null && ('old' in detailsObj || 'new' in detailsObj);
   
   if (hasDirectDiff || hasBeforeAfter || hasOldNew) {
-    const beforeObj = hasDirectDiff ? oldValue : (hasBeforeAfter ? parsedDetails.before : parsedDetails.old);
-    const afterObj = hasDirectDiff ? newValue : (hasBeforeAfter ? parsedDetails.after : parsedDetails.new);
+    const beforeObj = hasDirectDiff ? oldValue : (hasBeforeAfter ? detailsObj!.before : detailsObj!.old);
+    const afterObj = hasDirectDiff ? newValue : (hasBeforeAfter ? detailsObj!.after : detailsObj!.new);
     
     let displayBefore = beforeObj || {};
     let displayAfter = afterObj || {};

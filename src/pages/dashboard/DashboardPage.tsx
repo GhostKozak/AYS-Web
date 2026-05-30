@@ -90,6 +90,10 @@ function DashboardPage() {
         ? await reportApi.exportExcel('today', onProgress)
         : await reportApi.exportPdf('today', onProgress);
 
+      if (!data || data.size === 0 || data.type === 'application/json') {
+        throw new Error('Export failed: Empty data or JSON error response');
+      }
+
       const blob = new Blob([data], {
         type: type === 'excel'
           ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'

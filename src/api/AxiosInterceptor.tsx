@@ -20,72 +20,79 @@ export const AxiosInterceptor = () => {
   const [isOffline, setIsOffline] = useState(!navigator.onLine);
   const [showOnline, setShowOnline] = useState(false);
   const [pendingCount, setPendingCount] = useState(queueSize());
+  const isReplayingRef = useRef(false);
 
   const processQueue = useCallback(async () => {
-    const items = getQueue();
-    if (items.length === 0) return;
+    if (isReplayingRef.current) return;
+    isReplayingRef.current = true;
+    try {
+      const items = getQueue();
+      if (items.length === 0) return;
 
-    const currentUser = getUser();
-    const currentUserId = currentUser?._id;
-    // No authenticated session — drop all queued requests silently
-    if (!currentUserId) {
-      items.forEach((item) => removeFromQueue(item.id));
-      return;
-    }
-
-    let success = 0;
-    let failed = 0;
-
-    for (const item of items) {
-      // Belongs to a different user session — drop safely
-      if (item.userId && item.userId !== currentUserId) {
-        removeFromQueue(item.id);
-        continue;
+      const currentUser = getUser();
+      const currentUserId = currentUser?._id;
+      // No authenticated session — drop all queued requests silently
+      if (!currentUserId) {
+        items.forEach((item) => removeFromQueue(item.id));
+        return;
       }
-      // Session was cleared during earlier queue processing — stop
-      if (!getUser()) break;
-      try {
-        await apiClient({
-          method: item.method,
-          url: item.url,
-          data: item.data,
-        });
-        removeFromQueue(item.id);
-        success++;
-      } catch (err: unknown) {
-        const status = (err as { response?: { status?: number } })?.response?.status;
-        // Session expired — stop processing and let the 401 handler redirect
-        if (status === 401) break;
-        // 4xx client errors (other than 401) won't succeed on retry — drop them
-        if (status && status >= 400 && status < 500) {
+
+      let success = 0;
+      let failed = 0;
+
+      for (const item of items) {
+        // Belongs to a different user session — drop safely
+        if (item.userId && item.userId !== currentUserId) {
           removeFromQueue(item.id);
-          failed++;
+          continue;
         }
-        // 5xx / network errors stay in queue for next retry
+        // Session was cleared during earlier queue processing — stop
+        if (!getUser()) break;
+        try {
+          await apiClient({
+            method: item.method,
+            url: item.url,
+            data: item.data,
+          });
+          removeFromQueue(item.id);
+          success++;
+        } catch (err: unknown) {
+          const status = (err as { response?: { status?: number } })?.response?.status;
+          // Session expired — stop processing and let the 401 handler redirect
+          if (status === 401) break;
+          // 4xx client errors (other than 401) won't succeed on replay — drop them
+          if (status && status >= 400 && status < 500) {
+            removeFromQueue(item.id);
+            failed++;
+          }
+          // 5xx / network errors stay in queue for next retry
+        }
       }
-    }
 
-    setPendingCount(queueSize());
+      setPendingCount(queueSize());
 
-    if (success > 0) {
-      notification.success({
-        key: "offline-queue-result",
-        message: t("OfflineQueue.SYNCED_TITLE", "Requests Synced"),
-        description: t("OfflineQueue.SYNCED_DESC", {
-          defaultValue: "{{count}} request(s) completed successfully.",
-          count: success,
-        }),
-      });
-    }
-    if (failed > 0) {
-      notification.warning({
-        key: "offline-queue-failed",
-        message: t("OfflineQueue.FAILED_TITLE", "Sync Failed"),
-        description: t("OfflineQueue.FAILED_DESC", {
-          defaultValue: "{{count}} request(s) could not be processed.",
-          count: failed,
-        }),
-      });
+      if (success > 0) {
+        notification.success({
+          key: "offline-queue-result",
+          message: t("OfflineQueue.SYNCED_TITLE", "Requests Synced"),
+          description: t("OfflineQueue.SYNCED_DESC", {
+            defaultValue: "{{count}} request(s) completed successfully.",
+            count: success,
+          }),
+        });
+      }
+      if (failed > 0) {
+        notification.warning({
+          key: "offline-queue-failed",
+          message: t("OfflineQueue.FAILED_TITLE", "Sync Failed"),
+          description: t("OfflineQueue.FAILED_DESC", {
+            defaultValue: "{{count}} request(s) could not be processed.",
+            count: failed,
+          }),
+        });
+      }
+    } finally {
+      isReplayingRef.current = false;
     }
   }, [notification, t]);
 

@@ -64,7 +64,7 @@ const TripModal = ({
   const { createDriver } = useDrivers();
   const { createVehicle } = useVehicles();
   const [isNewDriver, setIsNewDriver] = useState(false);
-  const [selectedDriverObj, setSelectedDriverObj] = useState<any | null>(null);
+  const [selectedDriverObj, setSelectedDriverObj] = useState<DriverType | Pick<DriverType, "_id" | "full_name" | "phone_number"> | null>(null);
   const [extraCompanyOptions, setExtraCompanyOptions] = useState<{ label: string; value: string }[]>([]);
   const { t } = useTranslation();
   const { message } = App.useApp();
@@ -326,8 +326,11 @@ const TripModal = ({
           // User selected a company explicitly — keep it
         } else {
           const selectedDriver = selectedDriverObj || drivers.find((d) => d._id === values.driver) || (selectedRecord?.driver?._id === values.driver ? selectedRecord.driver : null);
-          if (selectedDriver && (selectedDriver as any).company) {
-            finalValues.company = typeof (selectedDriver as any).company === "string" ? (selectedDriver as any).company : (selectedDriver as any).company._id;
+          if (selectedDriver && 'company' in selectedDriver && selectedDriver.company) {
+            const company = selectedDriver.company as any;
+            if (company && company._id) {
+              finalValues.company = company._id;
+            }
           }
         }
       } else {
@@ -424,8 +427,8 @@ const TripModal = ({
               if ('driver' in changedValues) {
                 const driver = drivers.find((d) => d._id === changedValues.driver);
                 if (driver) {
-                  setSelectedDriverObj(driver as any);
-                  const driverCompany = (driver as any).company;
+                  setSelectedDriverObj(driver);
+                  const driverCompany = driver.company;
                   if (driverCompany) {
                     const companyId = typeof driverCompany === "string" ? driverCompany : driverCompany._id;
                     const companyName = typeof driverCompany === "string" ? undefined : driverCompany.name;
@@ -466,8 +469,8 @@ const TripModal = ({
                   placeholder={t("Trips.DRIVER_REQUIRED")}
                   defaultOptions={driverOptions}
                   onItemSelect={(driver) => {
-                    setSelectedDriverObj(driver as any);
-                    const driverCompany = (driver as any).company;
+                    setSelectedDriverObj(driver);
+                    const driverCompany = driver.company;
                     if (driverCompany) {
                       const companyId = typeof driverCompany === "string" ? driverCompany : driverCompany._id;
                       const companyName = typeof driverCompany === "string" ? undefined : driverCompany.name;

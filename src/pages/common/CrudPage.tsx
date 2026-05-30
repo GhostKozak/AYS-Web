@@ -192,13 +192,13 @@ function CrudPage<T extends { _id: string }>({
     try {
       await onDeleteItem(record._id);
       notification.success({
-        title: t("Common.SUCCESS"),
+        message: t("Common.SUCCESS"),
         description: t(deleteSuccessKey),
       });
       setSelectedRowKeys((prev) => prev.filter((key) => key !== record._id));
     } catch {
       notification.error({
-        title: t("Common.ERROR"),
+        message: t("Common.ERROR"),
         description: t("Errors.DELETE_FAILED"),
       });
     }
@@ -215,7 +215,7 @@ function CrudPage<T extends { _id: string }>({
     const failCount = results.filter((r) => r.status === "rejected").length;
     if (failCount > 0) {
       notification.warning({
-        title: t("Common.WARNING"),
+        message: t("Common.WARNING"),
         description: t("Common.BULK_DELETE_PARTIAL", {
           success: successCount,
           failed: failCount,
@@ -223,7 +223,7 @@ function CrudPage<T extends { _id: string }>({
       });
     } else {
       notification.success({
-        title: t("Common.SUCCESS"),
+        message: t("Common.SUCCESS"),
         description: t("Common.BULK_DELETE_SUCCESS", { count: successCount }),
       });
     }
@@ -246,12 +246,12 @@ function CrudPage<T extends { _id: string }>({
       await onFormSubmit(values, selectedRecord);
       if (selectedRecord) {
         notification.info({
-          title: t(updateNotificationTitleKey),
+          message: t(updateNotificationTitleKey),
           description: t(updateSuccessKey),
         });
       } else {
         notification.success({
-          title: t("Common.SUCCESS"),
+          message: t("Common.SUCCESS"),
           description: t(createSuccessKey),
         });
       }
@@ -259,7 +259,7 @@ function CrudPage<T extends { _id: string }>({
     } catch (error: any) {
       const errMsg = safeErrorMessage(error, t("Errors.OPERATION_FAILED"));
       notification.error({
-        title: t("Common.ERROR"),
+        message: t("Common.ERROR"),
         description: errMsg,
       });
     }

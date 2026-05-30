@@ -34,7 +34,7 @@ export const useTrips = (options?: UseTripsOptions) => {
   const { data, total, isLoading, isError, refetch, create, update, remove, page, setPage, pageSize, setPageSize, search, setSearch } = useCrud<
     TripType,
     CreateTripPayload
-  >(tripApi as any, {
+  >(tripApi, {
     queryKey: ["trips"],
     refetchInterval: pollingInterval,
     pagination,

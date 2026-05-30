@@ -99,7 +99,7 @@ export function useDashboardLayout() {
     });
 
     if (show) {
-      setLayouts((currentLayouts: any) => {
+      setLayouts((currentLayouts: Record<string, Layout[]>) => {
         const newLayouts = { ...currentLayouts };
         Object.keys(DEFAULT_LAYOUT).forEach((bp) => {
           const original = DEFAULT_LAYOUT[bp]?.find(

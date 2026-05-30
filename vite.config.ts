@@ -7,6 +7,16 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [react()],
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            'vendor-antd': ['antd', '@ant-design/icons'],
+            'vendor-react': ['react', 'react-dom'],
+          }
+        }
+      }
+    },
     server: {
       proxy: {
         '/api': {

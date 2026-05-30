@@ -34,7 +34,7 @@ function LoginPage() {
       const frontendUser = { ...data.user, _id: data.user.id };
 
       // Persist user info to localStorage so useAuth initialData hydrates immediately
-      setUser(frontendUser as any);
+      setUser(frontendUser);
 
       // 2. Set cache synchronously — AuthGuard will unblock on next render
       queryClient.setQueryData(["currentUser"], frontendUser);

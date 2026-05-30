@@ -45,7 +45,7 @@ export const getUser = (): User | null => {
   }
 };
 
-export const setUser = (user: User): void => {
+export const setUser = (user: Pick<User, "_id" | "email" | "firstName" | "lastName" | "role"> & Partial<User>): void => {
   const sanitized: Record<string, unknown> = {};
   for (const key of Object.keys(user)) {
     if (SANITIZED_FIELDS.has(key)) {

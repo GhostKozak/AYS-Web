@@ -175,7 +175,7 @@ function UserManagementPage() {
     {
       title: t("Common.ACTIONS"),
       key: "actions",
-      render: (_: any, record: User) => (
+      render: (_: unknown, record: User) => (
         <Space size="middle">
           <Button icon={<EditOutlined />} onClick={() => handleEdit(record)} />
           <Button
