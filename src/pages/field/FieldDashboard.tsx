@@ -190,12 +190,12 @@ function FieldDashboard() {
 
   const newArrivals = useMemo(() => {
     const cutoff = Date.now() - 60 * 60 * 1000;
-    return filteredPending.filter((t) => new Date(t.arrival_time).getTime() > cutoff);
+    return filteredPending.filter((t) => new Date(t.arrival_time ?? 0).getTime() > cutoff);
   }, [filteredPending]);
 
   const awaitingApproval = useMemo(() => {
     const cutoff = Date.now() - 60 * 60 * 1000;
-    return filteredPending.filter((t) => new Date(t.arrival_time).getTime() <= cutoff);
+    return filteredPending.filter((t) => new Date(t.arrival_time ?? 0).getTime() <= cutoff);
   }, [filteredPending]);
 
   useEffect(() => {
