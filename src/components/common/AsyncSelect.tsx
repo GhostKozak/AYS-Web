@@ -90,7 +90,7 @@ export function AsyncSelect<T>({
     } else {
       setOptions(defaultOptions);
     }
-  }, [defaultOptions]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [defaultOptions, fetchOptions]);
 
   const handleChange = (value: any, option: any) => {
     if (onChange) {
