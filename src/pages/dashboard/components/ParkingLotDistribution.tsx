@@ -31,7 +31,7 @@ function ParkingLotDistribution() {
 
   if (isLoading) return <Skeleton active paragraph={{ rows: 8 }} />;
 
-  const occupancyRate = data ? Math.round((data.currentCount / data.totalCapacity) * 100) : 0;
+  const occupancyRate = data && data.totalCapacity ? Math.round((data.currentCount / data.totalCapacity) * 100) : 0;
 
 
 
