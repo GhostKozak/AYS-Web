@@ -11,8 +11,32 @@ import { clearQueue } from "./offlineQueue";
 // However, UI routing relies on localStorage cache to prevent flickering.
 const SANITIZED_FIELDS = new Set(["_id", "email", "firstName", "lastName", "role"]);
 
+const safeLocalStorage = {
+  getItem(key: string): string | null {
+    try {
+      return localStorage.getItem(key);
+    } catch {
+      return null;
+    }
+  },
+  setItem(key: string, value: string): void {
+    try {
+      localStorage.setItem(key, value);
+    } catch {
+      // localStorage not available
+    }
+  },
+  removeItem(key: string): void {
+    try {
+      localStorage.removeItem(key);
+    } catch {
+      // localStorage not available
+    }
+  },
+};
+
 export const getUser = (): User | null => {
-  const userString = localStorage.getItem(STORAGE_KEYS.USER);
+  const userString = safeLocalStorage.getItem(STORAGE_KEYS.USER);
   if (!userString) return null;
   try {
     return JSON.parse(userString);
@@ -28,11 +52,11 @@ export const setUser = (user: User): void => {
       sanitized[key] = (user as unknown as Record<string, unknown>)[key];
     }
   }
-  localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(sanitized));
+  safeLocalStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(sanitized));
 };
 
 export const clearAuth = (): void => {
-  localStorage.removeItem(STORAGE_KEYS.USER);
+  safeLocalStorage.removeItem(STORAGE_KEYS.USER);
   clearQueue();
 };
 

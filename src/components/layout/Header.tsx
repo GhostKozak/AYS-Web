@@ -8,8 +8,8 @@ import {
   Input,
   Layout,
   Menu,
+  message,
   Modal,
-  notification,
   Space,
   Tag,
   theme,
@@ -37,6 +37,7 @@ function Header() {
   const { t, i18n } = useTranslation();
   const { themeMode, toggleTheme } = useAppConfig();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isFeedbackSubmitting, setIsFeedbackSubmitting] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [form] = Form.useForm();
   const navigate = useNavigate();
@@ -385,13 +386,22 @@ function Header() {
       <Modal
         title={t("Header.FEEDBACK_TITLE")}
         open={isModalOpen}
+        confirmLoading={isFeedbackSubmitting}
         onOk={() => {
           form
             .validateFields()
-            .then((values) => {
-              apiClient.post(API_ENDPOINTS.FEEDBACK, values).catch(() => {});
-              form.resetFields();
-              setIsModalOpen(false);
+            .then(async (values) => {
+              setIsFeedbackSubmitting(true);
+              try {
+                await apiClient.post(API_ENDPOINTS.FEEDBACK, values);
+                form.resetFields();
+                setIsModalOpen(false);
+                message.success(t("Header.FEEDBACK_SUCCESS"));
+              } catch {
+                message.error(t("Header.FEEDBACK_ERROR"));
+              } finally {
+                setIsFeedbackSubmitting(false);
+              }
             })
             .catch(() => { });
         }}

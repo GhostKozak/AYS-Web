@@ -52,7 +52,11 @@ export const AppConfigProvider: React.FC<{ children: ReactNode }> = ({
   const { i18n } = useTranslation();
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEYS.THEME, themeMode);
+    try {
+      localStorage.setItem(STORAGE_KEYS.THEME, themeMode);
+    } catch {
+      // localStorage not available
+    }
   }, [themeMode]);
 
   const toggleTheme = React.useCallback(() => {
