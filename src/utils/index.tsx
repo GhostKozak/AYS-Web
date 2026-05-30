@@ -98,8 +98,9 @@ export const calculateDiffs = <
     }
 
     // Eşitlik Kontrolü (Boşluk/Null yönetimi dahil)
-    if (oldVal !== newVal && (oldVal || newVal)) {
-      if (!oldVal && !newVal) return;
+    if (oldVal !== newVal) {
+      const isEmpty = (v: unknown) => v == null || v === '';
+      if (isEmpty(oldVal) && isEmpty(newVal)) return;
       changes.push({ key, oldValue: oldVal, newValue: newVal });
     }
   });
