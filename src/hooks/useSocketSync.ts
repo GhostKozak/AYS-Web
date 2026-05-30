@@ -35,18 +35,30 @@ export const useSocketSync = (onTripVerified?: (tripId: string) => void) => {
       });
 
       // 2. Update pending verification trips cache
-      queryClient.setQueryData<TripType[]>(["pending-trips"], (oldPending) => {
+      queryClient.setQueryData<any>(["pending-trips"], (oldPending) => {
         if (!oldPending) return oldPending;
 
+        const currentData = Array.isArray(oldPending) ? oldPending : (oldPending.data || []);
+
         const isStillPending = updatedTrip.status === "PENDING";
+        let updatedList: any[];
 
         if (isStillPending) {
-          return oldPending.map((trip) =>
+          updatedList = currentData.map((trip: any) =>
             trip._id === updatedTrip._id ? { ...trip, ...updatedTrip } : trip
           );
         } else {
-          return oldPending.filter((trip) => trip._id !== updatedTrip._id);
+          updatedList = currentData.filter((trip: any) => trip._id !== updatedTrip._id);
         }
+
+        if (Array.isArray(oldPending)) {
+          return updatedList;
+        }
+        return {
+          ...oldPending,
+          data: updatedList,
+          count: updatedTrip.status === "PENDING" ? oldPending.count : Math.max(0, oldPending.count - 1),
+        };
       });
 
       // 3. Trigger visual glow effect on table row via window custom event
