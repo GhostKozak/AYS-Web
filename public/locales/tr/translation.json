@@ -423,6 +423,8 @@
     "SEAL_OPTIONAL": "(İsteğe Bağlı)",
     "ARRIVAL": "Geliş Zamanı",
     "REJECT": "Reddet",
+    "CONFIRM_REJECT_TITLE": "Seferi Reddet",
+    "CONFIRM_REJECT_CONTENT": "Bu seferi reddetmek istediğinize emin misiniz? Bu işlem geri alınamaz.",
     "REJECT_SUCCESS": "Reddedildi",
     "MOVE_TO_PARK_SUCCESS": "Parka alındı",
     "RAMP_ALERT": "Boşalan araç var — rampadan çekin!",

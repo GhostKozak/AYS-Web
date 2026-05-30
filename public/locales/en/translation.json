@@ -423,6 +423,8 @@
     "SEAL_OPTIONAL": "(Optional)",
     "ARRIVAL": "Arrival Time",
     "REJECT": "Reject",
+    "CONFIRM_REJECT_TITLE": "Reject Trip",
+    "CONFIRM_REJECT_CONTENT": "Are you sure you want to reject this trip? This action cannot be undone.",
     "REJECT_SUCCESS": "Rejected",
     "MOVE_TO_PARK_SUCCESS": "Moved to park",
     "RAMP_ALERT": "Unloading complete — pull off ramp!",

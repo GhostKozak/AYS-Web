@@ -9,6 +9,7 @@ import {
   CarOutlined, ReloadOutlined, CheckCircleOutlined, CloseCircleOutlined,
   CameraOutlined, DeleteOutlined, UserOutlined,
   MoonOutlined, SunOutlined, SearchOutlined, ClockCircleOutlined,
+  ExclamationCircleFilled,
 } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import type { TripType } from "../../types";
@@ -155,16 +156,26 @@ function FieldDashboard() {
     }
   };
 
-  const handleReject = async (trip: TripType) => {
-    try {
-      await tripApi.update(trip._id, { is_trip_canceled: true });
-      message.success(t("FieldOps.REJECT_SUCCESS"));
-    } catch (err: any) {
-      const msg = err?.response?.data?.message || err?.message || t("Errors.OPERATION_FAILED");
-      message.error(typeof msg === "string" ? msg : t("Errors.OPERATION_FAILED"));
-    } finally {
-      refreshQueries();
-    }
+  const handleReject = (trip: TripType) => {
+    Modal.confirm({
+      title: t("FieldOps.CONFIRM_REJECT_TITLE"),
+      icon: <ExclamationCircleFilled />,
+      content: t("FieldOps.CONFIRM_REJECT_CONTENT"),
+      okText: t("FieldOps.REJECT"),
+      okType: "danger",
+      cancelText: t("Common.CANCEL"),
+      onOk: async () => {
+        try {
+          await tripApi.update(trip._id, { is_trip_canceled: true });
+          message.success(t("FieldOps.REJECT_SUCCESS"));
+        } catch (err: any) {
+          const msg = err?.response?.data?.message || err?.message || t("Errors.OPERATION_FAILED");
+          message.error(typeof msg === "string" ? msg : t("Errors.OPERATION_FAILED"));
+        } finally {
+          refreshQueries();
+        }
+      },
+    });
   };
 
 
