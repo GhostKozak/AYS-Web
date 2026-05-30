@@ -2,6 +2,14 @@ const QUEUE_KEY = "offline_req_queue";
 const MAX_QUEUE_SIZE = 50;
 const TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 
+const generateId = (): string => {
+  try {
+    return crypto.randomUUID();
+  } catch {
+    return `${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 10)}`;
+  }
+};
+
 export interface QueuedRequest {
   id: string;
   method: "POST" | "PUT" | "PATCH" | "DELETE";
@@ -48,7 +56,7 @@ export const addToQueue = (
     queue.shift(); // Drop oldest to stay within limit
   }
   queue.push({
-    id: crypto.randomUUID(),
+    id: generateId(),
     method,
     url,
     data,
