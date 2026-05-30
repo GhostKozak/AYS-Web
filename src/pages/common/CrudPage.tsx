@@ -151,8 +151,6 @@ function CrudPage<T extends { _id: string }>({
   const handleSearchSubmit = isPaginated
     ? (val: string) => {
         setPendingPaginatedSearch(val);
-        setPage!(1);
-        setServerSearch!(val);
       }
     : (val: string) => setLocalSearchParams(val ? { q: val } : {}, { replace: true });
 
