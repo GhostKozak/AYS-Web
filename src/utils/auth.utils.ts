@@ -65,6 +65,19 @@ export const clearAuth = (): void => {
 // fallback for role, to prevent stale / tampered data being used for authz)
 // ---------------------------------------------------------------------------
 
+export const getRoleColor = (role?: string): string => {
+  switch (role) {
+    case "admin":
+      return "green";
+    case "editor":
+      return "blue";
+    case "viewer":
+      return "orange";
+    default:
+      return "default";
+  }
+};
+
 export const hasRole = (allowedRoles: UserRole[], user?: User | null): boolean => {
   if (!user) return false;
   return allowedRoles.includes(user.role);

@@ -9,7 +9,7 @@ import dayjs from "dayjs";
 import { usePageTitle } from "../../hooks/usePageTitle";
 import type { User, CreateUserPayload, PaginatedResponse } from "../../types";
 import { USER_ROLES } from "../../types";
-import { getUser } from "../../utils/auth.utils";
+import { getUser, getRoleColor } from "../../utils/auth.utils";
 import { useIsMobile } from "../../hooks/useIsMobile";
 
 
@@ -148,7 +148,7 @@ function UserManagementPage() {
       title: t("Users.ROLE"),
       dataIndex: "role",
       key: "role",
-      render: (role: string) => <Tag color="purple">{role?.toUpperCase()}</Tag>,
+      render: (role: string) => <Tag color={getRoleColor(role)}>{role?.toUpperCase()}</Tag>,
     },
     {
       title: t("Table.STATUS"),

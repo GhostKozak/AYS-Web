@@ -32,6 +32,7 @@ import { useTranslation } from "react-i18next";
 import { useIsMobile } from "../../hooks/useIsMobile";
 
 import { useAuth } from "../../hooks/useAuth";
+import { getRoleColor } from "../../utils/auth.utils";
 
 function Header() {
   const { t, i18n } = useTranslation();
@@ -66,19 +67,6 @@ function Header() {
   const toggleLang = () => {
     const newLang = currentLang === "tr" ? "en" : "tr";
     i18n.changeLanguage(newLang);
-  };
-
-  const getRoleColor = (role?: string) => {
-    switch (role) {
-      case "admin":
-        return "green";
-      case "editor":
-        return "blue";
-      case "viewer":
-        return "orange";
-      default:
-        return "default";
-    }
   };
 
   const menuItems: MenuProps["items"] = useMemo(() => {
