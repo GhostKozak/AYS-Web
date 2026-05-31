@@ -332,6 +332,24 @@
   "Other": {
     "FAQ": "Frequently Asked Questions"
   },
+  "FAQ": {
+    "Q1": "What is AYS?",
+    "A1": "AYS (Vehicle Management System) is a platform developed to manage vehicle trips, company and driver information, field operations, and unloading processes.",
+    "Q2": "How to create a trip?",
+    "A2": "You can create a new trip by clicking the 'Add Trip' button at the top right of the Trips page. Fill in the vehicle, driver, company information and arrival time in the form, then save.",
+    "Q3": "What is field operation mode?",
+    "A3": "Field Operation mode allows field operators to physically verify vehicles. The operator checks the license plate, enters the seal number, and takes a photo to complete the verification process.",
+    "Q4": "How does seal verification work?",
+    "A4": "The field operator selects a vehicle from the pending list, enters the seal number, and takes a photo of the vehicle. After this process, the trip status is updated from 'Pending Approval' to 'Confirmed'.",
+    "Q5": "What do unload statuses mean?",
+    "A5": "Unload statuses: WAITING - vehicle waiting for unloading, UNLOADING - active unloading in progress, UNLOADED - unloading complete, COMPLETED - process finished, CANCELED - cancelled.",
+    "Q6": "What are the user roles?",
+    "A6": "There are four user roles: Admin - has all permissions, Editor - can add and edit data, Viewer - can only view data.",
+    "Q7": "How does GPS tracking work?",
+    "A7": "GPS devices installed in vehicles allow real-time location tracking. Vehicles with GPS tracking are marked with an ATS (Vehicle Tracking System) tag in trip details.",
+    "Q8": "How are parking areas managed?",
+    "A8": "Vehicles can be in temporary parking or main parking area. Parking duration is calculated automatically and waiting vehicles are listed on the Field Operations screen."
+  },
   "Excel": {
     "fileNames": {
       "TRIPS": "Trip_Report",

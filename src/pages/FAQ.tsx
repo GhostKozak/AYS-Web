@@ -10,27 +10,46 @@ function FAQ() {
   usePageTitle(t("Other.FAQ"));
   const isMobile = useIsMobile();
 
-  const text = `
-  A dog is a type of domesticated animal.
-  Known for its loyalty and faithfulness,
-  it can be found as a welcome guest in many households across the world.
-`;
-
   const items: CollapseProps["items"] = [
     {
       key: "1",
-      label: "This is panel header 1",
-      children: <p>{text}</p>,
+      label: t("FAQ.Q1"),
+      children: <p>{t("FAQ.A1")}</p>,
     },
     {
       key: "2",
-      label: "This is panel header 2",
-      children: <p>{text}</p>,
+      label: t("FAQ.Q2"),
+      children: <p>{t("FAQ.A2")}</p>,
     },
     {
       key: "3",
-      label: "This is panel header 3",
-      children: <p>{text}</p>,
+      label: t("FAQ.Q3"),
+      children: <p>{t("FAQ.A3")}</p>,
+    },
+    {
+      key: "4",
+      label: t("FAQ.Q4"),
+      children: <p>{t("FAQ.A4")}</p>,
+    },
+    {
+      key: "5",
+      label: t("FAQ.Q5"),
+      children: <p>{t("FAQ.A5")}</p>,
+    },
+    {
+      key: "6",
+      label: t("FAQ.Q6"),
+      children: <p>{t("FAQ.A6")}</p>,
+    },
+    {
+      key: "7",
+      label: t("FAQ.Q7"),
+      children: <p>{t("FAQ.A7")}</p>,
+    },
+    {
+      key: "8",
+      label: t("FAQ.Q8"),
+      children: <p>{t("FAQ.A8")}</p>,
     },
   ];
 
@@ -38,12 +57,6 @@ function FAQ() {
     <Layout style={{ padding: isMobile ? "0 12px" : "0 20px" }}>
       <Content>
         <h1 style={{ margin: 0 }}>{t("Other.FAQ")}</h1>
-        <p>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Recusandae
-          ipsam veniam cupiditate voluptate saepe libero placeat voluptatum, id
-          tenetur unde assumenda quam, deleniti natus, magni qui similique
-          perspiciatis fugiat eum?
-        </p>
         <Collapse
           items={items}
           defaultActiveKey={["1"]}

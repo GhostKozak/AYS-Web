@@ -332,6 +332,24 @@
   "Other": {
     "FAQ": "Sıkça Sorulan Sorular"
   },
+  "FAQ": {
+    "Q1": "AYS nedir?",
+    "A1": "AYS (Araç Yönetim Sistemi), araç seferlerini, firma ve sürücü bilgilerini, saha operasyonlarını ve boşaltma süreçlerini yönetmek için geliştirilmiş bir platformdur.",
+    "Q2": "Sefer nasıl oluşturulur?",
+    "A2": "Seferler sayfasında sağ üstteki 'Sefer Ekle' butonuna tıklayarak yeni bir sefer oluşturabilirsiniz. Açılan formda araç, sürücü, firma bilgilerini ve varış zamanını girerek kaydedebilirsiniz.",
+    "Q3": "Saha operasyon modu nedir?",
+    "A3": "Saha Operasyon modu, saha operatörlerinin araçları fiziksel olarak doğrulamasını sağlar. Operatör, aracın plakasını kontrol eder, mühür numarasını girer ve fotoğraf çekerek onaylama işlemini gerçekleştirir.",
+    "Q4": "Mühür doğrulama nasıl çalışır?",
+    "A4": "Saha operatörü, bekleyen seferler listesinden bir aracı seçer, mühür numarasını girer ve araç fotoğrafını çeker. Bu işlem sonrasında seferin durumu 'Onay Bekliyor'dan 'Onaylandı' olarak güncellenir.",
+    "Q5": "Boşaltma durumları ne anlama gelir?",
+    "A5": "Boşaltma durumları: WAITING (Bekliyor) - araç boşaltma sırasında, UNLOADING (Boşaltılıyor) - aktif boşaltma işlemi devam ediyor, UNLOADED (Boşaltıldı) - boşaltma tamamlandı, COMPLETED (Tamamlandı) - süreç bitti, CANCELED (İptal) - iptal edildi.",
+    "Q6": "Kullanıcı rolleri nelerdir?",
+    "A6": "Sistemde dört kullanıcı rolü bulunur: Admin (Yönetici) - tüm yetkilere sahiptir, Editor (Düzenleyici) - veri ekleme ve düzenleme yapabilir, Viewer (Görüntüleyici) - sadece görüntüleme yapabilir.",
+    "Q7": "GPS takibi nasıl çalışır?",
+    "A7": "Araçlara monte edilen GPS cihazları sayesinde araçların anlık konumları takip edilebilir. Sefer detaylarında ATS (Araç Takip Sistemi) etiketi ile GPS takibi olan araçlar işaretlenir.",
+    "Q8": "Park alanları nasıl yönetilir?",
+    "A8": "Araçlar geçici park (KK) veya ana park alanında olabilir. Park süresi otomatik hesaplanır ve bekleyen araçlar Saha Operasyon ekranında listelenir."
+  },
   "Excel": {
     "fileNames": {
       "TRIPS": "Sefer_Raporu",
