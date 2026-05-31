@@ -20,6 +20,7 @@ const getTripTableSettingsOptions = (t: TFunction) => [
   { key: "has_gps_tracking", title: t("Trips.GPS_TRACKING") },
   { key: "location", title: t("Trips.LOCATION") },
   { key: "seal_number", title: t("Trips.SEAL_NUMBER") },
+  { key: "deleted", title: t("Trips.STATUS") },
   { key: "status", title: t("Trips.VERIFICATION_STATUS") },
   { key: "field_photo_path", title: t("Trips.FIELD_PHOTO") },
   { key: "field_verified_at", title: t("Trips.FIELD_VERIFIED_AT") },

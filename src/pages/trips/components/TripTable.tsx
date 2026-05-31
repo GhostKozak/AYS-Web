@@ -341,6 +341,24 @@ export default function TripTable({
         ...getCustomFilterProps(t("Trips.SEARCH_SEAL", { defaultValue: "Mühür Ara" })),
       },
       {
+        title: t("Trips.STATUS"),
+        dataIndex: "deleted",
+        key: "deleted",
+        render: (deleted: boolean) => (
+          <Tag color={deleted ? "red" : "green"}>
+            {deleted ? t("Common.PASSIVE") : t("Common.ACTIVE")}
+          </Tag>
+        ),
+        visible: user?.role === USER_ROLES.ADMIN,
+        filters: [
+          { text: t("Common.ACTIVE"), value: false },
+          { text: t("Common.PASSIVE"), value: true },
+        ],
+        onFilter: (value, record) => record.deleted === value,
+        minWidth: 70,
+        maxWidth: 120,
+      },
+      {
         title: t("Trips.VERIFICATION_STATUS"),
         dataIndex: "status",
         key: "status",
