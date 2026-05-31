@@ -9,11 +9,13 @@ import {
   type DriverType,
   type TripType,
   type VehicleType,
+  USER_ROLES,
 } from "../../../types";
 import { useTranslation } from "react-i18next";
 import { calculateDiffs, formatLicencePlate, formatPhoneNumber, safeErrorMessage } from "../../../utils/index";
 import DiffViewer from "../../common/DiffViewer";
 import { COUNTRY_CODES, DEFAULT_COUNTRY_CODE } from "../../../constants/countries";
+import { useAuth } from "../../../hooks/useAuth";
 
 import { Select } from "antd";
 import { AsyncSelect } from "../../../components/common/AsyncSelect";
@@ -63,6 +65,7 @@ const TripModal = ({
   const { createCompany } = useCompanies();
   const { createDriver } = useDrivers();
   const { createVehicle } = useVehicles();
+  const { user } = useAuth();
   const [isNewDriver, setIsNewDriver] = useState(false);
   const [selectedDriverObj, setSelectedDriverObj] = useState<DriverType | Pick<DriverType, "_id" | "full_name" | "phone_number"> | null>(null);
   const [extraCompanyOptions, setExtraCompanyOptions] = useState<{ label: string; value: string }[]>([]);
@@ -238,6 +241,14 @@ const TripModal = ({
         getOldValue: (r) => r.notes || "-",
         getNewValue: (f) => f.notes || "-",
       },
+      {
+        key: "deleted",
+        label: t("Common.STATUS"),
+        getOldValue: (r) =>
+          r.deleted ? t("Common.PASSIVE") : t("Common.ACTIVE"),
+        getNewValue: (f) =>
+          f.deleted ? t("Common.PASSIVE") : t("Common.ACTIVE"),
+      },
     ]);
   }, [selectedRecord, currentValues, companies, drivers, vehicles, t]);
 
@@ -292,6 +303,9 @@ const TripModal = ({
             selectedRecord.is_in_temporary_parking_lot,
           is_in_parking_lot: selectedRecord.is_in_parking_lot,
           is_trip_canceled: selectedRecord.is_trip_canceled,
+          seal_number: selectedRecord.seal_number,
+          status: selectedRecord.status,
+          deleted: selectedRecord.deleted,
           notes: selectedRecord.notes,
         });
       } else {
@@ -605,25 +619,56 @@ const TripModal = ({
               <DatePicker style={{ width: '100%' }} showTime format="DD.MM.YYYY HH:mm" />
             </Form.Item>
 
-            {/* Hidden Fields */}
-            <Form.Item hidden name="departure_time">
-              <Input />
-            </Form.Item>
-            <Form.Item hidden name="unload_status">
-              <Input />
-            </Form.Item>
-            <Form.Item hidden name="is_trip_canceled" valuePropName="checked">
-              <Switch />
-            </Form.Item>
+            {selectedRecord ? (
+              <Form.Item label={t("Trips.DEPARTURE_TIME")} name="departure_time">
+                <DatePicker style={{ width: '100%' }} showTime format="DD.MM.YYYY HH:mm" />
+              </Form.Item>
+            ) : (
+              <Form.Item hidden name="departure_time">
+                <Input />
+              </Form.Item>
+            )}
+
+            {selectedRecord ? (
+              <Form.Item label={t("Trips.UNLOAD_STATUS")} name="unload_status">
+                <Select>
+                  <Select.Option value="WAITING">{t("Trips.STATUS_WAITING")}</Select.Option>
+                  <Select.Option value="UNLOADING">{t("Trips.STATUS_UNLOADING")}</Select.Option>
+                  <Select.Option value="UNLOADED">{t("Trips.STATUS_UNLOADED")}</Select.Option>
+                  <Select.Option value="COMPLETED">{t("Trips.STATUS_COMPLETED")}</Select.Option>
+                  <Select.Option value="CANCELED">{t("Trips.STATUS_CANCELED")}</Select.Option>
+                  <Select.Option value="UNKNOWN">{t("Trips.STATUS_UNKNOWN")}</Select.Option>
+                </Select>
+              </Form.Item>
+            ) : (
+              <Form.Item hidden name="unload_status">
+                <Input />
+              </Form.Item>
+            )}
+
+            {selectedRecord && (
+              <>
+                <Form.Item label={t("Trips.SEAL_NUMBER")} name="seal_number">
+                  <Input maxLength={50} />
+                </Form.Item>
+                <Form.Item label={t("Trips.VERIFICATION_STATUS")} name="status">
+                  <Select>
+                    <Select.Option value="PENDING">{t("Trips.VERIFY_PENDING")}</Select.Option>
+                    <Select.Option value="CONFIRMED">{t("Trips.VERIFY_CONFIRMED")}</Select.Option>
+                    <Select.Option value="CANCELED">{t("Trips.VERIFY_CANCELED")}</Select.Option>
+                  </Select>
+                </Form.Item>
+              </>
+            )}
 
             <Row gutter={16}>
               <Col span={12}>
-                <Form.Item label={t("Trips.GPS_TRACKING")} name="has_gps_tracking" valuePropName="checked" labelCol={{ span: 16 }} wrapperCol={{ span: 8 }}>
+                <Form.Item label={t("Trips.GPS_TRACKING")} name="has_gps_tracking" valuePropName="checked" labelCol={{ span: 14 }} wrapperCol={{ span: 10 }}>
                   <Switch />
                 </Form.Item>
               </Col>
               <Col span={12}>
-                <Form.Item label={t("Trips.TEMP_PARKING")} name="is_in_temporary_parking_lot" valuePropName="checked" labelCol={{ span: 16 }} wrapperCol={{ span: 8 }}>
+                <Form.Item label={t("Trips.TEMP_PARKING")} name="is_in_temporary_parking_lot" valuePropName="checked" labelCol={{ span: 14 }} wrapperCol={{ span: 10 }}>
                   <Switch />
                 </Form.Item>
               </Col>
@@ -631,10 +676,28 @@ const TripModal = ({
 
             <Row gutter={16}>
               <Col span={12}>
-                <Form.Item label={t("Trips.IN_PARKING_LOT")} name="is_in_parking_lot" valuePropName="checked" labelCol={{ span: 16 }} wrapperCol={{ span: 8 }}>
+                {selectedRecord ? (
+                  <Form.Item label={t("Trips.TRIP_CANCELED")} name="is_trip_canceled" valuePropName="checked" labelCol={{ span: 14 }} wrapperCol={{ span: 10 }}>
+                    <Switch />
+                  </Form.Item>
+                ) : (
+                  <Form.Item hidden name="is_trip_canceled" valuePropName="checked">
+                    <Switch />
+                  </Form.Item>
+                )}
+              </Col>
+              <Col span={12}>
+                <Form.Item label={t("Trips.IN_PARKING_LOT")} name="is_in_parking_lot" valuePropName="checked" labelCol={{ span: 14 }} wrapperCol={{ span: 10 }}>
                   <Switch />
                 </Form.Item>
               </Col>
+              {selectedRecord && user?.role === USER_ROLES.ADMIN && (
+                <Col span={12}>
+                  <Form.Item label={t("Common.STATUS")} name="deleted" valuePropName="checked" labelCol={{ span: 14 }} wrapperCol={{ span: 10 }}>
+                  <Switch checkedChildren={t("Common.PASSIVE")} unCheckedChildren={t("Common.ACTIVE")} />
+                </Form.Item>
+              </Col>
+              )}
             </Row>
 
             {currentValues?.is_in_parking_lot && (

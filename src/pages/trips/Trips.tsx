@@ -67,7 +67,7 @@ function Trips() {
         exportTripsToExcel(res.items);
       }}
       onFormSubmit={async (values, selectedRecord) => {
-        const payload = {
+        const payload: Record<string, any> = {
           driver: values.driver,
           company: values.company,
           vehicle: values.vehicle,
@@ -84,6 +84,9 @@ function Trips() {
           notes: values.notes,
         };
         if (selectedRecord) {
+          payload.seal_number = values.seal_number;
+          payload.status = values.status;
+          payload.deleted = values.deleted;
           await updateTrip({ id: selectedRecord._id, ...payload });
         } else {
           await createTrip(payload);
