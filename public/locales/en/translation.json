@@ -333,6 +333,9 @@
     "FAQ": "Frequently Asked Questions"
   },
   "FAQ": {
+    "CATEGORY_GENERAL": "General",
+    "CATEGORY_TRIPS": "Trips",
+    "CATEGORY_FIELD": "Field Operations",
     "Q1": "What is AYS?",
     "A1": "AYS (Vehicle Management System) is a platform developed to manage vehicle trips, company and driver information, field operations, and unloading processes.",
     "Q2": "How to create a trip?",
@@ -348,7 +351,10 @@
     "Q7": "How does GPS tracking work?",
     "A7": "GPS devices installed in vehicles allow real-time location tracking. Vehicles with GPS tracking are marked with an ATS (Vehicle Tracking System) tag in trip details.",
     "Q8": "How are parking areas managed?",
-    "A8": "Vehicles can be in temporary parking or main parking area. Parking duration is calculated automatically and waiting vehicles are listed on the Field Operations screen."
+    "A8": "Vehicles can be in temporary parking or main parking area. Parking duration is calculated automatically and waiting vehicles are listed on the Field Operations screen.",
+    "SUPPORT_TITLE": "Still need help?",
+    "SUPPORT_DESC": "Contact our support team, we're here to help.",
+    "SUPPORT_BUTTON": "Create Support Ticket"
   },
   "Excel": {
     "fileNames": {

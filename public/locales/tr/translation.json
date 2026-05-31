@@ -333,6 +333,9 @@
     "FAQ": "Sıkça Sorulan Sorular"
   },
   "FAQ": {
+    "CATEGORY_GENERAL": "Genel",
+    "CATEGORY_TRIPS": "Seferler",
+    "CATEGORY_FIELD": "Saha Operasyon",
     "Q1": "AYS nedir?",
     "A1": "AYS (Araç Yönetim Sistemi), araç seferlerini, firma ve sürücü bilgilerini, saha operasyonlarını ve boşaltma süreçlerini yönetmek için geliştirilmiş bir platformdur.",
     "Q2": "Sefer nasıl oluşturulur?",
@@ -348,7 +351,10 @@
     "Q7": "GPS takibi nasıl çalışır?",
     "A7": "Araçlara monte edilen GPS cihazları sayesinde araçların anlık konumları takip edilebilir. Sefer detaylarında ATS (Araç Takip Sistemi) etiketi ile GPS takibi olan araçlar işaretlenir.",
     "Q8": "Park alanları nasıl yönetilir?",
-    "A8": "Araçlar geçici park (KK) veya ana park alanında olabilir. Park süresi otomatik hesaplanır ve bekleyen araçlar Saha Operasyon ekranında listelenir."
+    "A8": "Araçlar geçici park (KK) veya ana park alanında olabilir. Park süresi otomatik hesaplanır ve bekleyen araçlar Saha Operasyon ekranında listelenir.",
+    "SUPPORT_TITLE": "Çözüm bulamadınız mı?",
+    "SUPPORT_DESC": "Destek ekibimize ulaşın, size yardımcı olalım.",
+    "SUPPORT_BUTTON": "Destek Talebi Oluştur"
   },
   "Excel": {
     "fileNames": {
