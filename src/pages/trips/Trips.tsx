@@ -84,7 +84,7 @@ function Trips() {
           notes: values.notes,
         };
         if (selectedRecord) {
-          payload.seal_number = values.seal_number;
+          payload.seal_number = values.seal_number?.trim();
           payload.status = values.status;
           payload.deleted = values.deleted;
           await updateTrip({ id: selectedRecord._id, ...payload });
