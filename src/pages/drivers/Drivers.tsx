@@ -10,7 +10,7 @@ import type { TFunction } from "i18next";
 const getDriverTableSettingsOptions = (t: TFunction) => [
   { key: "full_name", title: t("Drivers.FULL_NAME") },
   { key: "phone_number", title: t("Drivers.PHONE_NUMBER") },
-  { key: "tc_number", title: t("Drivers.TC_NUMBER") },
+
   { key: "createdAt", title: t("Table.CREATED_AT") },
   { key: "deleted", title: t("Table.STATUS") },
   { key: "action", title: t("Table.ACTIONS") },

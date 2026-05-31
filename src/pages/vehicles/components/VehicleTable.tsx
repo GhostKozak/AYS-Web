@@ -145,6 +145,7 @@ export default function VehicleTable({
         title: t("Vehicles.LICENSE_PLATE"),
         dataIndex: "licence_plate",
         key: "licence_plate",
+        align: "center",
         render: formatLicencePlate,
         ...getCustomFilterProps("licence_plate", t("Vehicles.LICENSE_PLATE"), {}, tableExtraProps?.setSearch),
       },
@@ -152,6 +153,7 @@ export default function VehicleTable({
         title: t("Vehicles.VEHICLE_TYPE"),
         dataIndex: "vehicle_type",
         key: "vehicle_type",
+        align: "center",
         render: (val) => (val ? t(`Vehicles.TYPE_${val}`) : "-"),
         filters: filters.type,
         onFilter: (value, record) => record.vehicle_type === value,
@@ -162,6 +164,7 @@ export default function VehicleTable({
         title: t("Table.CREATED_AT"),
         dataIndex: "createdAt",
         key: "createdAt",
+        align: "center",
         visible: canEdit,
         render: (date: string) => formatDateTime(date),
         sorter: (a, b) =>
@@ -172,6 +175,7 @@ export default function VehicleTable({
         title: t("Table.UPDATED_AT"),
         dataIndex: "updatedAt",
         key: "updatedAt",
+        align: "center",
         render: (date: string) => formatDateTime(date),
         sorter: (a, b) =>
           new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime(),
@@ -181,6 +185,7 @@ export default function VehicleTable({
         title: t("Table.STATUS"),
         key: "deleted",
         dataIndex: "deleted",
+        align: "center",
         visible: canEdit,
         render: (deleted: boolean) => (
           <Tag color={deleted ? "red" : "green"}>
@@ -196,6 +201,7 @@ export default function VehicleTable({
       {
         title: t("Table.ACTIONS"),
         key: "action",
+        align: "center",
         visible: canEdit,
         render: (_: any, record: VehicleType) => (
           <Space>

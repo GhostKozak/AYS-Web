@@ -170,9 +170,10 @@ export default function TripTable({
       {
         title: t("Trips.ARRIVAL_TIME"),
         key: "time_range",
+        align: "center",
         render: (_: unknown, record) => (
-          <div>
-            <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+          <div style={{ textAlign: "center" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 4 }}>
               <span style={{ fontSize: "0.75em", color: "#52c41a" }}>▼</span>
               <span>
                 {record.arrival_time
@@ -186,7 +187,7 @@ export default function TripTable({
                   : "-"}
               </span>
             </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 2 }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 4, marginTop: 2 }}>
               <span style={{ fontSize: "0.75em", color: "#ff4d4f" }}>▲</span>
               <span style={{ color: record.departure_time ? "inherit" : "#888" }}>
                 {record.departure_time
@@ -233,6 +234,7 @@ export default function TripTable({
         title: t("Trips.LICENSE_PLATE"),
         dataIndex: ["vehicle", "licence_plate"],
         key: "vehicle",
+        align: "center",
         render: (plate: string) => (plate ? formatLicencePlate(plate) : "-"),
         ...getCustomFilterProps(t("Trips.SEARCH_VEHICLE", { defaultValue: "Araç Ara" })),
       },
@@ -240,6 +242,7 @@ export default function TripTable({
         title: t("Trips.UNLOAD_STATUS"),
         dataIndex: "unload_status",
         key: "unload_status",
+        align: "center",
         render: (val: string) => {
           if (!val) return "-";
 
@@ -272,6 +275,7 @@ export default function TripTable({
         title: t("Trips.GPS_TRACKING"),
         dataIndex: "has_gps_tracking",
         key: "has_gps_tracking",
+        align: "center",
         render: (val: boolean) => (
           <Tag color={val ? "green" : "red"}>
             {val ? t("Common.YES") : t("Common.NO")}
@@ -287,6 +291,7 @@ export default function TripTable({
       {
         title: t("Trips.IN_PARKING_LOT"),
         key: "location",
+        align: "center",
         render: (_: unknown, record) => {
           if (record.is_trip_canceled) {
             return <Tag color="red">{t("Common.CANCEL")}</Tag>;
@@ -344,6 +349,7 @@ export default function TripTable({
         title: t("Trips.SEAL_NUMBER"),
         dataIndex: "seal_number",
         key: "seal_number",
+        align: "center",
         render: (val: string) => val || "-",
         minWidth: 90,
         maxWidth: 150,
@@ -353,6 +359,7 @@ export default function TripTable({
         title: t("Trips.STATUS"),
         dataIndex: "deleted",
         key: "deleted",
+        align: "center",
         render: (deleted: boolean) => (
           <Tag color={deleted ? "red" : "green"}>
             {deleted ? t("Common.PASSIVE") : t("Common.ACTIVE")}
@@ -371,6 +378,7 @@ export default function TripTable({
         title: t("Trips.VERIFICATION_STATUS"),
         dataIndex: "status",
         key: "status",
+        align: "center",
         render: (val: string) => {
           if (!val) return "-";
           const colorMap: Record<string, string> = {
@@ -398,6 +406,7 @@ export default function TripTable({
         title: t("Trips.FIELD_PHOTO"),
         dataIndex: "field_photo_path",
         key: "field_photo_path",
+        align: "center",
         render: (val: string) =>
           val ? (
             <Tooltip title={t("Trips.VIEW_PHOTO")}>
@@ -423,6 +432,7 @@ export default function TripTable({
         title: t("Trips.FIELD_VERIFIED_AT"),
         dataIndex: "field_verified_at",
         key: "field_verified_at",
+        align: "center",
         render: (date: string) =>
           date
             ? formatDateTime(date, {
@@ -447,6 +457,7 @@ export default function TripTable({
         title: t("Table.CREATED_AT"),
         dataIndex: "createdAt",
         key: "createdAt",
+        align: "center",
         render: (date: string) =>
           date
             ? formatDateTime(date, {
@@ -466,6 +477,7 @@ export default function TripTable({
         title: t("Table.UPDATED_AT"),
         dataIndex: "updatedAt",
         key: "updatedAt",
+        align: "center",
         render: (date: string) =>
           date
             ? formatDateTime(date, {
@@ -484,6 +496,7 @@ export default function TripTable({
       {
         title: t("Table.ACTIONS"),
         key: "action",
+        align: "center",
         fixed: "right",
         minWidth: 140,
         maxWidth: 240,

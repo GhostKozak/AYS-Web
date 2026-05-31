@@ -167,6 +167,7 @@ export default function DriverTable({
         title: t("Table.CREATED_AT"),
         dataIndex: "createdAt",
         key: "createdAt",
+        align: "center",
         visible: canEdit,
         render: (date: string) => formatDateTime(date),
         sorter: (a, b) =>
@@ -177,6 +178,7 @@ export default function DriverTable({
         title: t("Table.UPDATED_AT"),
         dataIndex: "updatedAt",
         key: "updatedAt",
+        align: "center",
         render: (date: string) => formatDateTime(date),
         sorter: (a, b) =>
           new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime(),
@@ -186,6 +188,7 @@ export default function DriverTable({
         title: t("Table.STATUS"),
         dataIndex: "deleted",
         key: "deleted",
+        align: "center",
         visible: canEdit,
         render: (deleted: boolean) => (
           <Tag color={deleted ? "red" : "green"}>
@@ -201,6 +204,7 @@ export default function DriverTable({
       {
         title: t("Table.ACTIONS"),
         key: "action",
+        align: "center",
         visible: canEdit,
         render: (_: any, record: DriverType) => (
           <Space>

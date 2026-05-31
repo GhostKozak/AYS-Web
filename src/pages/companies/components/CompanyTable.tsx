@@ -145,6 +145,7 @@ export default function CompaniesTable({
         title: t("Table.CREATED_AT"),
         dataIndex: "createdAt",
         key: "createdAt",
+        align: "center",
         visible: canEdit,
         render: (d: string) => formatDateTime(d),
         sorter: (a, b) =>
@@ -155,6 +156,7 @@ export default function CompaniesTable({
         title: t("Table.UPDATED_AT"),
         dataIndex: "updatedAt",
         key: "updatedAt",
+        align: "center",
         render: (d: string) => formatDateTime(d),
         sorter: (a, b) =>
           new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime(),
@@ -164,6 +166,7 @@ export default function CompaniesTable({
         title: t("Table.STATUS"),
         dataIndex: "deleted",
         key: "deleted",
+        align: "center",
         visible: canEdit,
         render: (deleted: boolean) => (
           <Tag color={deleted ? "red" : "green"}>
@@ -179,6 +182,7 @@ export default function CompaniesTable({
       {
         title: t("Table.ACTIONS"),
         key: "action",
+        align: "center",
         visible: canEdit,
         render: (_: any, record: CompanyType) => (
           <Space size="middle">
