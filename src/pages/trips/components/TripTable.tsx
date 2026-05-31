@@ -350,9 +350,20 @@ export default function TripTable({
         dataIndex: "seal_number",
         key: "seal_number",
         align: "center",
-        render: (val: string) => val || "-",
-        minWidth: 90,
-        maxWidth: 150,
+        render: (val: string) => {
+          if (!val) return "-";
+          const seals = val.split(",").map((s) => s.trim()).filter(Boolean);
+          if (seals.length === 1) return <Tag style={{ margin: 0 }}>{seals[0]}</Tag>;
+          return (
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 4, justifyContent: "center", maxWidth: 180 }}>
+              {seals.map((s, i) => (
+                <Tag key={i} style={{ margin: 0 }}>{s}</Tag>
+              ))}
+            </div>
+          );
+        },
+        minWidth: 100,
+        maxWidth: 200,
         ...getCustomFilterProps(t("Trips.SEARCH_SEAL", { defaultValue: "Mühür Ara" })),
       },
       {
