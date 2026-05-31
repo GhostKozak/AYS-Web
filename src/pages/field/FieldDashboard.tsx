@@ -7,7 +7,7 @@ import { Badge, Button, Card, Col, Row, Tag, App, Modal, Input, Segmented, Image
 import type { InputRef } from "antd";
 import {
   CarOutlined, ReloadOutlined, CheckCircleOutlined, CloseCircleOutlined,
-  CameraOutlined, DeleteOutlined, UserOutlined,
+  CameraOutlined, CloseOutlined, DeleteOutlined, UserOutlined,
   MoonOutlined, SunOutlined, SearchOutlined, ClockCircleOutlined,
   ExclamationCircleFilled,
 } from "@ant-design/icons";
@@ -65,8 +65,8 @@ function FieldDashboard() {
 
   const [verificationModalOpen, setVerificationModalOpen] = useState(false);
   const [selectedTrip, setSelectedTrip] = useState<TripType | null>(null);
-  const [photoFile, setPhotoFile] = useState<File | null>(null);
-  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [photoFiles, setPhotoFiles] = useState<File[]>([]);
+  const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
   const [sealNumber, setSealNumber] = useState("");
   const [verifying, setVerifying] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -74,12 +74,12 @@ function FieldDashboard() {
   const [lastSyncAt, setLastSyncAt] = useState(Date.now());
 
   const [previewVisible, setPreviewVisible] = useState(false);
-  const [currentPreview, setCurrentPreview] = useState(0);
+  const [previewCurrent, setPreviewCurrent] = useState(0);
   const [previewImages, setPreviewImages] = useState<string[]>([]);
 
-  const openPhotoPreview = useCallback((photoUrl: string) => {
-    setPreviewImages([photoUrl]);
-    setCurrentPreview(0);
+  const openPhotoPreview = useCallback((photoUrls: string[], startIndex = 0) => {
+    setPreviewImages(photoUrls);
+    setPreviewCurrent(startIndex);
     setPreviewVisible(true);
   }, []);
 
@@ -117,30 +117,47 @@ function FieldDashboard() {
 
   const openVerificationModal = (trip: TripType) => {
     setSelectedTrip(trip);
-    setPhotoFile(null);
-    setPhotoPreview(null);
+    setPhotoFiles([]);
+    setPhotoPreviews([]);
     setSealNumber("");
     setVerificationModalOpen(true);
   };
 
   const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (file.size > MAX_FILE_SIZE) {
-      message.error(t("FieldOps.FILE_SIZE_ERROR"));
-      e.target.value = "";
-      return;
+    const files = e.target.files;
+    if (!files?.length) return;
+    const valid: File[] = [];
+    const readers: Promise<string>[] = [];
+    for (const file of Array.from(files)) {
+      if (file.size > MAX_FILE_SIZE) {
+        message.error(`${file.name}: ${t("FieldOps.FILE_SIZE_ERROR")}`);
+        continue;
+      }
+      valid.push(file);
+      readers.push(new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.readAsDataURL(file);
+      }));
     }
-    setPhotoFile(file);
-    setPhotoPreview(URL.createObjectURL(file));
+    if (!valid.length) return;
+    Promise.all(readers).then((previews) => {
+      setPhotoFiles((prev) => [...prev, ...valid]);
+      setPhotoPreviews((prev) => [...prev, ...previews]);
+    });
+    e.target.value = "";
   }, [message, t]);
 
   const clearPhoto = useCallback(() => {
-    setPhotoFile(null);
-    if (photoPreview) URL.revokeObjectURL(photoPreview);
-    setPhotoPreview(null);
+    setPhotoFiles([]);
+    setPhotoPreviews([]);
     if (fileInputRef.current) fileInputRef.current.value = "";
-  }, [photoPreview]);
+  }, []);
+
+  const removePhoto = useCallback((index: number) => {
+    setPhotoFiles((prev) => prev.filter((_, i) => i !== index));
+    setPhotoPreviews((prev) => prev.filter((_, i) => i !== index));
+  }, []);
 
   const handleVerifySubmit = async () => {
     if (!selectedTrip) return;
@@ -148,13 +165,13 @@ function FieldDashboard() {
       message.error(t("FieldOps.SEAL_REQUIRED"));
       return;
     }
-    if (!photoFile) {
+    if (!photoFiles.length) {
       message.error(t("FieldOps.PHOTO_REQUIRED"));
       return;
     }
     setVerifying(true);
     try {
-      await tripApi.fieldVerify(selectedTrip._id, photoFile, sealNumber || undefined);
+      await tripApi.fieldVerify(selectedTrip._id, photoFiles, sealNumber || undefined);
       message.success(t("FieldOps.VERIFY_SUCCESS"));
       setVerificationModalOpen(false);
       clearPhoto();
@@ -273,13 +290,18 @@ function FieldDashboard() {
               )}
             </div>
             <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
-              {trip.field_photo_path && (
-                <img
-                  src={trip.field_photo_path}
-                  alt=""
-                  className="op-thumb"
-                  onClick={() => openPhotoPreview(trip.field_photo_path!)}
-                />
+              {(trip.field_photo_paths?.length ? trip.field_photo_paths : trip.field_photo_path ? [trip.field_photo_path] : []).length > 0 && (
+                <div style={{ position: "relative", display: "inline-block" }}>
+                  <img
+                    src={(trip.field_photo_paths?.length ? trip.field_photo_paths : trip.field_photo_path ? [trip.field_photo_path] : [])[0]}
+                    alt=""
+                    className="op-thumb"
+                    onClick={() => openPhotoPreview(trip.field_photo_paths?.length ? trip.field_photo_paths : [trip.field_photo_path!])}
+                  />
+                  {(trip.field_photo_paths?.length ?? 1) > 1 && (
+                    <span className="op-thumb-count">+{((trip.field_photo_paths?.length ?? 1) - 1)}</span>
+                  )}
+                </div>
               )}
             </div>
           </div>
@@ -334,21 +356,21 @@ function FieldDashboard() {
               )}
             </div>
             <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
-              {trip.field_photo_path && (
-                <img
-                  src={trip.field_photo_path}
-                  alt=""
-                  className="op-thumb"
-                  onClick={() => openPhotoPreview(trip.field_photo_path!)}
-                />
+              {(trip.field_photo_paths?.length ? trip.field_photo_paths : trip.field_photo_path ? [trip.field_photo_path] : []).length > 0 && (
+                <div style={{ position: "relative", display: "inline-block" }}>
+                  <img
+                    src={(trip.field_photo_paths?.length ? trip.field_photo_paths : trip.field_photo_path ? [trip.field_photo_path] : [])[0]}
+                    alt=""
+                    className="op-thumb"
+                    onClick={() => openPhotoPreview(trip.field_photo_paths?.length ? trip.field_photo_paths : [trip.field_photo_path!])}
+                  />
+                  {(trip.field_photo_paths?.length ?? 1) > 1 && (
+                    <span className="op-thumb-count">+{((trip.field_photo_paths?.length ?? 1) - 1)}</span>
+                  )}
+                </div>
               )}
             </div>
           </div>
-        </div>
-        <div className="op-card-actions">
-          <button className="op-btn op-btn-primary" onClick={() => openVerificationModal(trip)}>
-            {t("FieldOps.UPDATE_SEAL_PHOTO")}
-          </button>
         </div>
       </div>
     );
@@ -463,7 +485,7 @@ function FieldDashboard() {
               <Button block onClick={() => { setVerificationModalOpen(false); clearPhoto(); setSelectedTrip(null); }}>
                 {t("Common.CANCEL")}
               </Button>
-              <Button block type="primary" icon={<CameraOutlined />} loading={verifying} disabled={!photoFile || !sealNumber.trim()} onClick={handleVerifySubmit} size="large">
+              <Button block type="primary" icon={<CameraOutlined />} loading={verifying} disabled={!photoFiles.length || !sealNumber.trim()} onClick={handleVerifySubmit} size="large">
                 {verifying ? t("FieldOps.VERIFYING") : t("FieldOps.SAVE_SEAL_PHOTO")}
               </Button>
             </div>
@@ -508,15 +530,38 @@ function FieldDashboard() {
                   {t("FieldOps.PHOTO_UPLOAD")} <span style={{ color: "var(--red)" }}>*</span>
                 </div>
                 <div style={{ fontSize: 12, color: "var(--text-secondary)", marginBottom: 12 }}>{t("FieldOps.TAKE_PHOTO_SUB")}</div>
-                <input ref={fileInputRef} type="file" accept="image/jpeg, image/png" capture="environment" onChange={handleFileSelect} style={{ display: "none" }} />
-                {!photoPreview ? (
+                <input ref={fileInputRef} type="file" accept="image/jpeg, image/png" capture="environment" multiple onChange={handleFileSelect} style={{ display: "none" }} />
+                {photoPreviews.length === 0 ? (
                   <Button icon={<CameraOutlined />} size="large" block onClick={() => fileInputRef.current?.click()} style={{ height: 52, borderRadius: 12 }}>
                     {t("FieldOps.TAKE_PHOTO")}
                   </Button>
                 ) : (
-                  <div style={{ textAlign: "center" }}>
-                    <img src={photoPreview} alt="" style={{ maxWidth: "100%", maxHeight: 200, borderRadius: 12, marginBottom: 12, border: "2px solid var(--border)" }} />
-                    <Button danger icon={<DeleteOutlined />} onClick={clearPhoto}>{t("Common.DELETE")}</Button>
+                  <div>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 12 }}>
+                      {photoPreviews.map((preview, idx) => (
+                        <div key={idx} style={{ position: "relative", width: 80, height: 80 }}>
+                          <button
+                            onClick={() => removePhoto(idx)}
+                            style={{ position: "absolute", top: -6, left: -6, width: 20, height: 20, borderRadius: "50%", border: "none", background: "var(--red)", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1, padding: 0, lineHeight: 1 }}
+                          >
+                            <CloseOutlined style={{ fontSize: 10 }} />
+                          </button>
+                          <img
+                            src={preview}
+                            alt=""
+                            className="op-thumb"
+                            style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: 8, border: "2px solid var(--border)", cursor: "pointer" }}
+                            onClick={() => openPhotoPreview(photoPreviews, idx)}
+                          />
+                        </div>
+                      ))}
+                      <Button
+                        icon={<CameraOutlined />}
+                        onClick={() => fileInputRef.current?.click()}
+                        style={{ width: 80, height: 80, borderRadius: 8, border: "2px dashed var(--border)", display: "flex", alignItems: "center", justifyContent: "center" }}
+                      />
+                    </div>
+                    <Button danger icon={<DeleteOutlined />} onClick={() => Modal.confirm({ title: t("Common.ARE_YOU_SURE"), content: t("FieldOps.DELETE_ALL_PHOTOS_CONFIRM"), okText: t("Common.DELETE"), okType: "danger", cancelText: t("Common.CANCEL"), onOk: clearPhoto })}>{t("Common.DELETE_ALL")}</Button>
                   </div>
                 )}
               </div>
@@ -526,8 +571,9 @@ function FieldDashboard() {
 
         <Image.PreviewGroup
           preview={{
-            current: currentPreview,
+            current: previewCurrent,
             open: previewVisible,
+            onChange: (index) => setPreviewCurrent(index),
             onOpenChange: (vis) => setPreviewVisible(vis),
           }}
         >

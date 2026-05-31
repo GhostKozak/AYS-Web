@@ -159,9 +159,9 @@ export default function TripTable({
     return classes.join(" ");
   }, [glowingRowIds]);
 
-  const openPhotoPreview = useCallback((photoUrl: string) => {
-    setPreviewImages([photoUrl]);
-    setCurrentPreview(0);
+  const openPhotoPreview = useCallback((photoUrls: string[], startIndex = 0) => {
+    setPreviewImages(photoUrls);
+    setCurrentPreview(startIndex);
     setPreviewVisible(true);
   }, []);
 
@@ -404,29 +404,37 @@ export default function TripTable({
       },
       {
         title: t("Trips.FIELD_PHOTO"),
-        dataIndex: "field_photo_path",
         key: "field_photo_path",
         align: "center",
-        render: (val: string) =>
-          val ? (
+        render: (_: unknown, record) => {
+          const photos = record.field_photo_paths?.length
+            ? record.field_photo_paths
+            : record.field_photo_path
+              ? [record.field_photo_path]
+              : [];
+          if (!photos.length) return "-";
+          return (
             <Tooltip title={t("Trips.VIEW_PHOTO")}>
               <Button
                 type="text"
                 icon={<CameraOutlined style={{ color: "#1890ff" }} />}
-                onClick={(e) => { e.stopPropagation(); openPhotoPreview(val); }}
-              />
+                onClick={(e) => { e.stopPropagation(); openPhotoPreview(photos); }}
+              >
+                {photos.length > 1 && <span style={{ fontSize: 11, marginLeft: 2 }}>({photos.length})</span>}
+              </Button>
             </Tooltip>
-          ) : (
-            "-"
-          ),
+          );
+        },
         minWidth: 60,
-        maxWidth: 120,
+        maxWidth: 130,
         filters: [
           { text: t("Common.YES"), value: true },
           { text: t("Common.NO"), value: false },
         ],
-        onFilter: (value, record) =>
-          value ? !!record.field_photo_path : !record.field_photo_path,
+        onFilter: (value, record) => {
+          const has = !!(record.field_photo_paths?.length || record.field_photo_path);
+          return value ? has : !has;
+        },
       },
       {
         title: t("Trips.FIELD_VERIFIED_AT"),
@@ -600,6 +608,7 @@ export default function TripTable({
         preview={{
           current: currentPreview,
           open: previewVisible,
+          onChange: (index) => setCurrentPreview(index),
           onOpenChange: (vis) => setPreviewVisible(vis),
         }}
       >

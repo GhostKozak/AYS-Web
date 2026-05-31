@@ -60,6 +60,7 @@ export interface TripType {
   __v: number;
   seal_number?: string;
   field_photo_path?: string;
+  field_photo_paths?: string[];
   status?: 'PENDING' | 'CONFIRMED' | 'CANCELED';
   field_verified_at?: string;
   driver_full_name?: string;
