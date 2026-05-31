@@ -297,14 +297,23 @@ export default function TripTable({
                 <Tag color="green">{t("Trips.TEMP_PARKING_SHORT", { defaultValue: "Interrupted" })}</Tag>
                 {record.parked_at && (
                   <div style={{ fontSize: "0.8em", color: "#888" }}>
-                    {formatTime(record.parked_at, { hour: "2-digit", minute: "2-digit" })}
+                    {formatDateTime(record.parked_at, { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}
                   </div>
                 )}
               </div>
             );
           }
           if (record.is_in_parking_lot) {
-            return <Tag color="blue">{t("FieldOps.TAG_PARK")}</Tag>;
+            return (
+              <div>
+                <Tag color="blue">{t("FieldOps.TAG_PARK")}</Tag>
+                {record.parked_at && (
+                  <div style={{ fontSize: "0.8em", color: "#888" }}>
+                    {formatDateTime(record.parked_at, { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                  </div>
+                )}
+              </div>
+            );
           }
           return "-";
         },
