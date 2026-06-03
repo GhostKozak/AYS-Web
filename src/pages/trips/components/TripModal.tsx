@@ -1,4 +1,4 @@
-import { Modal, Form, Input, Button, Switch, Row, Col, DatePicker, Select, App, Flex, Space } from "antd";
+import { Modal, Form, Input, Button, Switch, Row, Col, DatePicker, Select, App, Flex, Space, Divider, Typography } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import dayjs from "dayjs";
 import { useCompanies } from "../../../hooks/useCompanies";
@@ -441,17 +441,17 @@ const TripModal = ({
       onCancel={onClose}
       footer={null}
       destroyOnHidden
-      width={hasChanges ? 950 : 750}
+      width={hasChanges ? 1200 : 920}
       styles={{ body: { transition: "all 0.3s ease" } }}
     >
       <Row gutter={24}>
-        <Col span={hasChanges ? 12 : 24}>
+        <Col span={hasChanges ? 14 : 24}>
           <Form
             name="tripForm"
             form={form}
             layout="horizontal"
-            labelCol={{ span: 10 }}
-            wrapperCol={{ span: 14 }}
+            labelCol={{ span: 8 }}
+            wrapperCol={{ span: 16 }}
             onFinish={handleFinish}
             autoComplete="off"
             initialValues={{
@@ -488,80 +488,115 @@ const TripModal = ({
               }
             }}
           >
-            <Form.Item label={t("Trips.NEW_DRIVER", { defaultValue: "Add New Driver" })} labelCol={{ span: 10 }} wrapperCol={{ span: 14 }}>
+            <Divider orientation="left" orientationMargin={0} style={{ marginTop: 8, marginBottom: 16 }}>
+              <Flex align="center" gap={6}>
+                <span style={{ fontSize: 13 }}>👤</span>
+                <Typography.Text strong style={{ fontSize: 13 }}>
+                  {t("Trips.SECTION_DRIVER", { defaultValue: "Sürücü Bilgileri" })}
+                </Typography.Text>
+              </Flex>
+            </Divider>
+
+            <Form.Item
+              label={t("Trips.NEW_DRIVER", { defaultValue: "Add New Driver" })}
+              labelCol={{ span: 4 }}
+              wrapperCol={{ span: 20 }}
+            >
               <Switch checked={isNewDriver} onChange={(checked) => setIsNewDriver(checked)} />
             </Form.Item>
 
             {!isNewDriver ? (
-              <>
-              <Form.Item
-                label={t("Trips.FULL_NAME")}
-                name="driver"
-                rules={[{ required: true, message: t("Trips.DRIVER_REQUIRED") }]}
-              >
-                <AsyncSelect<DriverType>
-                  moduleName="drivers"
-                  labelKey={(d) => `${d.full_name} — ${formatPhoneNumber(d.phone_number)}`}
-                  valueKey="_id"
-                  placeholder={t("Trips.DRIVER_REQUIRED")}
-                  defaultOptions={driverOptions}
-                  onItemSelect={(driver) => {
-                    setSelectedDriverObj(driver);
-                    const driverCompany = driver.company;
-                    if (driverCompany) {
-                      const companyId = typeof driverCompany === "string" ? driverCompany : driverCompany._id;
-                      const companyName = typeof driverCompany === "string" ? undefined : driverCompany.name;
-                      if (companyName) {
-                        setExtraCompanyOptions(prev => {
-                          if (prev.some(x => x.value === companyId)) return prev;
-                          return [...prev, { label: companyName, value: companyId }];
-                        });
-                      }
-                      form.setFieldsValue({ company: companyId });
-                    }
-                  }}
-                />
-              </Form.Item>
-              <Form.Item label={t("Trips.COMPANY_NAME")} name="company">
-                <AsyncSelect<CompanyType>
-                  moduleName="companies"
-                  labelKey="name"
-                  valueKey="_id"
-                  placeholder={t("Trips.COMPANY_REQUIRED")}
-                  defaultOptions={companyOptions}
-                />
-              </Form.Item>
-              </>
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Form.Item
+                    label={t("Trips.FULL_NAME")}
+                    name="driver"
+                    labelCol={{ span: 8 }}
+                    wrapperCol={{ span: 16 }}
+                    rules={[{ required: true, message: t("Trips.DRIVER_REQUIRED") }]}
+                  >
+                    <AsyncSelect<DriverType>
+                      moduleName="drivers"
+                      labelKey={(d) => `${d.full_name} — ${formatPhoneNumber(d.phone_number)}`}
+                      valueKey="_id"
+                      placeholder={t("Trips.DRIVER_REQUIRED")}
+                      defaultOptions={driverOptions}
+                      onItemSelect={(driver) => {
+                        setSelectedDriverObj(driver);
+                        const driverCompany = driver.company;
+                        if (driverCompany) {
+                          const companyId = typeof driverCompany === "string" ? driverCompany : driverCompany._id;
+                          const companyName = typeof driverCompany === "string" ? undefined : driverCompany.name;
+                          if (companyName) {
+                            setExtraCompanyOptions(prev => {
+                              if (prev.some(x => x.value === companyId)) return prev;
+                              return [...prev, { label: companyName, value: companyId }];
+                            });
+                          }
+                          form.setFieldsValue({ company: companyId });
+                        }
+                      }}
+                    />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item
+                    label={t("Trips.COMPANY_NAME")}
+                    name="company"
+                    labelCol={{ span: 8 }}
+                    wrapperCol={{ span: 16 }}
+                  >
+                    <AsyncSelect<CompanyType>
+                      moduleName="companies"
+                      labelKey="name"
+                      valueKey="_id"
+                      placeholder={t("Trips.COMPANY_REQUIRED")}
+                      defaultOptions={companyOptions}
+                    />
+                  </Form.Item>
+                </Col>
+              </Row>
             ) : (
               <>
-                <Form.Item
-                  label={t("Trips.COMPANY_NAME")}
-                  name="company"
-                  rules={[{ required: true, message: t("Trips.COMPANY_REQUIRED") }]}
-                >
-                  <AsyncSelect<CompanyType>
-                    moduleName="companies"
-                    labelKey="name"
-                    valueKey="_id"
-                    placeholder={t("Trips.COMPANY_REQUIRED")}
-                    defaultOptions={companyOptions}
-                    creatable
-                    creatableLabel={(search) => t("Trips.CREATE_NEW_COMPANY", { name: search })}
-                  />
-                </Form.Item>
+                <Row gutter={16}>
+                  <Col span={12}>
+                    <Form.Item
+                      label={t("Trips.COMPANY_NAME")}
+                      name="company"
+                      labelCol={{ span: 8 }}
+                      wrapperCol={{ span: 16 }}
+                      rules={[{ required: true, message: t("Trips.COMPANY_REQUIRED") }]}
+                    >
+                      <AsyncSelect<CompanyType>
+                        moduleName="companies"
+                        labelKey="name"
+                        valueKey="_id"
+                        placeholder={t("Trips.COMPANY_REQUIRED")}
+                        defaultOptions={companyOptions}
+                        creatable
+                        creatableLabel={(search) => t("Trips.CREATE_NEW_COMPANY", { name: search })}
+                      />
+                    </Form.Item>
+                  </Col>
+                  <Col span={12}>
+                    <Form.Item
+                      label={t("Trips.FULL_NAME")}
+                      name="driver_full_name"
+                      labelCol={{ span: 8 }}
+                      wrapperCol={{ span: 16 }}
+                      rules={[{ required: true, message: t("Trips.DRIVER_REQUIRED") }]}
+                    >
+                      <Input placeholder={t("Trips.FULL_NAME")} autoComplete="new-password" />
+                    </Form.Item>
+                  </Col>
+                </Row>
 
                 <Form.Item
-                  label={t("Trips.FULL_NAME")}
-                  name="driver_full_name"
-                  rules={[
-                    { required: true, message: t("Trips.DRIVER_REQUIRED") },
-                  ]}
+                  label={t("Trips.PHONE_NUMBER")}
+                  labelCol={{ span: 4 }}
+                  wrapperCol={{ span: 20 }}
                 >
-                  <Input placeholder={t("Trips.FULL_NAME")} autoComplete="new-password" />
-                </Form.Item>
-
-                <Form.Item label={t("Trips.PHONE_NUMBER")}>
-                  <Space.Compact>
+                  <Space.Compact style={{ width: '100%' }}>
                     <Form.Item name="driver_country_code" noStyle>
                       <Select
                         style={{ width: 90 }}
@@ -615,6 +650,7 @@ const TripModal = ({
                         placeholder={t("Trips.PHONE_PLACEHOLDER")}
                         autoComplete="new-password"
                         maxLength={15}
+                        style={{ flex: 1 }}
                       />
                     </Form.Item>
                   </Space.Compact>
@@ -622,9 +658,20 @@ const TripModal = ({
               </>
             )}
 
+            <Divider orientation="left" orientationMargin={0} style={{ marginTop: 16, marginBottom: 16 }}>
+              <Flex align="center" gap={6}>
+                <span style={{ fontSize: 13 }}>🚛</span>
+                <Typography.Text strong style={{ fontSize: 13 }}>
+                  {t("Trips.SECTION_VEHICLE", { defaultValue: "Araç & Firma" })}
+                </Typography.Text>
+              </Flex>
+            </Divider>
+
             <Form.Item
               label={t("Trips.LICENSE_PLATE")}
               name="vehicle"
+              labelCol={{ span: 4 }}
+              wrapperCol={{ span: 20 }}
               rules={[{ required: true, message: t("Trips.VEHICLE_REQUIRED", { defaultValue: "Vehicle selection is required" }) }]}
             >
               <AsyncSelect<VehicleType>
@@ -638,31 +685,84 @@ const TripModal = ({
               />
             </Form.Item>
 
-            <Form.Item label={t("Trips.ARRIVAL_TIME")} name="arrival_time">
-              <DatePicker style={{ width: '100%' }} showTime format="DD.MM.YYYY HH:mm" />
-            </Form.Item>
+            <Divider orientation="left" orientationMargin={0} style={{ marginTop: 16, marginBottom: 16 }}>
+              <Flex align="center" gap={6}>
+                <span style={{ fontSize: 13 }}>🕐</span>
+                <Typography.Text strong style={{ fontSize: 13 }}>
+                  {t("Trips.SECTION_TIME", { defaultValue: "Zaman & Durum" })}
+                </Typography.Text>
+              </Flex>
+            </Divider>
 
             {selectedRecord ? (
-              <Form.Item label={t("Trips.DEPARTURE_TIME")} name="departure_time">
-                <DatePicker style={{ width: '100%' }} showTime format="DD.MM.YYYY HH:mm" />
-              </Form.Item>
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Form.Item
+                    label={t("Trips.ARRIVAL_TIME")}
+                    name="arrival_time"
+                    labelCol={{ span: 8 }}
+                    wrapperCol={{ span: 16 }}
+                  >
+                    <DatePicker style={{ width: '100%' }} showTime format="DD.MM.YYYY HH:mm" />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item
+                    label={t("Trips.DEPARTURE_TIME")}
+                    name="departure_time"
+                    labelCol={{ span: 8 }}
+                    wrapperCol={{ span: 16 }}
+                  >
+                    <DatePicker style={{ width: '100%' }} showTime format="DD.MM.YYYY HH:mm" />
+                  </Form.Item>
+                </Col>
+              </Row>
             ) : (
-              <Form.Item hidden name="departure_time">
-                <Input />
-              </Form.Item>
+              <>
+                <Form.Item
+                  label={t("Trips.ARRIVAL_TIME")}
+                  name="arrival_time"
+                  labelCol={{ span: 4 }}
+                  wrapperCol={{ span: 20 }}
+                >
+                  <DatePicker style={{ width: '100%' }} showTime format="DD.MM.YYYY HH:mm" />
+                </Form.Item>
+                <Form.Item hidden name="departure_time">
+                  <Input />
+                </Form.Item>
+              </>
             )}
 
             {selectedRecord ? (
-              <Form.Item label={t("Trips.UNLOAD_STATUS")} name="unload_status">
-                <Select>
-                  <Select.Option value="WAITING">{t("Trips.STATUS_WAITING")}</Select.Option>
-                  <Select.Option value="UNLOADING">{t("Trips.STATUS_UNLOADING")}</Select.Option>
-                  <Select.Option value="UNLOADED">{t("Trips.STATUS_UNLOADED")}</Select.Option>
-                  <Select.Option value="COMPLETED">{t("Trips.STATUS_COMPLETED")}</Select.Option>
-                  <Select.Option value="CANCELED">{t("Trips.STATUS_CANCELED")}</Select.Option>
-                  <Select.Option value="UNKNOWN">{t("Trips.STATUS_UNKNOWN")}</Select.Option>
-                </Select>
-              </Form.Item>
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Form.Item
+                    label={t("Trips.UNLOAD_STATUS")}
+                    name="unload_status"
+                    labelCol={{ span: 8 }}
+                    wrapperCol={{ span: 16 }}
+                  >
+                    <Select>
+                      <Select.Option value="WAITING">{t("Trips.STATUS_WAITING")}</Select.Option>
+                      <Select.Option value="UNLOADING">{t("Trips.STATUS_UNLOADING")}</Select.Option>
+                      <Select.Option value="UNLOADED">{t("Trips.STATUS_UNLOADED")}</Select.Option>
+                      <Select.Option value="COMPLETED">{t("Trips.STATUS_COMPLETED")}</Select.Option>
+                      <Select.Option value="CANCELED">{t("Trips.STATUS_CANCELED")}</Select.Option>
+                      <Select.Option value="UNKNOWN">{t("Trips.STATUS_UNKNOWN")}</Select.Option>
+                    </Select>
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item
+                    label={t("Trips.SEAL_NUMBER")}
+                    name="seal_number"
+                    labelCol={{ span: 8 }}
+                    wrapperCol={{ span: 16 }}
+                  >
+                    <Input maxLength={50} />
+                  </Form.Item>
+                </Col>
+              </Row>
             ) : (
               <Form.Item hidden name="unload_status">
                 <Input />
@@ -670,44 +770,72 @@ const TripModal = ({
             )}
 
             {selectedRecord && (
-              <>
-                <Form.Item label={t("Trips.SEAL_NUMBER")} name="seal_number">
-                  <Input maxLength={50} />
-                </Form.Item>
-                <Form.Item label={t("Trips.VERIFICATION_STATUS")} name="status">
-                  <Select>
-                    <Select.Option value="PENDING">{t("Trips.VERIFY_PENDING")}</Select.Option>
-                    <Select.Option value="CONFIRMED">{t("Trips.VERIFY_CONFIRMED")}</Select.Option>
-                    <Select.Option value="CANCELED">{t("Trips.VERIFY_CANCELED")}</Select.Option>
-                  </Select>
-                </Form.Item>
-              </>
+              <Form.Item
+                label={t("Trips.VERIFICATION_STATUS")}
+                name="status"
+                labelCol={{ span: 4 }}
+                wrapperCol={{ span: 20 }}
+              >
+                <Select>
+                  <Select.Option value="PENDING">{t("Trips.VERIFY_PENDING")}</Select.Option>
+                  <Select.Option value="CONFIRMED">{t("Trips.VERIFY_CONFIRMED")}</Select.Option>
+                  <Select.Option value="CANCELED">{t("Trips.VERIFY_CANCELED")}</Select.Option>
+                </Select>
+              </Form.Item>
             )}
+
+            <Divider orientation="left" orientationMargin={0} style={{ marginTop: 16, marginBottom: 16 }}>
+              <Flex align="center" gap={6}>
+                <span style={{ fontSize: 13 }}>⚙️</span>
+                <Typography.Text strong style={{ fontSize: 13 }}>
+                  {t("Trips.SECTION_EXTRA", { defaultValue: "Ek Bilgiler" })}
+                </Typography.Text>
+              </Flex>
+            </Divider>
 
             <Row gutter={16}>
               <Col span={12}>
-                <Form.Item label={t("Trips.GPS_TRACKING")} name="has_gps_tracking" valuePropName="checked" labelCol={{ span: 14 }} wrapperCol={{ span: 10 }}>
+                <Form.Item
+                  label={t("Trips.GPS_TRACKING")}
+                  name="has_gps_tracking"
+                  valuePropName="checked"
+                  labelCol={{ span: 14 }}
+                  wrapperCol={{ span: 10 }}
+                >
                   <Switch />
                 </Form.Item>
               </Col>
               <Col span={12}>
-                <Form.Item label={t("Trips.IN_PARKING_LOT")} name="is_in_parking_lot" valuePropName="checked" labelCol={{ span: 14 }} wrapperCol={{ span: 10 }}>
+                <Form.Item
+                  label={t("Trips.IN_PARKING_LOT")}
+                  name="is_in_parking_lot"
+                  valuePropName="checked"
+                  labelCol={{ span: 14 }}
+                  wrapperCol={{ span: 10 }}
+                >
                   <Switch />
                 </Form.Item>
               </Col>
             </Row>
 
             {(currentValues?.is_in_parking_lot || form.getFieldValue('is_in_parking_lot')) && (
-              <Form.Item label={t("Trips.PARKED_AT")} name="parked_at">
-                <DatePicker style={{ width: '100%' }} showTime format="DD.MM.YYYY HH:mm" />
-              </Form.Item>
-            )}
-
-            {(currentValues?.is_in_parking_lot || form.getFieldValue('is_in_parking_lot')) && (
               <>
+                <Form.Item
+                  label={t("Trips.PARKED_AT")}
+                  name="parked_at"
+                  labelCol={{ span: 4 }}
+                  wrapperCol={{ span: 20 }}
+                >
+                  <DatePicker style={{ width: '100%' }} showTime format="DD.MM.YYYY HH:mm" />
+                </Form.Item>
                 <Row gutter={16}>
                   <Col span={12}>
-                    <Form.Item label={t("Trips.PARKING_AREA")} name="parking_area" labelCol={{ span: 14 }} wrapperCol={{ span: 10 }}>
+                    <Form.Item
+                      label={t("Trips.PARKING_AREA")}
+                      name="parking_area"
+                      labelCol={{ span: 14 }}
+                      wrapperCol={{ span: 10 }}
+                    >
                       <Select
                         showSearch
                         allowClear
@@ -721,30 +849,15 @@ const TripModal = ({
                     </Form.Item>
                   </Col>
                   <Col span={12}>
-                    <Form.Item label={t("Trips.PARKING_NOTE")} name="parking_note" labelCol={{ span: 14 }} wrapperCol={{ span: 10 }}>
+                    <Form.Item
+                      label={t("Trips.PARKING_NOTE")}
+                      name="parking_note"
+                      labelCol={{ span: 14 }}
+                      wrapperCol={{ span: 10 }}
+                    >
                       <Input placeholder={t("Trips.PARKING_NOTE_PLACEHOLDER")} />
                     </Form.Item>
                   </Col>
-                </Row>
-                <Row gutter={16}>
-                  <Col span={12}>
-                    {selectedRecord ? (
-                      <Form.Item label={t("Trips.TRIP_CANCELED")} name="is_trip_canceled" valuePropName="checked" labelCol={{ span: 14 }} wrapperCol={{ span: 10 }}>
-                        <Switch />
-                      </Form.Item>
-                    ) : (
-                      <Form.Item hidden name="is_trip_canceled" valuePropName="checked">
-                        <Switch />
-                      </Form.Item>
-                    )}
-                  </Col>
-                  {selectedRecord && user?.role === USER_ROLES.ADMIN && (
-                    <Col span={12}>
-                      <Form.Item label={t("Common.STATUS")} name="deleted" valuePropName="checked" labelCol={{ span: 14 }} wrapperCol={{ span: 10 }}>
-                      <Switch checkedChildren={t("Common.PASSIVE")} unCheckedChildren={t("Common.ACTIVE")} />
-                    </Form.Item>
-                  </Col>
-                  )}
                 </Row>
               </>
             )}
@@ -788,7 +901,7 @@ const TripModal = ({
           </Form>
         </Col>
         {hasChanges && (
-          <Col span={12} className="fadeIn">
+          <Col span={10} className="fadeIn">
             <DiffViewer diffs={diffs} />
           </Col>
         )}
