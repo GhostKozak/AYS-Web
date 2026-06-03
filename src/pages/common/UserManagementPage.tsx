@@ -11,6 +11,7 @@ import type { User, CreateUserPayload, PaginatedResponse } from "../../types";
 import { USER_ROLES } from "../../types";
 import { getUser, getRoleColor } from "../../utils/auth.utils";
 import { useIsMobile } from "../../hooks/useIsMobile";
+import GradientButton from "../../components/common/GradientButton";
 
 
 
@@ -204,9 +205,9 @@ function UserManagementPage() {
         gap: 8
       }}>
         <h1 style={{ margin: 0 }}>{t("Users.TITLE")}</h1>
-        <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
+        <GradientButton color="cyan" icon={<PlusOutlined />} onClick={handleAdd}>
           {t("Users.ADD_USER")}
-        </Button>
+        </GradientButton>
       </div>
       <Table
         columns={columns}

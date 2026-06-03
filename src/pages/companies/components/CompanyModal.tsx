@@ -4,6 +4,7 @@ import { type CompanyType } from "../../../types";
 import { useTranslation } from "react-i18next";
 import DiffViewer from "../../common/DiffViewer";
 import { calculateDiffs } from "../../../utils";
+import FormActions from "../../../components/common/FormActions";
 
 interface CompanyModalProps {
   isOpen: boolean;
@@ -97,11 +98,12 @@ const CompanyModal = ({
               />
             </Form.Item>
 
-            <Form.Item label={null} wrapperCol={{ offset: 8, span: 16 }}>
-              <Button type="primary" htmlType="submit" loading={isLoading || isSubmitting}>
-                {selectedRecord ? t("Companies.SAVE_CHANGES") : t("Common.ADD")}
-              </Button>
-            </Form.Item>
+            <FormActions
+              isEdit={!!selectedRecord}
+              isLoading={isLoading || isSubmitting}
+              onCancel={onClose}
+              wrapperCol={{ offset: 8, span: 16 }}
+            />
           </Form>
         </Col>
         {hasChanges && (

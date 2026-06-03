@@ -1,5 +1,4 @@
-import { Modal, Form, Input, Button, Row, Col, DatePicker, Select, App, Flex, Space, Divider, Typography } from "antd";
-import { SaveOutlined, PlusOutlined, CloseOutlined, LoadingOutlined } from "@ant-design/icons";
+import { Modal, Form, Input, Row, Col, DatePicker, Select, App, Flex, Space, Divider, Typography } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import dayjs from "dayjs";
 import { useCompanies } from "../../../hooks/useCompanies";
@@ -21,6 +20,7 @@ import { useAuth } from "../../../hooks/useAuth";
 
 import { AsyncSelect } from "../../../components/common/AsyncSelect";
 import ToggleCard from "../../../components/common/ToggleCard";
+import FormActions from "../../../components/common/FormActions";
 
 interface TripFormValues {
   driver_full_name: string;
@@ -923,82 +923,12 @@ const TripModal = ({
               <Input.TextArea rows={3} />
             </Form.Item>
 
-            <Form.Item label={null} wrapperCol={{ offset: 3, span: 21 }} style={{ marginTop: 20, marginBottom: 4 }}>
-              <Flex gap={10} align="center">
-                {/* ─── Submit Butonu ─── */}
-                <Button
-                  htmlType="submit"
-                  loading={isLoading || submitting}
-                  disabled={isLoading || submitting}
-                  icon={
-                    isLoading || submitting
-                      ? <LoadingOutlined />
-                      : selectedRecord
-                        ? <SaveOutlined />
-                        : <PlusOutlined />
-                  }
-                  style={{
-                    height: 40,
-                    paddingInline: 28,
-                    fontWeight: 600,
-                    fontSize: 14,
-                    letterSpacing: "0.01em",
-                    border: "none",
-                    borderRadius: 10,
-                    background: isLoading || submitting
-                      ? undefined
-                      : selectedRecord
-                        ? "linear-gradient(135deg, #1677ff 0%, #0052cc 100%)"
-                        : "linear-gradient(135deg, #13c2c2 0%, #008080 100%)",
-                    boxShadow: isLoading || submitting
-                      ? "none"
-                      : selectedRecord
-                        ? "0 4px 14px rgba(22, 119, 255, 0.35)"
-                        : "0 4px 14px rgba(19, 194, 194, 0.35)",
-                    color: "#fff",
-                    transition: "all 0.25s ease",
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!(isLoading || submitting)) {
-                      (e.currentTarget as HTMLButtonElement).style.transform = "translateY(-1px)";
-                      (e.currentTarget as HTMLButtonElement).style.boxShadow = selectedRecord
-                        ? "0 6px 20px rgba(22, 119, 255, 0.45)"
-                        : "0 6px 20px rgba(19, 194, 194, 0.45)";
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLButtonElement).style.transform = "";
-                    (e.currentTarget as HTMLButtonElement).style.boxShadow = selectedRecord
-                      ? "0 4px 14px rgba(22, 119, 255, 0.35)"
-                      : "0 4px 14px rgba(19, 194, 194, 0.35)";
-                  }}
-                >
-                  {isLoading || submitting
-                    ? t("Common.SAVING", { defaultValue: "Kaydediliyor..." })
-                    : selectedRecord
-                      ? t("Common.SAVE")
-                      : t("Common.ADD")
-                  }
-                </Button>
-
-                {/* ─── İptal Butonu ─── */}
-                <Button
-                  onClick={onClose}
-                  disabled={isLoading || submitting}
-                  icon={<CloseOutlined style={{ fontSize: 12 }} />}
-                  style={{
-                    height: 40,
-                    paddingInline: 20,
-                    fontWeight: 500,
-                    fontSize: 14,
-                    borderRadius: 10,
-                    transition: "all 0.25s ease",
-                  }}
-                >
-                  {t("Common.CANCEL", { defaultValue: "İptal" })}
-                </Button>
-              </Flex>
-            </Form.Item>
+            <FormActions
+              isEdit={!!selectedRecord}
+              isLoading={isLoading || submitting}
+              onCancel={onClose}
+              wrapperCol={{ offset: 3, span: 21 }}
+            />
           </Form>
         </Col>
         {hasChanges && (

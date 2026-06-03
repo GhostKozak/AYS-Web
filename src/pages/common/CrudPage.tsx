@@ -13,6 +13,7 @@ import { safeErrorMessage } from "../../utils";
 import TableSettingsModal from "../../components/TableSettingsModal";
 import { RoleGuard } from "../../components/auth/RoleGuard";
 import ErrorState from "../../components/common/ErrorState";
+import GradientButton from "../../components/common/GradientButton";
 import {
   FileExcelOutlined,
   PlusOutlined,
@@ -335,26 +336,24 @@ function CrudPage<T extends { _id: string }>({
                 okText={t("Common.YES")}
                 cancelText={t("Common.NO")}
               >
-                <Button
-                  color="danger"
-                  variant="solid"
+                <GradientButton
+                  color="red"
                   size="large"
                   loading={isBulkDeleting}
                 >
                   <DeleteOutlined />{" "}
                   {t("Common.BULK_DELETE", { count: selectedRowKeys.length })}
-                </Button>
+                </GradientButton>
               </Popconfirm>
             )}
-            <Button
+            <GradientButton
               color="cyan"
-              variant="solid"
               size="large"
               onClick={handleAdd}
             >
               <PlusOutlined />{" "}
               {isMobile ? t("Common.ADD") : t(addButtonKey)}
-            </Button>
+            </GradientButton>
           </Space>
         </RoleGuard>
       </Flex>

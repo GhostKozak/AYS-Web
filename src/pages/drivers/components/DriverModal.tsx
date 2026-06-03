@@ -4,6 +4,7 @@ import { type CompanyType, type DriverType } from "../../../types";
 import { useTranslation } from "react-i18next";
 import { calculateDiffs } from "../../../utils";
 import DiffViewer from "../../common/DiffViewer";
+import FormActions from "../../../components/common/FormActions";
 import { COUNTRY_CODES, DEFAULT_COUNTRY_CODE } from "../../../constants/countries";
 
 import { Select } from "antd";
@@ -244,11 +245,12 @@ const DriverModal = ({
               </Space.Compact>
             </Form.Item>
 
-            <Form.Item label={null} wrapperCol={{ offset: 8, span: 16 }}>
-              <Button type="primary" htmlType="submit" loading={isLoading || isSubmitting}>
-                {selectedRecord ? t("Common.SAVE") : t("Common.ADD")}
-              </Button>
-            </Form.Item>
+            <FormActions
+              isEdit={!!selectedRecord}
+              isLoading={isLoading || isSubmitting}
+              onCancel={onClose}
+              wrapperCol={{ offset: 8, span: 16 }}
+            />
           </Form>
         </Col>
         {hasChanges && (

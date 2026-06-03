@@ -221,7 +221,7 @@
   "Companies": {
     "COMPANY_NAME": "Firma Adı",
     "SEARCH": "Firma Ara...",
-    "ADD_BUTTON": "Yeni Firma Ekle",
+    "ADD_BUTTON": "Firma Ekle",
     "EDIT_FORM_TITLE": "Firma Düzenleme",
     "ADD_FORM_TITLE": "Yeni Firma Ekleme",
     "NAME_REQUIRED": "Lütfen firma ismini giriniz!",

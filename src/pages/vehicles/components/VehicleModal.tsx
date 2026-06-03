@@ -8,6 +8,7 @@ import {
 import { useTranslation } from "react-i18next";
 import DiffViewer from "../../common/DiffViewer";
 import { calculateDiffs } from "../../../utils";
+import FormActions from "../../../components/common/FormActions";
 
 interface VehicleModalProps {
   isOpen: boolean;
@@ -148,11 +149,12 @@ const VehicleModal = ({
               />
             </Form.Item>
 
-            <Form.Item label={null} wrapperCol={{ offset: 8, span: 16 }}>
-              <Button type="primary" htmlType="submit" loading={isLoading || isSubmitting}>
-                {selectedRecord ? t("Common.SAVE") : t("Common.ADD")}
-              </Button>
-            </Form.Item>
+            <FormActions
+              isEdit={!!selectedRecord}
+              isLoading={isLoading || isSubmitting}
+              onCancel={onClose}
+              wrapperCol={{ offset: 8, span: 16 }}
+            />
           </Form>
         </Col>
         {hasChanges && (
