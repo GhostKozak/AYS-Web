@@ -10,6 +10,7 @@ import type { TFunction } from "i18next";
 import TripModal from "./components/TripModal";
 import { exportTripsToExcel } from "../../utils/excel.utils";
 
+
 const getTripTableSettingsOptions = (t: TFunction) => [
   { key: "time_range", title: t("Trips.TIME_RANGE") },
   { key: "driver", title: t("Trips.DRIVER") },

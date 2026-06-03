@@ -1,4 +1,4 @@
-import { Modal, Form, Input, Button, Switch, Row, Col, DatePicker, Select, App, Flex, Space, Divider, Typography } from "antd";
+import { Modal, Form, Input, Button, Row, Col, DatePicker, Select, App, Flex, Space, Divider, Typography } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import dayjs from "dayjs";
 import { useCompanies } from "../../../hooks/useCompanies";
@@ -19,6 +19,7 @@ import { COUNTRY_CODES, DEFAULT_COUNTRY_CODE } from "../../../constants/countrie
 import { useAuth } from "../../../hooks/useAuth";
 
 import { AsyncSelect } from "../../../components/common/AsyncSelect";
+import ToggleCard from "../../../components/common/ToggleCard";
 
 interface TripFormValues {
   driver_full_name: string;
@@ -266,6 +267,20 @@ const TripModal = ({
         getNewValue: (f) => f.notes || "-",
       },
       {
+        key: "seal_number",
+        label: t("Trips.SEAL_NUMBER"),
+        getOldValue: (r) => r.seal_number || "-",
+        getNewValue: (f) => f.seal_number || "-",
+      },
+      {
+        key: "status",
+        label: t("Trips.VERIFICATION_STATUS"),
+        getOldValue: (r) =>
+          r.status ? t(`Trips.VERIFY_${r.status}`) : "-",
+        getNewValue: (f) =>
+          f.status ? t(`Trips.VERIFY_${f.status}`) : "-",
+      },
+      {
         key: "deleted",
         label: t("Common.STATUS"),
         getOldValue: (r) =>
@@ -497,16 +512,17 @@ const TripModal = ({
               </Flex>
             </Divider>
 
-            <Form.Item
-              label={t("Trips.NEW_DRIVER", { defaultValue: "Add New Driver" })}
-              labelCol={{ span: 4 }}
-              wrapperCol={{ span: 20 }}
-            >
-              <Switch checked={isNewDriver} onChange={(checked) => setIsNewDriver(checked)} />
-            </Form.Item>
+            <ToggleCard
+              icon="➕"
+              title={t("Trips.NEW_DRIVER", { defaultValue: "Yeni Sürücü Ekle" })}
+              description={t("Trips.NEW_DRIVER_DESC", { defaultValue: "Sistemde kayıtlı olmayan bir sürücü ekleyin" })}
+              accentColor="#13c2c2"
+              checked={isNewDriver}
+              onChange={(checked) => setIsNewDriver(checked)}
+            />
 
             {!isNewDriver ? (
-              <Row gutter={16}>
+              <Row gutter={16} style={{ marginTop: 16 }}>
                 <Col span={12}>
                   <Form.Item
                     label={t("Trips.FULL_NAME")}
@@ -558,7 +574,7 @@ const TripModal = ({
               </Row>
             ) : (
               <>
-                <Row gutter={16}>
+                <Row gutter={16} style={{ marginTop: 16 }}>
                   <Col span={12}>
                     <Form.Item
                       label={t("Trips.COMPANY_NAME")}
@@ -793,30 +809,30 @@ const TripModal = ({
               </Flex>
             </Divider>
 
-            <Row gutter={16}>
-              <Col span={12}>
-                <Form.Item
-                  label={t("Trips.GPS_TRACKING")}
-                  name="has_gps_tracking"
-                  valuePropName="checked"
-                  labelCol={{ span: 14 }}
-                  wrapperCol={{ span: 10 }}
-                >
-                  <Switch />
-                </Form.Item>
-              </Col>
-              <Col span={12}>
-                <Form.Item
-                  label={t("Trips.IN_PARKING_LOT")}
-                  name="is_in_parking_lot"
-                  valuePropName="checked"
-                  labelCol={{ span: 14 }}
-                  wrapperCol={{ span: 10 }}
-                >
-                  <Switch />
-                </Form.Item>
-              </Col>
-            </Row>
+            <div style={{ marginBottom: 16 }}>
+              <Row gutter={12} style={{ marginBottom: 0 }}>
+                <Col span={12}>
+                  <Form.Item name="has_gps_tracking" valuePropName="checked" noStyle>
+                    <ToggleCard
+                      icon="🛰️"
+                      title={t("Trips.GPS_TRACKING")}
+                      description={t("Trips.GPS_TRACKING_DESC", { defaultValue: "Araç konumunu canlı takip et" })}
+                      accentColor="#1677ff"
+                    />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item name="is_in_parking_lot" valuePropName="checked" noStyle>
+                    <ToggleCard
+                      icon="🅿️"
+                      title={t("Trips.IN_PARKING_LOT")}
+                      description={t("Trips.PARKING_LOT_DESC", { defaultValue: "Araç otopark alanında" })}
+                      accentColor="#fa8c16"
+                    />
+                  </Form.Item>
+                </Col>
+              </Row>
+            </div>
 
             {(currentValues?.is_in_parking_lot || form.getFieldValue('is_in_parking_lot')) && (
               <>
@@ -825,6 +841,7 @@ const TripModal = ({
                   name="parked_at"
                   labelCol={{ span: 4 }}
                   wrapperCol={{ span: 20 }}
+                  style={{ marginTop: 16 }}
                 >
                   <DatePicker style={{ width: '100%' }} showTime format="DD.MM.YYYY HH:mm" />
                 </Form.Item>
@@ -862,34 +879,50 @@ const TripModal = ({
               </>
             )}
 
-            {!currentValues?.is_in_parking_lot && !form.getFieldValue('is_in_parking_lot') && (
-              <Row gutter={16}>
-                <Col span={12}>
+            <div style={{ marginBottom: 16 }}>
+              <Row gutter={12} style={{ marginTop: 12, marginBottom: 0 }}>
+                <Col span={selectedRecord && user?.role === USER_ROLES.ADMIN ? 12 : 24}>
                   {selectedRecord ? (
-                    <Form.Item label={t("Trips.TRIP_CANCELED")} name="is_trip_canceled" valuePropName="checked" labelCol={{ span: 14 }} wrapperCol={{ span: 10 }}>
-                      <Switch />
+                    <Form.Item name="is_trip_canceled" valuePropName="checked" noStyle>
+                      <ToggleCard
+                        icon="🚫"
+                        title={t("Trips.TRIP_CANCELED")}
+                        description={t("Trips.TRIP_CANCELED_DESC", { defaultValue: "Bu seferi iptal olarak işaretle" })}
+                        accentColor="#ff4d4f"
+                      />
                     </Form.Item>
                   ) : (
                     <Form.Item hidden name="is_trip_canceled" valuePropName="checked">
-                      <Switch />
+                      <ToggleCard icon="🚫" title="" accentColor="#ff4d4f" />
                     </Form.Item>
                   )}
                 </Col>
                 {selectedRecord && user?.role === USER_ROLES.ADMIN && (
                   <Col span={12}>
-                    <Form.Item label={t("Common.STATUS")} name="deleted" valuePropName="checked" labelCol={{ span: 14 }} wrapperCol={{ span: 10 }}>
-                    <Switch checkedChildren={t("Common.PASSIVE")} unCheckedChildren={t("Common.ACTIVE")} />
-                  </Form.Item>
-                </Col>
+                    <Form.Item name="deleted" valuePropName="checked" noStyle>
+                      <ToggleCard
+                        icon="⚠️"
+                        title={t("Common.STATUS")}
+                        description={t("Common.STATUS_DESC", { defaultValue: "Kaydı pasif duruma al" })}
+                        accentColor="#8c8c8c"
+                      />
+                    </Form.Item>
+                  </Col>
                 )}
               </Row>
-            )}
+            </div>
 
-            <Form.Item label={t("Trips.NOTES")} name="notes">
+            <Form.Item
+              label={t("Trips.NOTES")}
+              name="notes"
+              labelCol={{ span: 4 }}
+              wrapperCol={{ span: 20 }}
+              style={{ marginTop: 16 }}
+            >
               <Input.TextArea rows={3} />
             </Form.Item>
 
-            <Form.Item label={null} wrapperCol={{ offset: 10, span: 14 }}>
+            <Form.Item label={null} wrapperCol={{ offset: 4, span: 20 }} style={{ marginTop: 8 }}>
               <Button
                 type="primary"
                 htmlType="submit"
