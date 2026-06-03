@@ -95,7 +95,8 @@
     "ACTIONS": "İşlemler",
     "RELOAD": "Yenile",
     "RETRY": "Tekrar Dene",
-    "EMPTY": "(Boş)"
+    "EMPTY": "(Boş)",
+    "STATUS": "Durum"
   },
   "TableSettings": {
     "TITLE": "Tablo Ayarları",
@@ -328,6 +329,15 @@
     "TIME_RANGE": "Zaman Aralığı",
     "DRIVER": "Sürücü",
     "LOCATION": "Konum",
+    "PARKING_HISTORY": "Park Geçmişi",
+    "PARKING_AREA": "Park Alanı",
+    "PARKING_NOTE": "Park Notu",
+    "PARKING_NOTE_PLACEHOLDER": "Örn: Gece geliş, kapı önü",
+    "PHONE_PLACEHOLDER": "5XX XXX XX XX",
+    "PARKING_MURAT_GARAJ": "Murat Garaj",
+    "PARKING_MORGUL_PARK": "Morgül Park",
+    "PARKING_KORIDOR_KESIK": "Koridor Kesik",
+    "PARKING_ACIK_SAHADA": "Açık Sahada",
     "STATUS": "Durum"
   },
   "Other": {

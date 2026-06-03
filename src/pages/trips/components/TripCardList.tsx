@@ -1,7 +1,7 @@
-import { Tag, Flex, Divider, Typography, Space } from "antd";
+import { Tag, Flex, Divider, Typography, Space, Popover } from "antd";
 import EntityCardList from "../../../components/common/EntityCardList";
 import { useTranslation } from "react-i18next";
-import { formatLicencePlate, formatDate } from "../../../utils";
+import { formatLicencePlate, formatDate, formatDateTime } from "../../../utils";
 import type { TripType } from "../../../types";
 
 type Props = {
@@ -66,8 +66,35 @@ export default function TripCardList({ items, isLoading, onEdit, onDelete }: Pro
               </Tag>
             )}
             {item.is_trip_canceled && <Tag color="red">{t("Common.CANCEL")}</Tag>}
-            {item.is_in_temporary_parking_lot && <Tag color="green">{t("Trips.TEMP_PARKING_SHORT")}</Tag>}
-            {item.is_in_parking_lot && !item.is_in_temporary_parking_lot && <Tag color="blue">{t("FieldOps.TAG_PARK")}</Tag>}
+            {item.is_in_parking_lot && (
+              <Popover
+                content={
+                  <div style={{ maxWidth: 280 }}>
+                    <div style={{ fontWeight: 600, marginBottom: 8, fontSize: 13 }}>{t("Trips.PARKING_HISTORY")}</div>
+                    {(item.parking_history ?? []).length === 0 ? (
+                      <div style={{ fontSize: 12, color: "#888" }}>{t("Common.NO_DATA")}</div>
+                    ) : (
+                      (item.parking_history ?? []).map((h, i) => (
+                        <div key={i} style={{ display: "flex", gap: 6, marginBottom: 6, fontSize: 12, lineHeight: 1.4 }}>
+                          <span style={{ color: "#888", flexShrink: 0, minWidth: 16 }}>{i + 1}.</span>
+                          <div>
+                            <div>{formatDateTime(h.entered_at, { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}</div>
+                            <div style={{ color: "#1677ff" }}>{h.area}</div>
+                            {h.note && <div style={{ color: "#888", fontStyle: "italic" }}>📝 {h.note}</div>}
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                }
+                trigger="click"
+                placement="bottom"
+              >
+                <div style={{ cursor: "pointer" }}>
+                  <Tag color="blue">{item.parking_area || t("FieldOps.TAG_PARK")}</Tag>
+                </div>
+              </Popover>
+            )}
           </Flex>
           {item.seal_number && (
             <Flex justify="space-between">

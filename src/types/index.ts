@@ -49,9 +49,11 @@ export interface TripType {
   arrival_time: string;
   unload_status: TripStatus;
   has_gps_tracking: boolean;
-  is_in_temporary_parking_lot: boolean;
   is_in_parking_lot: boolean;
   parked_at?: string;
+  parking_area?: string;
+  parking_note?: string;
+  parking_history?: { entered_at: string; area: string; note: string }[];
   is_trip_canceled: boolean;
   notes: string;
   deleted: boolean;
@@ -80,9 +82,10 @@ export interface CreateTripPayload {
   arrival_time?: string;
   unload_status?: string;
   has_gps_tracking?: boolean;
-  is_in_temporary_parking_lot?: boolean;
   is_in_parking_lot?: boolean;
   parked_at?: string;
+  parking_area?: string;
+  parking_note?: string;
   is_trip_canceled?: boolean;
   notes?: string;
 }

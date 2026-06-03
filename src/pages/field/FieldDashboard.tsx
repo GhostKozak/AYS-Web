@@ -3,7 +3,7 @@ import { usePageTitle } from "../../hooks/usePageTitle";
 import { useTrips } from "../../hooks/useTrips";
 import { usePendingTrips } from "../../hooks/usePendingTrips";
 import { useSocketSync } from "../../hooks/useSocketSync";
-import { Badge, Button, Card, Col, Row, Tag, App, Modal, Input, Segmented, Image } from "antd";
+import { Badge, Button, Card, Col, Row, Tag, App, Modal, Input, Segmented, Image, Popover } from "antd";
 import type { InputRef } from "antd";
 import {
   CarOutlined, ReloadOutlined, CheckCircleOutlined, CloseCircleOutlined,
@@ -261,7 +261,7 @@ function FieldDashboard() {
 
   const renderPendingCard = (trip: TripType) => {
     const waitingLong = Date.now() - new Date(trip.arrival_time).getTime() > 60 * 60 * 1000;
-    const parked = trip.is_in_parking_lot || trip.is_in_temporary_parking_lot;
+    const parked = trip.is_in_parking_lot;
     return (
       <div key={trip._id} className="op-card">
         <div className="op-card-body">
@@ -270,9 +270,33 @@ function FieldDashboard() {
             <div style={{ display: "flex", alignItems: "center", gap: 4, flexShrink: 0 }}>
               {!!trip.has_gps_tracking && <Tag color="green" style={{ fontSize: 10, borderRadius: 6, lineHeight: "18px" }}>🛰️ ATS</Tag>}
               {parked && (
-                <Tag color={trip.is_in_temporary_parking_lot ? "orange" : "blue"} style={{ fontSize: 10, borderRadius: 6, lineHeight: "18px" }}>
-                  🅿️ {trip.is_in_temporary_parking_lot ? t("FieldOps.STATUS_KK") : t("FieldOps.STATUS_PARKED")}
-                </Tag>
+                <Popover
+                  content={
+                    <div style={{ maxWidth: 280 }}>
+                      <div style={{ fontWeight: 600, marginBottom: 8, fontSize: 13 }}>{t("Trips.PARKING_HISTORY")}</div>
+                      {(trip.parking_history ?? []).length === 0 ? (
+                        <div style={{ fontSize: 12, color: "#888" }}>{t("Common.NO_DATA")}</div>
+                      ) : (
+                        (trip.parking_history ?? []).map((h, i) => (
+                          <div key={i} style={{ display: "flex", gap: 6, marginBottom: 6, fontSize: 12, lineHeight: 1.4 }}>
+                            <span style={{ color: "#888", flexShrink: 0, minWidth: 16 }}>{i + 1}.</span>
+                            <div>
+                              <div>{formatDateTime(h.entered_at, { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}</div>
+                              <div style={{ color: "#1677ff" }}>{h.area}</div>
+                              {h.note && <div style={{ color: "#888", fontStyle: "italic" }}>📝 {h.note}</div>}
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  }
+                  trigger="click"
+                  placement="bottomRight"
+                >
+                  <Tag color="blue" style={{ fontSize: 10, borderRadius: 6, lineHeight: "18px", cursor: "pointer" }}>
+                    🅿️ {trip.parking_area || t("FieldOps.STATUS_PARKED")}
+                  </Tag>
+                </Popover>
               )}
             </div>
           </div>
@@ -321,7 +345,6 @@ function FieldDashboard() {
   };
 
   const renderParkCard = (trip: TripType) => {
-    const parked = trip.is_in_temporary_parking_lot || trip.is_in_parking_lot;
     return (
       <div key={trip._id} className="op-card">
         <div className="op-card-body">
@@ -329,11 +352,33 @@ function FieldDashboard() {
             <div className="op-plate">{trip.vehicle?.licence_plate || "---"}</div>
             <div style={{ display: "flex", alignItems: "center", gap: 4, flexShrink: 0 }}>
               {!!trip.has_gps_tracking && <Tag color="green" style={{ fontSize: 10, borderRadius: 6, lineHeight: "18px" }}>🛰️ ATS</Tag>}
-              {parked && (
-                <Tag color={trip.is_in_temporary_parking_lot ? "orange" : "blue"} style={{ fontSize: 10, borderRadius: 6, lineHeight: "18px" }}>
-                  🅿️ {trip.is_in_temporary_parking_lot ? t("FieldOps.STATUS_KK") : t("FieldOps.STATUS_PARKED")}
+              <Popover
+                content={
+                  <div style={{ maxWidth: 280 }}>
+                    <div style={{ fontWeight: 600, marginBottom: 8, fontSize: 13 }}>{t("Trips.PARKING_HISTORY")}</div>
+                    {(trip.parking_history ?? []).length === 0 ? (
+                      <div style={{ fontSize: 12, color: "#888" }}>{t("Common.NO_DATA")}</div>
+                    ) : (
+                      (trip.parking_history ?? []).map((h, i) => (
+                        <div key={i} style={{ display: "flex", gap: 6, marginBottom: 6, fontSize: 12, lineHeight: 1.4 }}>
+                          <span style={{ color: "#888", flexShrink: 0, minWidth: 16 }}>{i + 1}.</span>
+                          <div>
+                            <div>{formatDateTime(h.entered_at, { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}</div>
+                            <div style={{ color: "#1677ff" }}>{h.area}</div>
+                            {h.note && <div style={{ color: "#888", fontStyle: "italic" }}>📝 {h.note}</div>}
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                }
+                trigger="click"
+                placement="bottomRight"
+              >
+                <Tag color="blue" style={{ fontSize: 10, borderRadius: 6, lineHeight: "18px", cursor: "pointer" }}>
+                  🅿️ {trip.parking_area || t("FieldOps.STATUS_PARKED")}
                 </Tag>
-              )}
+              </Popover>
             </div>
           </div>
           
@@ -345,7 +390,7 @@ function FieldDashboard() {
               <div className="op-meta">
                 <ClockCircleOutlined style={{ fontSize: 12 }} />
                 {trip.arrival_time ? formatTime(trip.arrival_time, { hour: "2-digit", minute: "2-digit" }) : "-"}
-                {parked && trip.parked_at && (
+                {trip.parked_at && (
                   <Tag className="op-duration-tag" style={{ marginLeft: 6 }}>
                     {formatDuration(trip.parked_at)}
                   </Tag>

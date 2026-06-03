@@ -1,4 +1,4 @@
-import { Table, Tag, Popconfirm, Button, Space, Tooltip, Image, Input } from "antd";
+import { Table, Tag, Popconfirm, Popover, Button, Space, Tooltip, Image, Input } from "antd";
 import { DeleteOutlined, EditOutlined, CameraOutlined } from "@ant-design/icons";
 import { USER_ROLES, type TripType, type TableSettings } from "../../../types";
 import { Trans, useTranslation } from "react-i18next";
@@ -6,7 +6,6 @@ import {
   formatLicencePlate,
   formatPhoneNumber,
   formatDateTime,
-  formatTime,
 } from "../../../utils";
 import { useMemo, useState, useEffect, useCallback } from "react";
 import type { ColumnType } from "antd/es/table";
@@ -289,58 +288,64 @@ export default function TripTable({
         sorter: (a, b) => Number(a.has_gps_tracking) - Number(b.has_gps_tracking),
       },
       {
-        title: t("Trips.IN_PARKING_LOT"),
+        title: t("Trips.LOCATION"),
         key: "location",
         align: "center",
         render: (_: unknown, record) => {
           if (record.is_trip_canceled) {
             return <Tag color="red">{t("Common.CANCEL")}</Tag>;
           }
-          if (record.is_in_temporary_parking_lot) {
-            return (
-              <div>
-                <Tag color="green">{t("Trips.TEMP_PARKING_SHORT", { defaultValue: "Interrupted" })}</Tag>
+          if (!record.is_in_parking_lot) return "-";
+
+          const content = (
+            <div style={{ maxWidth: 280 }}>
+              <div style={{ fontWeight: 600, marginBottom: 8, fontSize: 13 }}>{t("Trips.PARKING_HISTORY")}</div>
+              {(record.parking_history ?? []).length === 0 ? (
+                <div style={{ fontSize: 12, color: "#888" }}>{t("Common.NO_DATA")}</div>
+              ) : (
+                (record.parking_history ?? []).map((h, i) => (
+                  <div key={i} style={{ display: "flex", gap: 6, marginBottom: 6, fontSize: 12, lineHeight: 1.4 }}>
+                    <span style={{ color: "#888", flexShrink: 0, minWidth: 16 }}>{i + 1}.</span>
+                    <div>
+                      <div>{formatDateTime(h.entered_at, { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}</div>
+                      <div style={{ color: "#1677ff" }}>{h.area}</div>
+                      {h.note && <div style={{ color: "#888", fontStyle: "italic" }}>📝 {h.note}</div>}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          );
+
+          return (
+            <Popover content={content} trigger="click" placement="right">
+              <div style={{ cursor: "pointer" }}>
+                <Tag color="blue">{record.parking_area || t("FieldOps.TAG_PARK")}</Tag>
                 {record.parked_at && (
                   <div style={{ fontSize: "0.8em", color: "#888" }}>
                     {formatDateTime(record.parked_at, { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}
                   </div>
                 )}
               </div>
-            );
-          }
-          if (record.is_in_parking_lot) {
-            return (
-              <div>
-                <Tag color="blue">{t("FieldOps.TAG_PARK")}</Tag>
-                {record.parked_at && (
-                  <div style={{ fontSize: "0.8em", color: "#888" }}>
-                    {formatDateTime(record.parked_at, { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}
-                  </div>
-                )}
-              </div>
-            );
-          }
-          return "-";
+            </Popover>
+          );
         },
         filters: [
-          { text: t("Trips.TEMP_PARKING_SHORT", { defaultValue: "Interrupted" }), value: "temp" },
           { text: t("FieldOps.TAG_PARK"), value: "park" },
           { text: t("Common.CANCEL"), value: "canceled" },
         ],
         onFilter: (value, record) => {
-          if (value === "temp") return record.is_in_temporary_parking_lot;
-          if (value === "park") return record.is_in_parking_lot && !record.is_in_temporary_parking_lot;
+          if (value === "park") return record.is_in_parking_lot;
           if (value === "canceled") return record.is_trip_canceled;
           return true;
         },
-        minWidth: 90,
-        maxWidth: 180,
+        minWidth: 100,
+        maxWidth: 200,
         sorter: (a, b) => {
           const getOrder = (r: TripType) => {
             if (r.is_trip_canceled) return 0;
-            if (r.is_in_temporary_parking_lot) return 1;
-            if (r.is_in_parking_lot) return 2;
-            return 3;
+            if (r.is_in_parking_lot) return 1;
+            return 2;
           };
           return getOrder(a) - getOrder(b);
         },

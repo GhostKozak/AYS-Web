@@ -95,7 +95,8 @@
     "ACTIONS": "Actions",
     "RELOAD": "Reload",
     "RETRY": "Try Again",
-    "EMPTY": "(Empty)"
+    "EMPTY": "(Empty)",
+    "STATUS": "Status"
   },
   "TableSettings": {
     "TITLE": "Table Settings",
@@ -328,6 +329,15 @@
     "TIME_RANGE": "Time Range",
     "DRIVER": "Driver",
     "LOCATION": "Location",
+    "PARKING_HISTORY": "Parking History",
+    "PARKING_AREA": "Parking Area",
+    "PARKING_NOTE": "Parking Note",
+    "PARKING_NOTE_PLACEHOLDER": "E.g. Night arrival, front gate",
+    "PHONE_PLACEHOLDER": "5XX XXX XX XX",
+    "PARKING_MURAT_GARAJ": "Murat Garaj",
+    "PARKING_MORGUL_PARK": "Morgül Park",
+    "PARKING_KORIDOR_KESIK": "Koridor Kesik",
+    "PARKING_ACIK_SAHADA": "Açık Sahada",
     "STATUS": "Status"
   },
   "Other": {

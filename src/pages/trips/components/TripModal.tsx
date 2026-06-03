@@ -1,4 +1,4 @@
-import { Modal, Form, Input, Button, Switch, Row, Col, DatePicker, App, Flex, Space } from "antd";
+import { Modal, Form, Input, Button, Switch, Row, Col, DatePicker, Select, App, Flex, Space } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import dayjs from "dayjs";
 import { useCompanies } from "../../../hooks/useCompanies";
@@ -7,6 +7,7 @@ import { useVehicles } from "../../../hooks/useVehicles";
 import {
   type CompanyType,
   type DriverType,
+  type DiffConfigItem,
   type TripType,
   type VehicleType,
   USER_ROLES,
@@ -17,7 +18,6 @@ import DiffViewer from "../../common/DiffViewer";
 import { COUNTRY_CODES, DEFAULT_COUNTRY_CODE } from "../../../constants/countries";
 import { useAuth } from "../../../hooks/useAuth";
 
-import { Select } from "antd";
 import { AsyncSelect } from "../../../components/common/AsyncSelect";
 
 interface TripFormValues {
@@ -31,7 +31,6 @@ interface TripFormValues {
   parked_at?: dayjs.Dayjs;
   unload_status?: string;
   has_gps_tracking?: boolean;
-  is_in_temporary_parking_lot?: boolean;
   is_in_parking_lot?: boolean;
   is_trip_canceled?: boolean;
   notes?: string;
@@ -154,7 +153,15 @@ const TripModal = ({
             : "-",
       },
       {
-        label: t("Trips.FULL_NAME"),
+        label: t("Trips.UNLOAD_STATUS"),
+        key: "unload_status",
+        getOldValue: (r) =>
+          r.unload_status ? t(`Trips.STATUS_${r.unload_status}`) : "-",
+        getNewValue: (f) =>
+          f.unload_status ? t(`Trips.STATUS_${f.unload_status}`) : "-",
+      },
+      {
+        label: t("Trips.DRIVER"),
         dbKey: "driver",
         formKey: "driver",
         getOldValue: (r) => r.driver?.full_name || "-",
@@ -164,6 +171,36 @@ const TripModal = ({
           if (found) return found.full_name;
           if (selectedRecord?.driver?._id === f.driver) return selectedRecord?.driver?.full_name || "-";
           return f.driver;
+        },
+      },
+      {
+        label: t("Trips.PHONE_NUMBER"),
+        dbKey: "driver_phone_number",
+        formKey: "driver_phone_number",
+        getOldValue: (r) => r.driver?.phone_number || "-",
+        getNewValue: (f) => {
+          if (f.driver_phone_number) {
+            const country = COUNTRY_CODES.find(c => c.code === f.driver_country_code);
+            const prefix = country?.value || DEFAULT_COUNTRY_CODE;
+            return `${prefix}${f.driver_phone_number}`;
+          }
+          if (selectedRecord?.driver?.phone_number) {
+            return selectedRecord.driver.phone_number;
+          }
+          return "-";
+        },
+      },
+      {
+        label: t("Trips.COMPANY"),
+        dbKey: "company",
+        formKey: "company",
+        getOldValue: (r) => r.company?.name || "-",
+        getNewValue: (f) => {
+          if (!f.company) return "-";
+          const c = companies.find((c) => c._id === f.company);
+          if (c) return c.name;
+          if (selectedRecord?.company?._id === f.company) return selectedRecord?.company?.name || "-";
+          return f.company;
         },
       },
       {
@@ -183,41 +220,12 @@ const TripModal = ({
         },
       },
       {
-        label: t("Trips.COMPANY_NAME"),
-        dbKey: "company",
-        formKey: "company",
-        getOldValue: (r) => r.company?.name || "-",
-        getNewValue: (f) => {
-          if (!f.company) return "-";
-          const c = companies.find((c) => c._id === f.company);
-          if (c) return c.name;
-          if (selectedRecord?.company?._id === f.company) return selectedRecord?.company?.name || "-";
-          return f.company;
-        },
-      },
-      {
-        label: t("Trips.UNLOAD_STATUS"),
-        key: "unload_status",
-        getOldValue: (r) =>
-          r.unload_status ? t(`Trips.STATUS_${r.unload_status}`) : "-",
-        getNewValue: (f) =>
-          f.unload_status ? t(`Trips.STATUS_${f.unload_status}`) : "-",
-      },
-      {
         label: t("Trips.GPS_TRACKING"),
         key: "has_gps_tracking",
         getOldValue: (r) =>
           r.has_gps_tracking ? t("Common.YES") : t("Common.NO"),
         getNewValue: (f) =>
           f.has_gps_tracking ? t("Common.YES") : t("Common.NO"),
-      },
-      {
-        label: t("Trips.TEMP_PARKING"),
-        key: "is_in_temporary_parking_lot",
-        getOldValue: (r) =>
-          r.is_in_temporary_parking_lot ? t("Common.YES") : t("Common.NO"),
-        getNewValue: (f) =>
-          f.is_in_temporary_parking_lot ? t("Common.YES") : t("Common.NO"),
       },
       {
         label: t("Trips.IN_PARKING_LOT"),
@@ -227,6 +235,22 @@ const TripModal = ({
         getNewValue: (f) =>
           f.is_in_parking_lot ? t("Common.YES") : t("Common.NO"),
       },
+      ...((selectedRecord?.is_in_parking_lot || currentValues?.is_in_parking_lot)
+        ? [
+            {
+              label: t("Trips.PARKING_AREA"),
+              key: "parking_area" as keyof TripType,
+              getOldValue: (r: TripType) => r.parking_area || "-",
+              getNewValue: (f: any) => f.parking_area || "-",
+            } as DiffConfigItem<TripType, any>,
+            {
+              label: t("Trips.PARKING_NOTE"),
+              key: "parking_note" as keyof TripType,
+              getOldValue: (r: TripType) => r.parking_note || "-",
+              getNewValue: (f: any) => f.parking_note || "-",
+            } as DiffConfigItem<TripType, any>,
+          ]
+        : []),
       {
         label: t("Trips.TRIP_CANCELED"),
         key: "is_trip_canceled",
@@ -299,9 +323,9 @@ const TripModal = ({
           parked_at: toInputDate(selectedRecord.parked_at),
           unload_status: selectedRecord.unload_status,
           has_gps_tracking: selectedRecord.has_gps_tracking,
-          is_in_temporary_parking_lot:
-            selectedRecord.is_in_temporary_parking_lot,
           is_in_parking_lot: selectedRecord.is_in_parking_lot,
+          parking_area: selectedRecord.parking_area,
+          parking_note: selectedRecord.parking_note,
           is_trip_canceled: selectedRecord.is_trip_canceled,
           seal_number: selectedRecord.seal_number,
           status: selectedRecord.status,
@@ -432,7 +456,6 @@ const TripModal = ({
             autoComplete="off"
             initialValues={{
               has_gps_tracking: false,
-              is_in_temporary_parking_lot: false,
               is_in_parking_lot: false,
               is_trip_canceled: false,
               unload_status: "WAITING",
@@ -589,7 +612,7 @@ const TripModal = ({
                       ]}
                     >
                       <Input
-                        placeholder="5XX XXX XX XX"
+                        placeholder={t("Trips.PHONE_PLACEHOLDER")}
                         autoComplete="new-password"
                         maxLength={15}
                       />
@@ -668,42 +691,85 @@ const TripModal = ({
                 </Form.Item>
               </Col>
               <Col span={12}>
-                <Form.Item label={t("Trips.TEMP_PARKING")} name="is_in_temporary_parking_lot" valuePropName="checked" labelCol={{ span: 14 }} wrapperCol={{ span: 10 }}>
-                  <Switch />
-                </Form.Item>
-              </Col>
-            </Row>
-
-            <Row gutter={16}>
-              <Col span={12}>
-                {selectedRecord ? (
-                  <Form.Item label={t("Trips.TRIP_CANCELED")} name="is_trip_canceled" valuePropName="checked" labelCol={{ span: 14 }} wrapperCol={{ span: 10 }}>
-                    <Switch />
-                  </Form.Item>
-                ) : (
-                  <Form.Item hidden name="is_trip_canceled" valuePropName="checked">
-                    <Switch />
-                  </Form.Item>
-                )}
-              </Col>
-              <Col span={12}>
                 <Form.Item label={t("Trips.IN_PARKING_LOT")} name="is_in_parking_lot" valuePropName="checked" labelCol={{ span: 14 }} wrapperCol={{ span: 10 }}>
                   <Switch />
                 </Form.Item>
               </Col>
-              {selectedRecord && user?.role === USER_ROLES.ADMIN && (
-                <Col span={12}>
-                  <Form.Item label={t("Common.STATUS")} name="deleted" valuePropName="checked" labelCol={{ span: 14 }} wrapperCol={{ span: 10 }}>
-                  <Switch checkedChildren={t("Common.PASSIVE")} unCheckedChildren={t("Common.ACTIVE")} />
-                </Form.Item>
-              </Col>
-              )}
             </Row>
 
-            {currentValues?.is_in_parking_lot && (
+            {(currentValues?.is_in_parking_lot || form.getFieldValue('is_in_parking_lot')) && (
               <Form.Item label={t("Trips.PARKED_AT")} name="parked_at">
                 <DatePicker style={{ width: '100%' }} showTime format="DD.MM.YYYY HH:mm" />
               </Form.Item>
+            )}
+
+            {(currentValues?.is_in_parking_lot || form.getFieldValue('is_in_parking_lot')) && (
+              <>
+                <Row gutter={16}>
+                  <Col span={12}>
+                    <Form.Item label={t("Trips.PARKING_AREA")} name="parking_area" labelCol={{ span: 14 }} wrapperCol={{ span: 10 }}>
+                      <Select
+                        showSearch
+                        allowClear
+                        options={[
+                          { label: t("Trips.PARKING_MURAT_GARAJ"), value: 'Murat Garaj' },
+                          { label: t("Trips.PARKING_MORGUL_PARK"), value: 'Morgül Park' },
+                          { label: t("Trips.PARKING_KORIDOR_KESIK"), value: 'Koridor Kesik' },
+                          { label: t("Trips.PARKING_ACIK_SAHADA"), value: 'Açık Sahada' },
+                        ]}
+                      />
+                    </Form.Item>
+                  </Col>
+                  <Col span={12}>
+                    <Form.Item label={t("Trips.PARKING_NOTE")} name="parking_note" labelCol={{ span: 14 }} wrapperCol={{ span: 10 }}>
+                      <Input placeholder={t("Trips.PARKING_NOTE_PLACEHOLDER")} />
+                    </Form.Item>
+                  </Col>
+                </Row>
+                <Row gutter={16}>
+                  <Col span={12}>
+                    {selectedRecord ? (
+                      <Form.Item label={t("Trips.TRIP_CANCELED")} name="is_trip_canceled" valuePropName="checked" labelCol={{ span: 14 }} wrapperCol={{ span: 10 }}>
+                        <Switch />
+                      </Form.Item>
+                    ) : (
+                      <Form.Item hidden name="is_trip_canceled" valuePropName="checked">
+                        <Switch />
+                      </Form.Item>
+                    )}
+                  </Col>
+                  {selectedRecord && user?.role === USER_ROLES.ADMIN && (
+                    <Col span={12}>
+                      <Form.Item label={t("Common.STATUS")} name="deleted" valuePropName="checked" labelCol={{ span: 14 }} wrapperCol={{ span: 10 }}>
+                      <Switch checkedChildren={t("Common.PASSIVE")} unCheckedChildren={t("Common.ACTIVE")} />
+                    </Form.Item>
+                  </Col>
+                  )}
+                </Row>
+              </>
+            )}
+
+            {!currentValues?.is_in_parking_lot && !form.getFieldValue('is_in_parking_lot') && (
+              <Row gutter={16}>
+                <Col span={12}>
+                  {selectedRecord ? (
+                    <Form.Item label={t("Trips.TRIP_CANCELED")} name="is_trip_canceled" valuePropName="checked" labelCol={{ span: 14 }} wrapperCol={{ span: 10 }}>
+                      <Switch />
+                    </Form.Item>
+                  ) : (
+                    <Form.Item hidden name="is_trip_canceled" valuePropName="checked">
+                      <Switch />
+                    </Form.Item>
+                  )}
+                </Col>
+                {selectedRecord && user?.role === USER_ROLES.ADMIN && (
+                  <Col span={12}>
+                    <Form.Item label={t("Common.STATUS")} name="deleted" valuePropName="checked" labelCol={{ span: 14 }} wrapperCol={{ span: 10 }}>
+                    <Switch checkedChildren={t("Common.PASSIVE")} unCheckedChildren={t("Common.ACTIVE")} />
+                  </Form.Item>
+                </Col>
+                )}
+              </Row>
             )}
 
             <Form.Item label={t("Trips.NOTES")} name="notes">

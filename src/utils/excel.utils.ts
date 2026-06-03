@@ -85,7 +85,7 @@ export const exportTripsToExcel = (trips: TripType[]) => {
     [i18next.t('Excel.columns.DEPARTURE')]: trip.departure_time ? new Date(trip.departure_time).toLocaleString(currentLocale) : '-',
     [i18next.t('Excel.columns.STATUS')]: i18next.t(`Excel.status.${trip.unload_status}`),
     [i18next.t('Excel.columns.GPS')]: trip.has_gps_tracking ? i18next.t('Excel.boolean.EXIST') : i18next.t('Excel.boolean.MISSING'),
-    [i18next.t('Excel.columns.PARKING')]: trip.is_in_temporary_parking_lot ? i18next.t('Excel.boolean.YES') : i18next.t('Excel.boolean.NO'),
+    [i18next.t('Excel.columns.PARKING')]: trip.is_in_parking_lot ? (trip.parking_area || i18next.t('Excel.boolean.YES')) : i18next.t('Excel.boolean.NO'),
     [i18next.t('Excel.columns.NOTES')]: trip.notes || ''
   }));
   
@@ -150,7 +150,7 @@ export const exportDailyDashboard = (trips: TripType[]) => {
     [i18next.t('Excel.columns.DRIVER')]: trip.driver?.full_name || '-',
     [i18next.t('Excel.columns.ARRIVAL')]: trip.arrival_time ? new Date(trip.arrival_time).toLocaleTimeString(currentLocale) : '-',
     [i18next.t('Excel.columns.STATUS')]: i18next.t(`Excel.status.${trip.unload_status}`),
-    [i18next.t('Excel.columns.PARKING')]: trip.is_in_temporary_parking_lot ? i18next.t('Excel.boolean.YES') : i18next.t('Excel.boolean.NO'),
+    [i18next.t('Excel.columns.PARKING')]: trip.is_in_parking_lot ? (trip.parking_area || i18next.t('Excel.boolean.YES')) : i18next.t('Excel.boolean.NO'),
     [i18next.t('Excel.columns.NOTES')]: trip.notes || ''
   }));
 

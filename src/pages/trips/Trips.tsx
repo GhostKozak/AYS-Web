@@ -77,9 +77,10 @@ function Trips() {
           arrival_time: values.arrival_time,
           unload_status: values.unload_status,
           has_gps_tracking: values.has_gps_tracking,
-          is_in_temporary_parking_lot: values.is_in_temporary_parking_lot,
           is_in_parking_lot: values.is_in_parking_lot,
           parked_at: values.parked_at,
+          parking_area: values.parking_area,
+          parking_note: values.parking_note,
           is_trip_canceled: values.is_trip_canceled,
           notes: values.notes,
         };
