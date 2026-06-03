@@ -466,8 +466,8 @@ const TripModal = ({
             name="tripForm"
             form={form}
             layout="horizontal"
-            labelCol={{ span: 8 }}
-            wrapperCol={{ span: 16 }}
+            labelCol={{ span: 6 }}
+            wrapperCol={{ span: 18 }}
             onFinish={handleFinish}
             autoComplete="off"
             initialValues={{
@@ -528,8 +528,8 @@ const TripModal = ({
                   <Form.Item
                     label={t("Trips.FULL_NAME")}
                     name="driver"
-                    labelCol={{ span: 8 }}
-                    wrapperCol={{ span: 16 }}
+                    labelCol={{ span: 6 }}
+                    wrapperCol={{ span: 18 }}
                     rules={[{ required: true, message: t("Trips.DRIVER_REQUIRED") }]}
                   >
                     <AsyncSelect<DriverType>
@@ -560,8 +560,8 @@ const TripModal = ({
                   <Form.Item
                     label={t("Trips.COMPANY_NAME")}
                     name="company"
-                    labelCol={{ span: 8 }}
-                    wrapperCol={{ span: 16 }}
+                    labelCol={{ span: 6 }}
+                    wrapperCol={{ span: 18 }}
                   >
                     <AsyncSelect<CompanyType>
                       moduleName="companies"
@@ -580,8 +580,8 @@ const TripModal = ({
                     <Form.Item
                       label={t("Trips.COMPANY_NAME")}
                       name="company"
-                      labelCol={{ span: 8 }}
-                      wrapperCol={{ span: 16 }}
+                      labelCol={{ span: 6 }}
+                      wrapperCol={{ span: 18 }}
                       rules={[{ required: true, message: t("Trips.COMPANY_REQUIRED") }]}
                     >
                       <AsyncSelect<CompanyType>
@@ -599,8 +599,8 @@ const TripModal = ({
                     <Form.Item
                       label={t("Trips.FULL_NAME")}
                       name="driver_full_name"
-                      labelCol={{ span: 8 }}
-                      wrapperCol={{ span: 16 }}
+                      labelCol={{ span: 6 }}
+                      wrapperCol={{ span: 18 }}
                       rules={[{ required: true, message: t("Trips.DRIVER_REQUIRED") }]}
                     >
                       <Input placeholder={t("Trips.FULL_NAME")} autoComplete="new-password" />
@@ -610,8 +610,8 @@ const TripModal = ({
 
                 <Form.Item
                   label={t("Trips.PHONE_NUMBER")}
-                  labelCol={{ span: 4 }}
-                  wrapperCol={{ span: 20 }}
+                  labelCol={{ span: 3 }}
+                  wrapperCol={{ span: 21 }}
                 >
                   <Space.Compact style={{ width: '100%' }}>
                     <Form.Item name="driver_country_code" noStyle>
@@ -687,8 +687,8 @@ const TripModal = ({
             <Form.Item
               label={t("Trips.LICENSE_PLATE")}
               name="vehicle"
-              labelCol={{ span: 4 }}
-              wrapperCol={{ span: 20 }}
+              labelCol={{ span: 3 }}
+              wrapperCol={{ span: 21 }}
               rules={[{ required: true, message: t("Trips.VEHICLE_REQUIRED", { defaultValue: "Vehicle selection is required" }) }]}
             >
               <AsyncSelect<VehicleType>
@@ -717,8 +717,8 @@ const TripModal = ({
                   <Form.Item
                     label={t("Trips.ARRIVAL_TIME")}
                     name="arrival_time"
-                    labelCol={{ span: 8 }}
-                    wrapperCol={{ span: 16 }}
+                    labelCol={{ span: 6 }}
+                    wrapperCol={{ span: 18 }}
                   >
                     <DatePicker style={{ width: '100%' }} showTime format="DD.MM.YYYY HH:mm" />
                   </Form.Item>
@@ -727,8 +727,8 @@ const TripModal = ({
                   <Form.Item
                     label={t("Trips.DEPARTURE_TIME")}
                     name="departure_time"
-                    labelCol={{ span: 8 }}
-                    wrapperCol={{ span: 16 }}
+                    labelCol={{ span: 6 }}
+                    wrapperCol={{ span: 18 }}
                   >
                     <DatePicker style={{ width: '100%' }} showTime format="DD.MM.YYYY HH:mm" />
                   </Form.Item>
@@ -739,8 +739,8 @@ const TripModal = ({
                 <Form.Item
                   label={t("Trips.ARRIVAL_TIME")}
                   name="arrival_time"
-                  labelCol={{ span: 4 }}
-                  wrapperCol={{ span: 20 }}
+                  labelCol={{ span: 3 }}
+                  wrapperCol={{ span: 21 }}
                 >
                   <DatePicker style={{ width: '100%' }} showTime format="DD.MM.YYYY HH:mm" />
                 </Form.Item>
@@ -756,8 +756,8 @@ const TripModal = ({
                   <Form.Item
                     label={t("Trips.UNLOAD_STATUS")}
                     name="unload_status"
-                    labelCol={{ span: 8 }}
-                    wrapperCol={{ span: 16 }}
+                    labelCol={{ span: 6 }}
+                    wrapperCol={{ span: 18 }}
                   >
                     <Select>
                       <Select.Option value="WAITING">{t("Trips.STATUS_WAITING")}</Select.Option>
@@ -773,8 +773,8 @@ const TripModal = ({
                   <Form.Item
                     label={t("Trips.SEAL_NUMBER")}
                     name="seal_number"
-                    labelCol={{ span: 8 }}
-                    wrapperCol={{ span: 16 }}
+                    labelCol={{ span: 6 }}
+                    wrapperCol={{ span: 18 }}
                   >
                     <Input maxLength={50} />
                   </Form.Item>
@@ -790,8 +790,8 @@ const TripModal = ({
               <Form.Item
                 label={t("Trips.VERIFICATION_STATUS")}
                 name="status"
-                labelCol={{ span: 4 }}
-                wrapperCol={{ span: 20 }}
+                labelCol={{ span: 3 }}
+                wrapperCol={{ span: 21 }}
               >
                 <Select>
                   <Select.Option value="PENDING">{t("Trips.VERIFY_PENDING")}</Select.Option>
@@ -840,8 +840,8 @@ const TripModal = ({
                 <Form.Item
                   label={t("Trips.PARKED_AT")}
                   name="parked_at"
-                  labelCol={{ span: 4 }}
-                  wrapperCol={{ span: 20 }}
+                  labelCol={{ span: 3 }}
+                  wrapperCol={{ span: 21 }}
                   style={{ marginTop: 16 }}
                 >
                   <DatePicker style={{ width: '100%' }} showTime format="DD.MM.YYYY HH:mm" />
@@ -851,8 +851,8 @@ const TripModal = ({
                     <Form.Item
                       label={t("Trips.PARKING_AREA")}
                       name="parking_area"
-                      labelCol={{ span: 14 }}
-                      wrapperCol={{ span: 10 }}
+                      labelCol={{ span: 8 }}
+                      wrapperCol={{ span: 16 }}
                     >
                       <Select
                         showSearch
@@ -870,8 +870,8 @@ const TripModal = ({
                     <Form.Item
                       label={t("Trips.PARKING_NOTE")}
                       name="parking_note"
-                      labelCol={{ span: 14 }}
-                      wrapperCol={{ span: 10 }}
+                      labelCol={{ span: 8 }}
+                      wrapperCol={{ span: 16 }}
                     >
                       <Input placeholder={t("Trips.PARKING_NOTE_PLACEHOLDER")} />
                     </Form.Item>
@@ -916,14 +916,14 @@ const TripModal = ({
             <Form.Item
               label={t("Trips.NOTES")}
               name="notes"
-              labelCol={{ span: 4 }}
-              wrapperCol={{ span: 20 }}
+              labelCol={{ span: 3 }}
+              wrapperCol={{ span: 21 }}
               style={{ marginTop: 16 }}
             >
               <Input.TextArea rows={3} />
             </Form.Item>
 
-            <Form.Item label={null} wrapperCol={{ offset: 4, span: 20 }} style={{ marginTop: 20, marginBottom: 4 }}>
+            <Form.Item label={null} wrapperCol={{ offset: 3, span: 21 }} style={{ marginTop: 20, marginBottom: 4 }}>
               <Flex gap={10} align="center">
                 {/* ─── Submit Butonu ─── */}
                 <Button
