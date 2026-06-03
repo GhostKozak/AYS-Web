@@ -433,7 +433,7 @@ const TripDrawer = ({
       }}
     >
       {/* ─── BÖLÜM 1: Sürücü Bilgileri ─── */}
-      <Divider orientation="left" orientationMargin={0} style={{ marginTop: 8, marginBottom: 16 }}>
+      <Divider titlePlacement="left" styles={{ content: { marginLeft: 0 } }} style={{ marginTop: 8, marginBottom: 16 }}>
         <Flex align="center" gap={6}>
           <span style={{ fontSize: 13 }}>👤</span>
           <Typography.Text strong style={{ fontSize: 13 }}>
@@ -585,7 +585,7 @@ const TripDrawer = ({
       )}
 
       {/* ─── BÖLÜM 2: Araç & Firma ─── */}
-      <Divider orientation="left" orientationMargin={0} style={{ marginTop: 16, marginBottom: 16 }}>
+      <Divider titlePlacement="left" styles={{ content: { marginLeft: 0 } }} style={{ marginTop: 16, marginBottom: 16 }}>
         <Flex align="center" gap={6}>
           <span style={{ fontSize: 13 }}>🚛</span>
           <Typography.Text strong style={{ fontSize: 13 }}>
@@ -613,7 +613,7 @@ const TripDrawer = ({
       </Form.Item>
 
       {/* ─── BÖLÜM 3: Zaman & Durum ─── */}
-      <Divider orientation="left" orientationMargin={0} style={{ marginTop: 16, marginBottom: 16 }}>
+      <Divider titlePlacement="left" styles={{ content: { marginLeft: 0 } }} style={{ marginTop: 16, marginBottom: 16 }}>
         <Flex align="center" gap={6}>
           <span style={{ fontSize: 13 }}>🕐</span>
           <Typography.Text strong style={{ fontSize: 13 }}>
@@ -683,7 +683,7 @@ const TripDrawer = ({
       )}
 
       {/* ─── BÖLÜM 4: Ek Bilgiler ─── */}
-      <Divider orientation="left" orientationMargin={0} style={{ marginTop: 16, marginBottom: 16 }}>
+      <Divider titlePlacement="left" styles={{ content: { marginLeft: 0 } }} style={{ marginTop: 16, marginBottom: 16 }}>
         <Flex align="center" gap={6}>
           <span style={{ fontSize: 13 }}>⚙️</span>
           <Typography.Text strong style={{ fontSize: 13 }}>
