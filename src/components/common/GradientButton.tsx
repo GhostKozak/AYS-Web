@@ -1,5 +1,5 @@
-import React from "react";
-import { Button, ButtonProps } from "antd";
+import { Button } from "antd";
+import type { ButtonProps } from "antd";
 
 export interface GradientButtonProps extends Omit<ButtonProps, "color"> {
   color?: "cyan" | "blue" | "green" | "red" | "gray";

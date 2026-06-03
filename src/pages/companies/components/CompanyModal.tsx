@@ -1,4 +1,4 @@
-import { Modal, Form, Input, Button, Row, Col } from "antd";
+import { Modal, Form, Input, Row, Col } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import { type CompanyType } from "../../../types";
 import { useTranslation } from "react-i18next";
